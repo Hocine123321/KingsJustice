@@ -1,0 +1,52 @@
+name: KingsJustice
+options:
+  bundleIdPrefix: com.hocine
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    GENERATE_INFOPLIST_FILE: YES
+targets:
+  KingsJustice:
+    type: application
+    platform: iOS
+    sources:
+      - KingsJustice
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.hocine.KingsJustice
+        INFOPLIST_KEY_CFBundleDisplayName: "The King's Justice"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIRequiresFullScreen: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UIStatusBarHidden: YES
+        INFOPLIST_KEY_UIViewControllerBasedStatusBarAppearance: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ENABLE_PREVIEWS: NO
+  KingsJusticeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - KingsJusticeTests
+    dependencies:
+      - target: KingsJustice
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.hocine.KingsJusticeTests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  KingsJustice:
+    build:
+      targets:
+        KingsJustice: all
+        KingsJusticeTests: [test]
+    test:
+      targets:
+        - KingsJusticeTests

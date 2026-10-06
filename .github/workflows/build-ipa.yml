@@ -1,0 +1,107 @@
+name: Build IPA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ipa:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select newest Xcode 26
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then echo "Using $X"; sudo xcode-select -s "$X"; fi
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Archive (unsigned)
+        shell: bash
+        run: |
+          mkdir -p build
+          set -o pipefail
+          xcodebuild archive \
+            -project KingsJustice.xcodeproj -scheme KingsJustice -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath build/KingsJustice.xcarchive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            2>&1 | tee build/archive.log | tail -n 40
+
+      - name: Surface build errors as annotations
+        if: failure()
+        shell: bash
+        run: |
+          {
+            echo "xcodebuild errors:"
+            grep -E 'error:' build/archive.log | sed 's#/Users/runner/work/KingsJustice/KingsJustice/##' | awk '!seen[$0]++' | head -40
+            echo "--- last 25 log lines:"
+            tail -n 25 build/archive.log | sed 's#/Users/runner/work/KingsJustice/KingsJustice/##'
+          } > build/errors.txt
+          MSG=$(python3 -c "print(open('build/errors.txt').read().replace('%','%25').replace('\r','%0D').replace('\n','%0A'))")
+          echo "::error title=Archive errors::$MSG"
+
+      - name: Package IPA
+        run: |
+          rm -rf Payload && mkdir Payload
+          cp -R build/KingsJustice.xcarchive/Products/Applications/KingsJustice.app Payload/
+          zip -qry build/KingsJustice-unsigned.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KingsJustice-unsigned-ipa
+          path: build/KingsJustice-unsigned.ipa
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: archive-log
+          path: build/archive.log
+
+  tests:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode 26
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate project
+        run: xcodegen generate
+      - name: Pick an iPhone simulator
+        id: sim
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          c = sorted((rt, x['udid']) for rt, ds in d.items() if 'iOS' in rt for x in ds if x['name'].startswith('iPhone'))
+          print(c[-1][1])")
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+      - name: Unit tests
+        shell: bash
+        run: |
+          mkdir -p build
+          set -o pipefail
+          xcodebuild test -project KingsJustice.xcodeproj -scheme KingsJustice \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -only-testing:KingsJusticeTests 2>&1 | tee build/unit.log | tail -n 60
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: unit-log
+          path: build/unit.log
