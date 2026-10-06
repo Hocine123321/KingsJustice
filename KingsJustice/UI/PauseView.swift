@@ -1,15 +1,15 @@
 import SwiftUI
 
-public struct PauseView<Engine: UIEngine>: View {
-    @ObservedObject public var engine: Engine
-    public let onSelectSettings: () -> Void
+struct PauseView<Engine: UIEngine>: View {
+    @ObservedObject var engine: Engine
+    let onSelectSettings: () -> Void
     
-    public init(engine: Engine, onSelectSettings: @escaping () -> Void) {
+    init(engine: Engine, onSelectSettings: @escaping () -> Void) {
         self.engine = engine
         self.onSelectSettings = onSelectSettings
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             UITheme.bgNearBlack.opacity(0.85)
                 .ignoresSafeArea()

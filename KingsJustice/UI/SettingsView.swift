@@ -1,12 +1,12 @@
 import SwiftUI
 
-public struct SettingsView<Engine: UIEngine>: View {
-    @ObservedObject public var engine: Engine
-    public let onBack: () -> Void
+struct SettingsView<Engine: UIEngine>: View {
+    @ObservedObject var engine: Engine
+    let onBack: () -> Void
     
     @State private var showWipeAlert: Bool = false
     
-    public init(engine: Engine, onBack: @escaping () -> Void) {
+    init(engine: Engine, onBack: @escaping () -> Void) {
         self.engine = engine
         self.onBack = onBack
     }
@@ -23,7 +23,7 @@ public struct SettingsView<Engine: UIEngine>: View {
         [("high", "High"), ("med", "Medium"), ("low", "Low (fastest)")]
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             BackgroundGradientView()
             

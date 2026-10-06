@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - FX & Visual Events
 
-public enum FXEvent: Equatable {
+enum FXEvent: Equatable {
     case spark(x: Double, y: Double, count: Int)
     case blood(x: Double, y: Double, count: Int, dir: Double, power: Double)
     case stain(x: Double, y: Double, radius: Double)
@@ -12,11 +12,11 @@ public enum FXEvent: Equatable {
 
 // MARK: - Pose Request
 
-public struct PoseRequest: Equatable {
-    public var values: [Double]
-    public var speed: Double
+struct PoseRequest: Equatable {
+    var values: [Double]
+    var speed: Double
 
-    public init(values: [Double], speed: Double = 9.0) {
+    init(values: [Double], speed: Double = 9.0) {
         self.values = values
         self.speed = speed
     }
@@ -24,62 +24,62 @@ public struct PoseRequest: Equatable {
 
 // MARK: - Pose State (mutable internal pose tracker)
 
-public struct PoseState: Equatable {
-    public var cur: [Double]
-    public var tgt: [Double]
-    public var spd: Double
+struct PoseState: Equatable {
+    var cur: [Double]
+    var tgt: [Double]
+    var spd: Double
 
-    public init(values: [Double], spd: Double = 9.0) {
+    init(values: [Double], spd: Double = 9.0) {
         self.cur = values
         self.tgt = values
         self.spd = spd
     }
 
-    public mutating func setTarget(_ target: [Double], speed: Double = 14.0) {
+    mutating func setTarget(_ target: [Double], speed: Double = 14.0) {
         self.tgt = target
         self.spd = speed
     }
 
-    public mutating func step(dt: Double) {
+    mutating func step(dt: Double) {
         let k = 1.0 - exp(-spd * dt)
         for i in 0..<min(cur.count, tgt.count) {
             cur[i] += (tgt[i] - cur[i]) * k
         }
     }
 
-    public var request: PoseRequest {
+    var request: PoseRequest {
         return PoseRequest(values: cur, speed: spd)
     }
 }
 
 // MARK: - Note Event
 
-public struct NoteEvent: Identifiable, Equatable {
-    public let id: Int
-    public var time: Double
-    public var kind: String
-    public var input: String
-    public var lane: Int
-    public var flag: String?
-    public var state: String
-    public var tellDone: Bool
-    public var group: Int
-    public var dmg: Double
-    public var tell: Double
-    public var pose: String?
-    public var feint: Bool
-    public var feintAt: Double
-    public var feintOk: Bool
-    public var feintBit: Int
-    public var armorHit: Int
-    public var orig: Int
-    public var counter: Bool
-    public var shifted: Bool
-    public var dep: Int?
-    public var _sh: Int
-    public var grabPresses: [String: Double]
+struct NoteEvent: Identifiable, Equatable {
+    let id: Int
+    var time: Double
+    var kind: String
+    var input: String
+    var lane: Int
+    var flag: String?
+    var state: String
+    var tellDone: Bool
+    var group: Int
+    var dmg: Double
+    var tell: Double
+    var pose: String?
+    var feint: Bool
+    var feintAt: Double
+    var feintOk: Bool
+    var feintBit: Int
+    var armorHit: Int
+    var orig: Int
+    var counter: Bool
+    var shifted: Bool
+    var dep: Int?
+    var _sh: Int
+    var grabPresses: [String: Double]
 
-    public init(
+    init(
         id: Int,
         time: Double,
         kind: String,
@@ -132,14 +132,14 @@ public struct NoteEvent: Identifiable, Equatable {
 
 // MARK: - Shop Item
 
-public struct ShopTonic: Identifiable, Equatable {
-    public var id: String
-    public var name: String
-    public var desc: String
-    public var price: Int
-    public var owned: Int
+struct ShopTonic: Identifiable, Equatable {
+    var id: String
+    var name: String
+    var desc: String
+    var price: Int
+    var owned: Int
 
-    public init(id: String, name: String, desc: String, price: Int, owned: Int) {
+    init(id: String, name: String, desc: String, price: Int, owned: Int) {
         self.id = id
         self.name = name
         self.desc = desc
@@ -150,13 +150,13 @@ public struct ShopTonic: Identifiable, Equatable {
 
 // MARK: - Difficulty Parameters
 
-public struct DifficultyParams {
-    public let win: Double
-    public let take: Double
-    public let tempo: Double
-    public let enemyDmg: Double
+struct DifficultyParams {
+    let win: Double
+    let take: Double
+    let tempo: Double
+    let enemyDmg: Double
 
-    public init(win: Double, take: Double, tempo: Double, enemyDmg: Double) {
+    init(win: Double, take: Double, tempo: Double, enemyDmg: Double) {
         self.win = win
         self.take = take
         self.tempo = tempo
@@ -166,12 +166,12 @@ public struct DifficultyParams {
 
 // MARK: - Timing Windows Calculation Result
 
-public struct TimingWindowsCalc {
-    public let perfect: Double
-    public let good: Double
-    public let miss: Double
+struct TimingWindowsCalc {
+    let perfect: Double
+    let good: Double
+    let miss: Double
 
-    public init(perfect: Double, good: Double, miss: Double) {
+    init(perfect: Double, good: Double, miss: Double) {
         self.perfect = perfect
         self.good = good
         self.miss = miss
@@ -180,14 +180,14 @@ public struct TimingWindowsCalc {
 
 // MARK: - Mulberry32 Seeded PRNG
 
-public final class MulberryRNG {
+final class MulberryRNG {
     private var state: UInt32
 
-    public init(seed: UInt32) {
+    init(seed: UInt32) {
         self.state = seed
     }
 
-    public func next() -> Double {
+    func next() -> Double {
         state = state &+ 0x6D2B79F5
         var t = state
         t = (t ^ (t >> 15)) &* (t | 1)
@@ -200,49 +200,49 @@ public final class MulberryRNG {
 
 // MARK: - Pose Dictionary Constant (PZ)
 
-public enum EnginePoses {
-    public static let kIdle: [Double]  = [420.0, 0.0, -40.0, 40.0, 80.0, 0.0, 0.0, 0.0]
-    public static let kGuard: [Double] = [445.0, 3.0, -30.0, 50.0, 85.0, 0.9, 0.0, 2.0]
-    public static let kParry: [Double] = [482.0, -2.0, -5.0, 5.0, 40.0, 0.2, 0.0, 0.0]
-    public static let kWind: [Double]  = [440.0, 8.0, 70.0, 95.0, 115.0, 0.0, 0.0, 3.0]
-    public static let kSlash: [Double] = [500.0, -4.0, -5.0, 5.0, 35.0, 0.0, 0.0, 0.0]
-    public static let kThrust: [Double] = [512.0, -6.0, 5.0, -5.0, 0.0, 0.0, 0.0, 2.0]
-    public static let kOver: [Double]  = [480.0, 6.0, 98.0, 122.0, 142.0, 0.0, 0.0, 6.0]
-    public static let kDuck: [Double]  = [430.0, 14.0, -20.0, 30.0, 80.0, 0.6, 0.0, 34.0]
-    public static let kJump: [Double]  = [440.0, -4.0, -60.0, 20.0, 60.0, 0.0, 0.0, -30.0]
-    public static let kDodge: [Double] = [380.0, -12.0, -40.0, 40.0, 80.0, 0.0, 0.0, 4.0]
-    public static let kHurt: [Double]  = [395.0, -18.0, -75.0, -55.0, -35.0, -0.4, 0.0, 8.0]
-    public static let kDead: [Double]  = [540.0, -40.0, -95.0, -80.0, -60.0, 0.0, 1.0, 0.0]
-    public static let kWin: [Double]   = [470.0, 2.0, 60.0, 40.0, 100.0, 0.0, 0.0, 0.0]
-    public static let kStun: [Double]  = [420.0, -14.0, -60.0, 30.0, 40.0, 0.0, 0.0, 10.0]
+enum EnginePoses {
+    static let kIdle: [Double]  = [420.0, 0.0, -40.0, 40.0, 80.0, 0.0, 0.0, 0.0]
+    static let kGuard: [Double] = [445.0, 3.0, -30.0, 50.0, 85.0, 0.9, 0.0, 2.0]
+    static let kParry: [Double] = [482.0, -2.0, -5.0, 5.0, 40.0, 0.2, 0.0, 0.0]
+    static let kWind: [Double]  = [440.0, 8.0, 70.0, 95.0, 115.0, 0.0, 0.0, 3.0]
+    static let kSlash: [Double] = [500.0, -4.0, -5.0, 5.0, 35.0, 0.0, 0.0, 0.0]
+    static let kThrust: [Double] = [512.0, -6.0, 5.0, -5.0, 0.0, 0.0, 0.0, 2.0]
+    static let kOver: [Double]  = [480.0, 6.0, 98.0, 122.0, 142.0, 0.0, 0.0, 6.0]
+    static let kDuck: [Double]  = [430.0, 14.0, -20.0, 30.0, 80.0, 0.6, 0.0, 34.0]
+    static let kJump: [Double]  = [440.0, -4.0, -60.0, 20.0, 60.0, 0.0, 0.0, -30.0]
+    static let kDodge: [Double] = [380.0, -12.0, -40.0, 40.0, 80.0, 0.0, 0.0, 4.0]
+    static let kHurt: [Double]  = [395.0, -18.0, -75.0, -55.0, -35.0, -0.4, 0.0, 8.0]
+    static let kDead: [Double]  = [540.0, -40.0, -95.0, -80.0, -60.0, 0.0, 1.0, 0.0]
+    static let kWin: [Double]   = [470.0, 2.0, 60.0, 40.0, 100.0, 0.0, 0.0, 0.0]
+    static let kStun: [Double]  = [420.0, -14.0, -60.0, 30.0, 40.0, 0.0, 0.0, 10.0]
 
-    public static let gIdle: [Double]    = [900.0, 0.0, -40.0, 45.0, 70.0, 0.0, 0.0, 0.0]
-    public static let gWind: [Double]    = [880.0, -8.0, 98.0, 122.0, 142.0, 0.0, 0.0, 6.0]
-    public static let gWindL: [Double]   = [885.0, 6.0, -20.0, 30.0, -25.0, 0.0, 0.0, 18.0]
-    public static let gWindH: [Double]   = [880.0, -10.0, 120.0, 130.0, 160.0, 0.0, 0.0, 2.0]
-    public static let gLunge: [Double]   = [820.0, 10.0, 10.0, -5.0, 20.0, 0.0, 0.0, 10.0]
-    public static let gThrow: [Double]   = [895.0, -6.0, 110.0, 60.0, 60.0, 0.0, 0.0, 2.0]
-    public static let gStrike: [Double]  = [760.0, 8.0, -20.0, -15.0, 10.0, 0.0, 0.0, -2.0]
-    public static let gStrikeL: [Double] = [775.0, 12.0, -8.0, -12.0, -10.0, 0.0, 0.0, 16.0]
-    public static let gSwing: [Double]   = [800.0, -4.0, 75.0, 100.0, 125.0, 0.0, 0.0, 3.0]
-    public static let gParried: [Double] = [930.0, 8.0, -10.0, 10.0, 50.0, 0.0, 0.0, 3.0]
-    public static let gBlockH: [Double]  = [880.0, -4.0, 60.0, 95.0, 115.0, 0.0, 0.0, 0.0]
-    public static let gBlockL: [Double]  = [885.0, 4.0, -30.0, -20.0, -55.0, 0.0, 0.0, 14.0]
-    public static let gHurt: [Double]    = [945.0, 10.0, -70.0, -60.0, -30.0, 0.0, 0.0, 6.0]
-    public static let gDead: [Double]    = [1010.0, 18.0, -95.0, -80.0, -60.0, 0.0, 1.0, 0.0]
-    public static let gStun: [Double]    = [920.0, -12.0, -60.0, 30.0, 40.0, 0.0, 0.0, 10.0]
-    public static let gWin: [Double]     = [640.0, 2.0, -20.0, 10.0, 30.0, 0.0, 0.0, 0.0]
+    static let gIdle: [Double]    = [900.0, 0.0, -40.0, 45.0, 70.0, 0.0, 0.0, 0.0]
+    static let gWind: [Double]    = [880.0, -8.0, 98.0, 122.0, 142.0, 0.0, 0.0, 6.0]
+    static let gWindL: [Double]   = [885.0, 6.0, -20.0, 30.0, -25.0, 0.0, 0.0, 18.0]
+    static let gWindH: [Double]   = [880.0, -10.0, 120.0, 130.0, 160.0, 0.0, 0.0, 2.0]
+    static let gLunge: [Double]   = [820.0, 10.0, 10.0, -5.0, 20.0, 0.0, 0.0, 10.0]
+    static let gThrow: [Double]   = [895.0, -6.0, 110.0, 60.0, 60.0, 0.0, 0.0, 2.0]
+    static let gStrike: [Double]  = [760.0, 8.0, -20.0, -15.0, 10.0, 0.0, 0.0, -2.0]
+    static let gStrikeL: [Double] = [775.0, 12.0, -8.0, -12.0, -10.0, 0.0, 0.0, 16.0]
+    static let gSwing: [Double]   = [800.0, -4.0, 75.0, 100.0, 125.0, 0.0, 0.0, 3.0]
+    static let gParried: [Double] = [930.0, 8.0, -10.0, 10.0, 50.0, 0.0, 0.0, 3.0]
+    static let gBlockH: [Double]  = [880.0, -4.0, 60.0, 95.0, 115.0, 0.0, 0.0, 0.0]
+    static let gBlockL: [Double]  = [885.0, 4.0, -30.0, -20.0, -55.0, 0.0, 0.0, 14.0]
+    static let gHurt: [Double]    = [945.0, 10.0, -70.0, -60.0, -30.0, 0.0, 0.0, 6.0]
+    static let gDead: [Double]    = [1010.0, 18.0, -95.0, -80.0, -60.0, 0.0, 1.0, 0.0]
+    static let gStun: [Double]    = [920.0, -12.0, -60.0, 30.0, 40.0, 0.0, 0.0, 10.0]
+    static let gWin: [Double]     = [640.0, 2.0, -20.0, 10.0, 30.0, 0.0, 0.0, 0.0]
 }
 
 // MARK: - Tips Reference Dictionary
 
-public struct TipInfo {
-    public let title: String
-    public let description: String
+struct TipInfo {
+    let title: String
+    let description: String
 }
 
-public enum EngineTips {
-    public static let tips: [String: TipInfo] = [
+enum EngineTips {
+    static let tips: [String: TipInfo] = [
         "slash": TipInfo(title: "Parry", description: "Press PARRY (Space / tap) just as the ring closes on the red circle."),
         "low": TipInfo(title: "Low sweep", description: "Duck it: press S or tap DUCK as the ring closes."),
         "high": TipInfo(title: "Overhead", description: "Jump over it: press W or tap JUMP."),

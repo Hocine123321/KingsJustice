@@ -1,10 +1,10 @@
 import SwiftUI
 
 /// Custom button style that preserves presses even if finger drifts slightly.
-public struct DriftButtonStyle: ButtonStyle {
-    public init() {}
+struct DriftButtonStyle: ButtonStyle {
+    init() {}
     
-    public func makeBody(configuration: Configuration) -> some View {
+    func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .brightness(configuration.isPressed ? 0.2 : 0.0)
@@ -13,20 +13,20 @@ public struct DriftButtonStyle: ButtonStyle {
 }
 
 /// Standard medieval pill button with tracked uppercase text.
-public struct PillButton: View {
-    public let title: String
-    public let action: () -> Void
-    public var isPrimary: Bool = false
-    public var isDisabled: Bool = false
+struct PillButton: View {
+    let title: String
+    let action: () -> Void
+    var isPrimary: Bool = false
+    var isDisabled: Bool = false
     
-    public init(title: String, isPrimary: Bool = false, isDisabled: Bool = false, action: @escaping () -> Void) {
+    init(title: String, isPrimary: Bool = false, isDisabled: Bool = false, action: @escaping () -> Void) {
         self.title = title
         self.isPrimary = isPrimary
         self.isDisabled = isDisabled
         self.action = action
     }
     
-    public var body: some View {
+    var body: some View {
         Button(action: {
             guard !isDisabled else { return }
             UIAudio.onFirstUserTap()
@@ -55,16 +55,16 @@ public struct PillButton: View {
 }
 
 /// Reusable card component for game modes, fighting styles, and roster champions.
-public struct MenuCard: View {
-    public let title: String
-    public let description: String
-    public var specialText: String? = nil
-    public var badgeText: String? = nil
-    public var isSelected: Bool = false
-    public var isLocked: Bool = false
-    public let action: () -> Void
+struct MenuCard: View {
+    let title: String
+    let description: String
+    var specialText: String? = nil
+    var badgeText: String? = nil
+    var isSelected: Bool = false
+    var isLocked: Bool = false
+    let action: () -> Void
     
-    public init(
+    init(
         title: String,
         description: String,
         specialText: String? = nil,
@@ -82,7 +82,7 @@ public struct MenuCard: View {
         self.action = action
     }
     
-    public var body: some View {
+    var body: some View {
         Button(action: {
             guard !isLocked else { return }
             UIAudio.onFirstUserTap()
@@ -139,22 +139,22 @@ public struct MenuCard: View {
 }
 
 /// Instant touch-down action pad for fight controls (multi-touch reliable, min 85pt hit target).
-public struct TouchPadButton: View {
-    public let title: String
-    public let colorHex: String
-    public let action: () -> Void
-    public var minHeight: CGFloat = 85.0
+struct TouchPadButton: View {
+    let title: String
+    let colorHex: String
+    let action: () -> Void
+    var minHeight: CGFloat = 85.0
     
     @State private var isPressed: Bool = false
     
-    public init(title: String, colorHex: String, minHeight: CGFloat = 85.0, action: @escaping () -> Void) {
+    init(title: String, colorHex: String, minHeight: CGFloat = 85.0, action: @escaping () -> Void) {
         self.title = title
         self.colorHex = colorHex
         self.minHeight = minHeight
         self.action = action
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16)
                 .fill(isPressed ? Color(hex: colorHex).opacity(0.6) : Color(hex: "#0e0a08").opacity(0.4))
@@ -189,18 +189,18 @@ public struct TouchPadButton: View {
 }
 
 /// Instant touch-down circular action button for Focus / Potion.
-public struct CircularActionButton: View {
-    public let title: String
-    public var badgeText: String? = nil
-    public var fillFraction: Double = 0.0
-    public var isReady: Bool = false
-    public let colorHex: String
-    public let size: CGFloat
-    public let action: () -> Void
+struct CircularActionButton: View {
+    let title: String
+    var badgeText: String? = nil
+    var fillFraction: Double = 0.0
+    var isReady: Bool = false
+    let colorHex: String
+    let size: CGFloat
+    let action: () -> Void
     
     @State private var isPressed: Bool = false
     
-    public init(
+    init(
         title: String,
         badgeText: String? = nil,
         fillFraction: Double = 0.0,
@@ -218,7 +218,7 @@ public struct CircularActionButton: View {
         self.action = action
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             Circle()
                 .fill(Color(hex: "#0e0a08").opacity(0.6))
@@ -273,16 +273,16 @@ public struct CircularActionButton: View {
 }
 
 /// Standard header title kick element.
-public struct HeaderKickView: View {
-    public let kick: String
-    public let title: String
+struct HeaderKickView: View {
+    let kick: String
+    let title: String
     
-    public init(kick: String, title: String) {
+    init(kick: String, title: String) {
         self.kick = kick
         self.title = title
     }
     
-    public var body: some View {
+    var body: some View {
         VStack(spacing: 4) {
             Text(kick.uppercased())
                 .font(UITheme.kickFont)

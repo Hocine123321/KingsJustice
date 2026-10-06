@@ -3,7 +3,7 @@ import Foundation
 extension GameEngine {
     // MARK: - Mode & Run Management
 
-    public func startRun(mode: String, enemyIndex: Int) {
+    func startRun(mode: String, enemyIndex: Int) {
         self.mode = mode
         self.training = (mode == "training")
 
@@ -24,7 +24,7 @@ extension GameEngine {
         }
     }
 
-    public func beginFight(index: Int, keepHp: Bool = false) {
+    func beginFight(index: Int, keepHp: Bool = false) {
         self.enemyIdx = index
         let E = enemyFor(mode: mode, idx: index)
         self.enemyDef = E
@@ -97,7 +97,7 @@ extension GameEngine {
         updateHud()
     }
 
-    public func enemyFor(mode: String, idx: Int) -> EnemyDef {
+    func enemyFor(mode: String, idx: Int) -> EnemyDef {
         if mode == "survival" {
             let base = GameData.roster[min(GameData.roster.count - 2, wave % 6)]
             let k = 1.0 + Double(wave / 6) * 0.25
@@ -163,7 +163,7 @@ extension GameEngine {
         return GameData.roster[clampedIdx]
     }
 
-    public func end2(win: Bool) {
+    func end2(win: Bool) {
         guard !over else { return }
         over = true
         won = win
@@ -236,22 +236,22 @@ extension GameEngine {
         updateHud()
     }
 
-    public func pause() {
+    func pause() {
         guard on && started && !over && !paused else { return }
         paused = true
     }
 
-    public func resume() {
+    func resume() {
         paused = false
     }
 
-    public func quitToMenu() {
+    func quitToMenu() {
         paused = false
         over = true
         on = false
     }
 
-    public func hashStr(_ s: String) -> UInt32 {
+    func hashStr(_ s: String) -> UInt32 {
         var h: UInt32 = 2166136261
         for scalar in s.unicodeScalars {
             h ^= scalar.value
@@ -260,7 +260,7 @@ extension GameEngine {
         return h
     }
 
-    public func todayDateString() -> String {
+    func todayDateString() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)

@@ -1,9 +1,9 @@
 import SwiftUI
 
-public final class MockRenderSource: RenderSource, ObservableObject {
-    @Published public var rsTime: Double = 0.0
-    @Published public var rsEnemy: EnemyDef? = GameData.roster.first
-    @Published public var rsStyle: StyleDef = GameData.styles.first ?? StyleDef(
+final class MockRenderSource: RenderSource, ObservableObject {
+    @Published var rsTime: Double = 0.0
+    @Published var rsEnemy: EnemyDef? = GameData.roster.first
+    @Published var rsStyle: StyleDef = GameData.styles.first ?? StyleDef(
         id: "knight",
         name: "Knight",
         desc: "",
@@ -15,42 +15,42 @@ public final class MockRenderSource: RenderSource, ObservableObject {
         special: SpecialDef(id: "s", name: "S", desc: "", charge: "", need: 100),
         look: LookDef(colors: ["#0a0807", "#5d6877", "#a7b4c2"], trim: "#d9b45a", eye: "#ff3a3a", helm: "greathelm", cape: "cloak", weapon: "longsword", size: 1.0, shield: true, glow: nil)
     )
-    @Published public var rsPlayerPose: [Double] = [450.0, 0.0, -40.0, 40.0, 80.0, 0.0, 0.0, 0.0]
-    @Published public var rsEnemyPose: [Double] = [900.0, 0.0, -40.0, 45.0, 70.0, 0.0, 0.0, 0.0]
-    @Published public var rsEvents: [RenderNote] = []
-    @Published public var rsShake: Double = 0.0
-    @Published public var rsHurt: Double = 0.0
-    @Published public var rsRoundIsDefend: Bool = true
-    @Published public var rsArenaKey: String = "throne"
-    @Published public var rsHitStop: Bool = false
-    @Published public var rsWound: Double = 0.0
-    @Published public var rsFlash: Double = 0.0
-    @Published public var rsFocusActive: Bool = false
-    @Published public var rsPerfectGlow: Double = 0.0
+    @Published var rsPlayerPose: [Double] = [450.0, 0.0, -40.0, 40.0, 80.0, 0.0, 0.0, 0.0]
+    @Published var rsEnemyPose: [Double] = [900.0, 0.0, -40.0, 45.0, 70.0, 0.0, 0.0, 0.0]
+    @Published var rsEvents: [RenderNote] = []
+    @Published var rsShake: Double = 0.0
+    @Published var rsHurt: Double = 0.0
+    @Published var rsRoundIsDefend: Bool = true
+    @Published var rsArenaKey: String = "throne"
+    @Published var rsHitStop: Bool = false
+    @Published var rsWound: Double = 0.0
+    @Published var rsFlash: Double = 0.0
+    @Published var rsFocusActive: Bool = false
+    @Published var rsPerfectGlow: Double = 0.0
 
     private var pendingFX: [RenderFX] = []
 
-    public init() {}
+    init() {}
 
-    public func rsDrainFX() -> [RenderFX] {
+    func rsDrainFX() -> [RenderFX] {
         let list = pendingFX
         pendingFX.removeAll()
         return list
     }
 
-    public func addFX(_ fx: RenderFX) {
+    func addFX(_ fx: RenderFX) {
         pendingFX.append(fx)
     }
 }
 
-public struct RenderPreviewView: View {
+struct RenderPreviewView: View {
     @StateObject private var mockSource = MockRenderSource()
     @State private var selectedArena: String = "throne"
     @State private var selectedEnemyIdx: Int = 0
 
-    public init() {}
+    init() {}
 
-    public var body: some View {
+    var body: some View {
         VStack(spacing: 0) {
             GameSceneView(source: mockSource)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

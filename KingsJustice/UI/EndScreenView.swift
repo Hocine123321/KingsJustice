@@ -1,13 +1,13 @@
 import SwiftUI
 
-public struct EndScreenView<Engine: UIEngine>: View {
-    @ObservedObject public var engine: Engine
-    public let onNext: () -> Void
-    public let onRetry: () -> Void
-    public let onShop: () -> Void
-    public let onMainMenu: () -> Void
+struct EndScreenView<Engine: UIEngine>: View {
+    @ObservedObject var engine: Engine
+    let onNext: () -> Void
+    let onRetry: () -> Void
+    let onShop: () -> Void
+    let onMainMenu: () -> Void
     
-    public init(
+    init(
         engine: Engine,
         onNext: @escaping () -> Void,
         onRetry: @escaping () -> Void,
@@ -40,7 +40,7 @@ public struct EndScreenView<Engine: UIEngine>: View {
         }
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             BackgroundGradientView()
             

@@ -41,16 +41,16 @@ final class FrameClock: ObservableObject {
     }
 }
 
-public struct RootView: View {
+struct RootView: View {
     @StateObject private var engine: GameEngine = GameEngine()
     @StateObject private var clock: FrameClock = FrameClock()
     @State private var screen: AppScreen = .title
     @State private var settingsFromPause: Bool = false
     @State private var pendingMode: String = "duel"
 
-    public init() {}
+    init() {}
 
-    public var body: some View {
+    var body: some View {
         ZStack {
             UITheme.bgNearBlack.ignoresSafeArea()
             content

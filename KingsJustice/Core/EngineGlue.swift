@@ -4,13 +4,13 @@ import Combine
 // MARK: - UIEngine conformance (names the SwiftUI layer expects)
 
 extension GameEngine: UIEngine {
-    public var focus: Double { return stamina }
-    public var judgeColorHex: String { return judgeColor }
-    public var roundIsDefend: Bool { return roundType == .defend }
-    public var tipText: String? { return tutorialTip }
-    public var potionCount: Int { return potion }
+    var focus: Double { return stamina }
+    var judgeColorHex: String { return judgeColor }
+    var roundIsDefend: Bool { return roundType == .defend }
+    var tipText: String? { return tutorialTip }
+    var potionCount: Int { return potion }
 
-    public func tonicCatalog() -> [TonicInfo] {
+    func tonicCatalog() -> [TonicInfo] {
         var out: [TonicInfo] = []
         for t in tonics {
             out.append(TonicInfo(id: t.id, name: t.name, desc: t.desc, price: t.price, owned: t.owned))
@@ -18,15 +18,15 @@ extension GameEngine: UIEngine {
         return out
     }
 
-    public func buy(_ id: String) -> Bool {
+    func buy(_ id: String) -> Bool {
         return buy(id: id)
     }
 
-    public func canBuy(_ id: String) -> Bool {
+    func canBuy(_ id: String) -> Bool {
         return canBuy(id: id)
     }
 
-    public func unlockedStyles() -> [String] {
+    func unlockedStyles() -> [String] {
         var result: [String] = ["knight"]
         if save.unlockedDuelist { result.append("duelist") }
         if save.unlockedBerserker { result.append("berserker") }
@@ -37,25 +37,25 @@ extension GameEngine: UIEngine {
 // MARK: - RenderSource conformance (what the Canvas scene reads each frame)
 
 extension GameEngine: RenderSource {
-    public var rsTime: Double { return t }
-    public var rsEnemy: EnemyDef? { return enemyDef }
-    public var rsStyle: StyleDef { return styleDef }
-    public var rsPlayerPose: [Double] { return playerPoseState.cur }
-    public var rsEnemyPose: [Double] { return enemyPoseState.cur }
-    public var rsShake: Double { return shake }
-    public var rsHurt: Double { return hurtLevel }
-    public var rsRoundIsDefend: Bool { return roundType == .defend }
-    public var rsArenaKey: String { return enemyDef?.arena ?? "castle" }
-    public var rsHitStop: Bool { return hitStop > 0 }
-    public var rsWound: Double {
+    var rsTime: Double { return t }
+    var rsEnemy: EnemyDef? { return enemyDef }
+    var rsStyle: StyleDef { return styleDef }
+    var rsPlayerPose: [Double] { return playerPoseState.cur }
+    var rsEnemyPose: [Double] { return enemyPoseState.cur }
+    var rsShake: Double { return shake }
+    var rsHurt: Double { return hurtLevel }
+    var rsRoundIsDefend: Bool { return roundType == .defend }
+    var rsArenaKey: String { return enemyDef?.arena ?? "castle" }
+    var rsHitStop: Bool { return hitStop > 0 }
+    var rsWound: Double {
         if kmax <= 0 { return 0 }
         return max(0.0, min(1.0, 1.0 - khp / kmax)) * 0.8
     }
-    public var rsFlash: Double { return flashOpacity }
-    public var rsFocusActive: Bool { return focusUntil > t }
-    public var rsPerfectGlow: Double { return 0.0 }
+    var rsFlash: Double { return flashOpacity }
+    var rsFocusActive: Bool { return focusUntil > t }
+    var rsPerfectGlow: Double { return 0.0 }
 
-    public var rsEvents: [RenderNote] {
+    var rsEvents: [RenderNote] {
         var out: [RenderNote] = []
         for e in events {
             if e.state != "live" { continue }
@@ -83,7 +83,7 @@ extension GameEngine: RenderSource {
         return out
     }
 
-    public func rsDrainFX() -> [RenderFX] {
+    func rsDrainFX() -> [RenderFX] {
         var out: [RenderFX] = []
         for fx in fxQueue {
             switch fx {

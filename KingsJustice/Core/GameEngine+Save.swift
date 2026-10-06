@@ -3,7 +3,7 @@ import Foundation
 extension GameEngine {
     // MARK: - Save & Settings Persistence
 
-    public func saveAll() {
+    func saveAll() {
         let encoder = JSONEncoder()
         if let set = try? encoder.encode(settings) {
             UserDefaults.standard.set(set, forKey: "kj_set")
@@ -13,7 +13,7 @@ extension GameEngine {
         }
     }
 
-    public func loadAll() {
+    func loadAll() {
         let decoder = JSONDecoder()
         if let setData = UserDefaults.standard.data(forKey: "kj_set"),
            let loadedSet = try? decoder.decode(GameSettings.self, from: setData) {
@@ -27,7 +27,7 @@ extension GameEngine {
 
     // MARK: - Shop API
 
-    public var tonics: [ShopTonic] {
+    var tonics: [ShopTonic] {
         return [
             ShopTonic(id: "heal", name: "Healing Draught", desc: "Press H (or tap flask) mid-fight: restore 35% health. Once per fight.", price: 60, owned: save.invHeal),
             ShopTonic(id: "focus", name: "Battle Focus", desc: "Start the next fight with your Focus meter half full.", price: 50, owned: save.invFocus),
@@ -36,13 +36,13 @@ extension GameEngine {
         ]
     }
 
-    public func canBuy(id: String) -> Bool {
+    func canBuy(id: String) -> Bool {
         guard let tonic = tonics.first(where: { $0.id == id }) else { return false }
         return save.gold >= tonic.price
     }
 
     @discardableResult
-    public func buy(id: String) -> Bool {
+    func buy(id: String) -> Bool {
         guard canBuy(id: id) else { return false }
         switch id {
         case "heal":
@@ -65,7 +65,7 @@ extension GameEngine {
         return true
     }
 
-    public func prepareTonicsForFight() {
+    func prepareTonicsForFight() {
         if save.invFocus > 0 {
             save.invFocus -= 1
             stamina = 50.0
@@ -85,7 +85,7 @@ extension GameEngine {
         saveAll()
     }
 
-    public func drinkPotion() {
+    func drinkPotion() {
         guard on && started && !over && !paused && potion > 0 else { return }
         potion = 0
         hp = min(maxhp, hp + maxhp * 0.35)

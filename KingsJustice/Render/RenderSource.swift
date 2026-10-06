@@ -1,22 +1,22 @@
 import Foundation
 
-public struct RenderNote: Identifiable, Sendable {
-    public let id: String
-    public let time: Double
-    public let kind: String
-    public let input: String
-    public let lane: Int
-    public let colorHex: String
-    public let ringStyle: String
-    public let tellDone: Double
-    public let state: String
-    public let flag: String?
-    public let origLane: Int?
-    public let shifted: Bool
-    public let feint: Bool
-    public let feintOk: Bool
+struct RenderNote: Identifiable, Sendable {
+    let id: String
+    let time: Double
+    let kind: String
+    let input: String
+    let lane: Int
+    let colorHex: String
+    let ringStyle: String
+    let tellDone: Double
+    let state: String
+    let flag: String?
+    let origLane: Int?
+    let shifted: Bool
+    let feint: Bool
+    let feintOk: Bool
 
-    public init(
+    init(
         id: String = UUID().uuidString,
         time: Double,
         kind: String,
@@ -49,14 +49,14 @@ public struct RenderNote: Identifiable, Sendable {
     }
 }
 
-public enum RenderFX: Sendable {
+enum RenderFX: Sendable {
     case spark(x: Double, y: Double, n: Int)
     case blood(x: Double, y: Double, n: Int, dir: Double, power: Double)
     case stain(x: Double, y: Double, r: Double)
     case flashHurt
 }
 
-public protocol RenderSource: AnyObject {
+protocol RenderSource: AnyObject {
     var rsTime: Double { get }
     var rsEnemy: EnemyDef? { get }
     var rsStyle: StyleDef { get }

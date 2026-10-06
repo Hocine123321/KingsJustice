@@ -2,6 +2,7 @@ import XCTest
 import SwiftUI
 @testable import KingsJustice
 
+@MainActor
 final class UITests: XCTestCase {
     func testEngineConformsToUIEngine() {
         let e = GameEngine()

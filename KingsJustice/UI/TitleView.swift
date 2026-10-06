@@ -1,13 +1,13 @@
 import SwiftUI
 
-public struct TitleView: View {
-    public let onBegin: () -> Void
+struct TitleView: View {
+    let onBegin: () -> Void
     
-    public init(onBegin: @escaping () -> Void) {
+    init(onBegin: @escaping () -> Void) {
         self.onBegin = onBegin
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             BackgroundGradientView()
             

@@ -1,8 +1,8 @@
 import Foundation
 import AVFoundation
 
-public enum Synth {
-    public static func scaleOffsets(for scaleName: String) -> [Int] {
+enum Synth {
+    static func scaleOffsets(for scaleName: String) -> [Int] {
         switch scaleName.lowercased() {
         case "minor", "aeolian":
             return [0, 2, 3, 5, 7, 8, 10]
@@ -21,11 +21,11 @@ public enum Synth {
         }
     }
 
-    public static func midiToFreq(_ midi: Int) -> Double {
+    static func midiToFreq(_ midi: Int) -> Double {
         return 440.0 * pow(2.0, Double(midi - 69) / 12.0)
     }
 
-    public static func buffer(for kind: SfxKind, variant: Int = 0, sampleRate: Double = 44100.0) -> [Float] {
+    static func buffer(for kind: SfxKind, variant: Int = 0, sampleRate: Double = 44100.0) -> [Float] {
         let sr = max(8000.0, sampleRate)
         var samples: [Float] = []
 
@@ -72,7 +72,7 @@ public enum Synth {
         return samples
     }
 
-    public static func drumBuffer(for kind: String, variant: Int = 0, sampleRate: Double = 44100.0) -> [Float] {
+    static func drumBuffer(for kind: String, variant: Int = 0, sampleRate: Double = 44100.0) -> [Float] {
         let sr = max(8000.0, sampleRate)
         var samples: [Float] = []
 
@@ -93,7 +93,7 @@ public enum Synth {
         return samples
     }
 
-    public static func bassBuffer(midiNote: Int, duration: Double = 0.4, sampleRate: Double = 44100.0) -> [Float] {
+    static func bassBuffer(midiNote: Int, duration: Double = 0.4, sampleRate: Double = 44100.0) -> [Float] {
         let sr = max(8000.0, sampleRate)
         let totalFrames = Int(sr * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
@@ -122,7 +122,7 @@ public enum Synth {
         return samples
     }
 
-    public static func droneBuffer(root: Int, scaleName: String, duration: Double = 3.0, sampleRate: Double = 44100.0) -> [Float] {
+    static func droneBuffer(root: Int, scaleName: String, duration: Double = 3.0, sampleRate: Double = 44100.0) -> [Float] {
         let sr = max(8000.0, sampleRate)
         let totalFrames = Int(sr * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
@@ -165,7 +165,7 @@ public enum Synth {
         return samples
     }
 
-    public static func pcmBuffer(from samples: [Float], sampleRate: Double = 44100.0) -> AVAudioPCMBuffer? {
+    static func pcmBuffer(from samples: [Float], sampleRate: Double = 44100.0) -> AVAudioPCMBuffer? {
         guard !samples.isEmpty else { return nil }
         guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1),
               let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count)) else {
@@ -181,7 +181,7 @@ public enum Synth {
         return buffer
     }
 
-    public static func normalize(_ samples: inout [Float], targetPeak: Float = 0.95) {
+    static func normalize(_ samples: inout [Float], targetPeak: Float = 0.95) {
         var maxVal: Float = 0.0
         for i in 0..<samples.count {
             let s = samples[i]

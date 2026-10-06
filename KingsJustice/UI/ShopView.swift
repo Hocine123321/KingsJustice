@@ -1,15 +1,15 @@
 import SwiftUI
 
-public struct ShopView<Engine: UIEngine>: View {
-    @ObservedObject public var engine: Engine
-    public let onBack: () -> Void
+struct ShopView<Engine: UIEngine>: View {
+    @ObservedObject var engine: Engine
+    let onBack: () -> Void
     
-    public init(engine: Engine, onBack: @escaping () -> Void) {
+    init(engine: Engine, onBack: @escaping () -> Void) {
         self.engine = engine
         self.onBack = onBack
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             BackgroundGradientView()
             

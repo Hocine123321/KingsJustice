@@ -3,7 +3,7 @@ import Foundation
 extension GameEngine {
     // MARK: - Main Input Function
 
-    public func input(kind: String, lane: Int) {
+    func input(kind: String, lane: Int) {
         guard on && started && !over && !paused else { return }
         let W = currentWindows()
         let now = t + settings.offset / 1000.0
@@ -106,7 +106,7 @@ extension GameEngine {
 
     // MARK: - Defend Resolution
 
-    public func resolveDefend(index: Int, grade: String) {
+    func resolveDefend(index: Int, grade: String) {
         events[index].state = "done"
         let perfect = (grade == "perfect")
         let late = (grade == "late")
@@ -188,7 +188,7 @@ extension GameEngine {
         updateHud()
     }
 
-    public func hitPlayer(_ e: inout NoteEvent, k: Double = 1.0) {
+    func hitPlayer(_ e: inout NoteEvent, k: Double = 1.0) {
         pStreak = 0
         if e.state == "live" {
             e.state = "miss"
@@ -229,13 +229,13 @@ extension GameEngine {
         chip(dmg)
     }
 
-    public func missDefend(_ e: inout NoteEvent) {
+    func missDefend(_ e: inout NoteEvent) {
         hitPlayer(&e, k: 1.0)
     }
 
     // MARK: - Attack Note Resolution
 
-    public func resolveNote(index: Int, grade: String) {
+    func resolveNote(index: Int, grade: String) {
         let perfect = (grade == "perfect")
         let good = (grade == "good")
 
@@ -369,7 +369,7 @@ extension GameEngine {
         updateHud()
     }
 
-    public func missNote(_ n: inout NoteEvent) {
+    func missNote(_ n: inout NoteEvent) {
         n.state = "miss"
         combo = 0
         nM += 1
@@ -379,7 +379,7 @@ extension GameEngine {
 
     // MARK: - Combat Helpers
 
-    public func chip(_ n: Double) {
+    func chip(_ n: Double) {
         if invulnUntil > t { return }
         let D = difficultyParams(settings.difficulty)
         let toughMul = tough ? 0.8 : 1.0
@@ -406,7 +406,7 @@ extension GameEngine {
         updateHud()
     }
 
-    public func useFocus() {
+    func useFocus() {
         guard on && started && !over && !paused else { return }
         guard stamina >= 100.0 || focusUntil <= t else { return }
         guard stamina >= 100.0 else { return }
@@ -417,7 +417,7 @@ extension GameEngine {
         onSfx?(.focus, 1.0)
     }
 
-    public func gainFocus(_ n: Double) {
+    func gainFocus(_ n: Double) {
         if focusUntil > t { return }
         stamina = min(100.0, stamina + n)
         if stamina >= 100.0 && fReadyBit == 0 {
@@ -426,7 +426,7 @@ extension GameEngine {
         }
     }
 
-    public func addScore2(_ p: Int) {
+    func addScore2(_ p: Int) {
         combo += 1
         gainFocus(p >= 300 ? 5.0 : 3.0)
         maxCombo = max(maxCombo, combo)
@@ -448,7 +448,7 @@ extension GameEngine {
         }
     }
 
-    public func damageEnemy(_ d: Double) {
+    func damageEnemy(_ d: Double) {
         if training { return }
         khp -= d
         if khp <= 0 {
@@ -456,28 +456,28 @@ extension GameEngine {
         }
     }
 
-    public func say(_ txt: String, col: String) {
+    func say(_ txt: String, col: String) {
         judgeText = txt
         judgeColor = col
         judgeStamp += 1.0
     }
 
-    public func taunt(_ line: String) {
+    func taunt(_ line: String) {
         tauntText = "“\(line)”"
     }
 
-    public func shake2(_ n: Double) {
+    func shake2(_ n: Double) {
         shake = max(shake, n * settings.shake)
     }
 
-    public func flashScreen(color: String, opacity: Double) {
+    func flashScreen(color: String, opacity: Double) {
         guard settings.flash else { return }
         flashColor = color
         flashOpacity = opacity
         onSpawnFX?(.flashScreen(color: color, opacity: opacity))
     }
 
-    public func updateHud() {
+    func updateHud() {
         gold = save.gold
     }
 }

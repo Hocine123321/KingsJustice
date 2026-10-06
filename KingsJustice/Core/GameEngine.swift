@@ -1,115 +1,115 @@
 import Foundation
 import Combine
 
-public final class GameEngine: ObservableObject {
+final class GameEngine: ObservableObject {
     // MARK: - Published Properties (HUD / UI)
 
-    @Published public var hp: Double = 100.0
-    @Published public var maxhp: Double = 100.0
-    @Published public var khp: Double = 100.0
-    @Published public var kmax: Double = 100.0
-    @Published public var stamina: Double = 0.0 // focus / stamina 0..100
-    @Published public var special: Double = 0.0
-    @Published public var score: Int = 0
-    @Published public var combo: Int = 0
-    @Published public var maxCombo: Int = 0
-    @Published public var judgeText: String = ""
-    @Published public var judgeColor: String = "#ffffff"
-    @Published public var judgeStamp: Double = 0.0
-    public var hurtLevel: Double = 0.0
-    public var fxQueue: [FXEvent] = []
-    @Published public var roundType: RoundType = .defend
-    @Published public var paused: Bool = false
-    @Published public var over: Bool = false
-    @Published public var won: Bool = false
-    @Published public var phaseBanner: String? = nil
-    @Published public var tutorialTip: String? = nil
-    @Published public var gold: Int = 0
-    @Published public var potion: Int = 0
-    @Published public var round: Int = 0
-    @Published public var wave: Int = 0
-    @Published public var mode: String = "duel"
-    @Published public var enemyName: String = ""
-    @Published public var enemyTitle: String = ""
-    @Published public var playerName: String = "KNIGHT"
-    @Published public var promptText: String = ""
-    @Published public var tauntText: String = ""
-    @Published public var started: Bool = false
-    @Published public var on: Bool = false
+    @Published var hp: Double = 100.0
+    @Published var maxhp: Double = 100.0
+    @Published var khp: Double = 100.0
+    @Published var kmax: Double = 100.0
+    @Published var stamina: Double = 0.0 // focus / stamina 0..100
+    @Published var special: Double = 0.0
+    @Published var score: Int = 0
+    @Published var combo: Int = 0
+    @Published var maxCombo: Int = 0
+    @Published var judgeText: String = ""
+    @Published var judgeColor: String = "#ffffff"
+    @Published var judgeStamp: Double = 0.0
+    var hurtLevel: Double = 0.0
+    var fxQueue: [FXEvent] = []
+    @Published var roundType: RoundType = .defend
+    @Published var paused: Bool = false
+    @Published var over: Bool = false
+    @Published var won: Bool = false
+    @Published var phaseBanner: String? = nil
+    @Published var tutorialTip: String? = nil
+    @Published var gold: Int = 0
+    @Published var potion: Int = 0
+    @Published var round: Int = 0
+    @Published var wave: Int = 0
+    @Published var mode: String = "duel"
+    @Published var enemyName: String = ""
+    @Published var enemyTitle: String = ""
+    @Published var playerName: String = "KNIGHT"
+    @Published var promptText: String = ""
+    @Published var tauntText: String = ""
+    @Published var started: Bool = false
+    @Published var on: Bool = false
 
     // MARK: - Settings & Save
 
-    @Published public var settings: GameSettings = GameSettings()
-    @Published public var save: SaveData = SaveData()
+    @Published var settings: GameSettings = GameSettings()
+    @Published var save: SaveData = SaveData()
 
     // MARK: - Per-frame Render Data (Plain Properties)
 
-    public var events: [NoteEvent] = []
-    public var playerPoseState: PoseState = PoseState(values: EnginePoses.kIdle)
-    public var enemyPoseState: PoseState = PoseState(values: EnginePoses.gIdle)
-    public var shake: Double = 0.0
-    public var hitStop: Double = 0.0
-    public var flashColor: String? = nil
-    public var flashOpacity: Double = 0.0
+    var events: [NoteEvent] = []
+    var playerPoseState: PoseState = PoseState(values: EnginePoses.kIdle)
+    var enemyPoseState: PoseState = PoseState(values: EnginePoses.gIdle)
+    var shake: Double = 0.0
+    var hitStop: Double = 0.0
+    var flashColor: String? = nil
+    var flashOpacity: Double = 0.0
 
-    public var playerPoseRequest: PoseRequest {
+    var playerPoseRequest: PoseRequest {
         return playerPoseState.request
     }
 
-    public var enemyPoseRequest: PoseRequest {
+    var enemyPoseRequest: PoseRequest {
         return enemyPoseState.request
     }
 
     // MARK: - Active Defs
 
-    public var enemyDef: EnemyDef?
-    public var styleDef: StyleDef = GameData.styles[0]
+    var enemyDef: EnemyDef?
+    var styleDef: StyleDef = GameData.styles[0]
 
     // MARK: - Callbacks / Side Effects
 
-    public var onSfx: ((SfxKind, Double) -> Void)?
-    public var onHaptic: ((String) -> Void)?
-    public var onSpawnFX: ((FXEvent) -> Void)?
+    var onSfx: ((SfxKind, Double) -> Void)?
+    var onHaptic: ((String) -> Void)?
+    var onSpawnFX: ((FXEvent) -> Void)?
 
     // MARK: - Internal Engine State
 
-    public var t: Double = 0.0
-    public var bpm: Double = 84.0
-    public var roundEnd: Double = 0.0
-    public var roundStart: Double = 0.0
-    public var enemyIdx: Int = 0
-    public var phaseIdx: Int = 0
-    public var rng: MulberryRNG = MulberryRNG(seed: 1)
+    var t: Double = 0.0
+    var bpm: Double = 84.0
+    var roundEnd: Double = 0.0
+    var roundStart: Double = 0.0
+    var enemyIdx: Int = 0
+    var phaseIdx: Int = 0
+    var rng: MulberryRNG = MulberryRNG(seed: 1)
 
     // Combat flags
-    public var rageUntil: Double = 0.0
-    public var riposte: Bool = false
-    public var bastion: Bool = false
-    public var windUsed: Bool = false
-    public var guardBreak: Double = 0.0
-    public var staggerUntil: Double = 0.0
-    public var stunUntil: Double = 0.0
-    public var focusUntil: Double = 0.0
-    public var invulnUntil: Double = 0.0
-    public var counterWin: Double = 0.0
-    public var pStreak: Int = 0
-    public var nP: Int = 0
-    public var nG: Int = 0
-    public var nM: Int = 0
-    public var dmgScale: Double = 1.0
-    public var tough: Bool = false
-    public var edge: Bool = false
-    public var pendTough: Bool = false
-    public var pendEdge: Bool = false
-    public var startFocus: Double = 0.0
-    public var training: Bool = false
-    public var rushList: [Int] = []
-    public var startTimer: Double = 0.0
-    public var fReadyBit: Int = 0
+    var rageUntil: Double = 0.0
+    var riposte: Bool = false
+    var bastion: Bool = false
+    var windUsed: Bool = false
+    var guardBreak: Double = 0.0
+    var staggerUntil: Double = 0.0
+    var stunUntil: Double = 0.0
+    var focusUntil: Double = 0.0
+    var invulnUntil: Double = 0.0
+    var counterWin: Double = 0.0
+    var pStreak: Int = 0
+    var nP: Int = 0
+    var nG: Int = 0
+    var nM: Int = 0
+    var dmgScale: Double = 1.0
+    var tough: Bool = false
+    var edge: Bool = false
+    var pendTough: Bool = false
+    var pendEdge: Bool = false
+    var startFocus: Double = 0.0
+    var training: Bool = false
+    var rushList: [Int] = []
+    var startTimer: Double = 0.0
+    var fReadyBit: Int = 0
 
     // MARK: - Initialization
 
-    public init() {
+    init() {
         loadAll()
         let style = GameData.styles.first(where: { $0.id == settings.style }) ?? GameData.styles[0]
         self.styleDef = style
@@ -123,7 +123,7 @@ public final class GameEngine: ObservableObject {
 
     // MARK: - Main Tick Loop (External Clock Drive)
 
-    public func tick(dt: Double) {
+    func tick(dt: Double) {
         guard on else { return }
 
         // Start countdown before fight begins
@@ -255,7 +255,7 @@ public final class GameEngine: ObservableObject {
         }
     }
 
-    public func getEnemyPoseVector(_ key: String) -> [Double] {
+    func getEnemyPoseVector(_ key: String) -> [Double] {
         switch key {
         case "gWind": return EnginePoses.gWind
         case "gWindL": return EnginePoses.gWindL
@@ -276,7 +276,7 @@ public final class GameEngine: ObservableObject {
         }
     }
 
-    public func getPlayerPoseVector(_ key: String) -> [Double] {
+    func getPlayerPoseVector(_ key: String) -> [Double] {
         switch key {
         case "kGuard": return EnginePoses.kGuard
         case "kParry": return EnginePoses.kParry

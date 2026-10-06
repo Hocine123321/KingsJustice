@@ -3,8 +3,8 @@ import Foundation
 import UIKit
 #endif
 
-public enum Haptics {
-    public static func play(_ name: String) {
+enum Haptics {
+    static func play(_ name: String) {
         #if canImport(UIKit)
         DispatchQueue.main.async {
             switch name.lowercased() {

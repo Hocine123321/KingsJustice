@@ -1,11 +1,11 @@
 import SwiftUI
 
-public struct CampaignSelectView<Engine: UIEngine>: View {
-    @ObservedObject public var engine: Engine
-    public let onSelectOpponent: (Int) -> Void
-    public let onBack: () -> Void
+struct CampaignSelectView<Engine: UIEngine>: View {
+    @ObservedObject var engine: Engine
+    let onSelectOpponent: (Int) -> Void
+    let onBack: () -> Void
     
-    public init(engine: Engine, onSelectOpponent: @escaping (Int) -> Void, onBack: @escaping () -> Void) {
+    init(engine: Engine, onSelectOpponent: @escaping (Int) -> Void, onBack: @escaping () -> Void) {
         self.engine = engine
         self.onSelectOpponent = onSelectOpponent
         self.onBack = onBack
@@ -15,7 +15,7 @@ public struct CampaignSelectView<Engine: UIEngine>: View {
         min(GameData.roster.count - 1, engine.save.beat.count)
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             BackgroundGradientView()
             

@@ -3,7 +3,7 @@ import Foundation
 extension GameEngine {
     // MARK: - Timing Windows
 
-    public func currentWindows() -> TimingWindowsCalc {
+    func currentWindows() -> TimingWindowsCalc {
         let w = styleDef.windows
         let D = difficultyParams(settings.difficulty)
         let k = 0.8
@@ -15,7 +15,7 @@ extension GameEngine {
         )
     }
 
-    public func difficultyParams(_ diff: String) -> DifficultyParams {
+    func difficultyParams(_ diff: String) -> DifficultyParams {
         switch diff.lowercased() {
         case "easy":
             return DifficultyParams(win: 1.3, take: 0.55, tempo: 0.88, enemyDmg: 0.65)
@@ -28,13 +28,13 @@ extension GameEngine {
         }
     }
 
-    public func lenFactor() -> Double {
+    func lenFactor() -> Double {
         let idx = (mode == "duel" || mode == "rush") ? enemyIdx : min(5, wave)
         let table = [1.0, 0.9, 0.8, 0.7, 0.6, 0.52, 0.42]
         return table[min(6, idx)]
     }
 
-    public func earlyEase() -> Double {
+    func earlyEase() -> Double {
         let idx = (mode == "duel" || mode == "rush") ? enemyIdx : min(4, wave)
         let table = [0.6, 0.68, 0.74, 0.8, 0.85, 0.9, 0.92]
         return table[min(6, idx)]
@@ -42,7 +42,7 @@ extension GameEngine {
 
     // MARK: - Round Building
 
-    public func buildRound() {
+    func buildRound() {
         guard let E = enemyDef else { return }
         let B = 60.0 / bpm
         let type: RoundType = (round % 2 == 0) ? .defend : .attack
@@ -164,7 +164,7 @@ extension GameEngine {
         roundStart = base
     }
 
-    public func startRound2() {
+    func startRound2() {
         buildRound()
         promptText = (roundType == .defend ? "Defend" : "Strike")
         if roundType == .attack {
@@ -179,7 +179,7 @@ extension GameEngine {
         round += 1
     }
 
-    public func maybePhase() {
+    func maybePhase() {
         guard let E = enemyDef else { return }
         for i in 0..<E.phases.count {
             let p = E.phases[i]
@@ -195,7 +195,7 @@ extension GameEngine {
         }
     }
 
-    public func showTip(key: String) {
+    func showTip(key: String) {
         guard save.seen[key] != true, let tip = EngineTips.tips[key] else { return }
         save.seen[key] = true
         tutorialTip = "\(tip.title): \(tip.description)"

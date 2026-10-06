@@ -1,14 +1,14 @@
 import SwiftUI
 
-public struct MainMenuView<Engine: UIEngine>: View {
-    @ObservedObject public var engine: Engine
-    public let onSelectMode: (String) -> Void
-    public let onSelectStyle: () -> Void
-    public let onSelectShop: () -> Void
-    public let onSelectSettings: () -> Void
-    public let onWatchCinematic: () -> Void
+struct MainMenuView<Engine: UIEngine>: View {
+    @ObservedObject var engine: Engine
+    let onSelectMode: (String) -> Void
+    let onSelectStyle: () -> Void
+    let onSelectShop: () -> Void
+    let onSelectSettings: () -> Void
+    let onWatchCinematic: () -> Void
     
-    public init(
+    init(
         engine: Engine,
         onSelectMode: @escaping (String) -> Void,
         onSelectStyle: @escaping () -> Void,
@@ -50,7 +50,7 @@ public struct MainMenuView<Engine: UIEngine>: View {
         return nil
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             BackgroundGradientView()
             

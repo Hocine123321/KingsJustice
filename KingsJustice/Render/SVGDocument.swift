@@ -2,45 +2,45 @@ import SwiftUI
 import Foundation
 import CoreGraphics
 
-public final class SVGNode: @unchecked Sendable {
-    public let tag: String
-    public var attributes: [String: String]
-    public var children: [SVGNode]
+final class SVGNode: @unchecked Sendable {
+    let tag: String
+    var attributes: [String: String]
+    var children: [SVGNode]
 
-    public init(tag: String, attributes: [String: String] = [:], children: [SVGNode] = []) {
+    init(tag: String, attributes: [String: String] = [:], children: [SVGNode] = []) {
         self.tag = tag
         self.attributes = attributes
         self.children = children
     }
 }
 
-public struct SVGGradient: Sendable {
-    public let id: String
-    public let isRadial: Bool
-    public let x1: Double
-    public let y1: Double
-    public let x2: Double
-    public let y2: Double
-    public let cx: Double
-    public let cy: Double
-    public let r: Double
-    public let gradientUnits: String // "objectBoundingBox" | "userSpaceOnUse"
-    public let stops: [Gradient.Stop]
+struct SVGGradient: Sendable {
+    let id: String
+    let isRadial: Bool
+    let x1: Double
+    let y1: Double
+    let x2: Double
+    let y2: Double
+    let cx: Double
+    let cy: Double
+    let r: Double
+    let gradientUnits: String // "objectBoundingBox" | "userSpaceOnUse"
+    let stops: [Gradient.Stop]
 }
 
-public struct SVGClipPath: Sendable {
-    public let id: String
-    public let nodes: [SVGNode]
+struct SVGClipPath: Sendable {
+    let id: String
+    let nodes: [SVGNode]
 }
 
 @MainActor
-public final class SVGDefsRegistry {
-    public static let shared = SVGDefsRegistry()
+final class SVGDefsRegistry {
+    static let shared = SVGDefsRegistry()
 
-    public var gradients: [String: SVGGradient] = [:]
-    public var clipPaths: [String: SVGClipPath] = [:]
-    public var defNodes: [String: SVGNode] = [:]
-    public var noiseImage: CGImage? = nil
+    var gradients: [String: SVGGradient] = [:]
+    var clipPaths: [String: SVGClipPath] = [:]
+    var defNodes: [String: SVGNode] = [:]
+    var noiseImage: CGImage? = nil
 
     private init() {
         parseSharedDefs()
@@ -54,7 +54,7 @@ public final class SVGDefsRegistry {
         for (k, v) in doc.localDefNodes { defNodes[k] = v }
     }
 
-    public static func generateNoiseImage() -> CGImage? {
+    static func generateNoiseImage() -> CGImage? {
         let width = 128
         let height = 128
         var pixels = [UInt8](repeating: 0, count: width * height * 4)
@@ -96,13 +96,14 @@ public final class SVGDefsRegistry {
     }
 }
 
-public final class SVGDocument: @unchecked Sendable {
-    public let rootNodes: [SVGNode]
-    public var localGradients: [String: SVGGradient] = [:]
-    public var localClipPaths: [String: SVGClipPath] = [:]
-    public var localDefNodes: [String: SVGNode] = [:]
+@MainActor
+final class SVGDocument {
+    let rootNodes: [SVGNode]
+    var localGradients: [String: SVGGradient] = [:]
+    var localClipPaths: [String: SVGClipPath] = [:]
+    var localDefNodes: [String: SVGNode] = [:]
 
-    public init(markup: String) {
+    init(markup: String) {
         let parser = SVGFragmentParser(markup: markup)
         self.rootNodes = parser.rootNodes
         self.localGradients = parser.gradients
@@ -110,7 +111,7 @@ public final class SVGDocument: @unchecked Sendable {
         self.localDefNodes = parser.defNodes
     }
 
-    public func draw(in context: GraphicsContext, size: CGSize) {
+    func draw(in context: GraphicsContext, size: CGSize) {
         let renderState = SVGRenderState()
         for node in rootNodes {
             drawNode(node, in: context, state: renderState)
@@ -464,17 +465,17 @@ public final class SVGDocument: @unchecked Sendable {
     }
 }
 
-public struct SVGRenderState {
-    public var fill: SVGFill = .color(Color.black)
-    public var fillOpacity: Double = 1.0
-    public var stroke: SVGFill = .none
-    public var strokeWidth: Double = 1.0
-    public var strokeCap: CGLineCap = .butt
-    public var strokeOpacity: Double = 1.0
-    public var opacity: Double = 1.0
-    public var clipPathId: String? = nil
-    public var filterId: String? = nil
-    public var transform: CGAffineTransform = .identity
+struct SVGRenderState {
+    var fill: SVGFill = .color(Color.black)
+    var fillOpacity: Double = 1.0
+    var stroke: SVGFill = .none
+    var strokeWidth: Double = 1.0
+    var strokeCap: CGLineCap = .butt
+    var strokeOpacity: Double = 1.0
+    var opacity: Double = 1.0
+    var clipPathId: String? = nil
+    var filterId: String? = nil
+    var transform: CGAffineTransform = .identity
 }
 
 private final class SVGFragmentParser: NSObject, XMLParserDelegate {

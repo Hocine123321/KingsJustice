@@ -1,10 +1,10 @@
 import SwiftUI
 
-public struct StyleSelectView<Engine: UIEngine>: View {
-    @ObservedObject public var engine: Engine
-    public let onBack: () -> Void
+struct StyleSelectView<Engine: UIEngine>: View {
+    @ObservedObject var engine: Engine
+    let onBack: () -> Void
     
-    public init(engine: Engine, onBack: @escaping () -> Void) {
+    init(engine: Engine, onBack: @escaping () -> Void) {
         self.engine = engine
         self.onBack = onBack
     }
@@ -35,7 +35,7 @@ public struct StyleSelectView<Engine: UIEngine>: View {
         }
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             BackgroundGradientView()
             

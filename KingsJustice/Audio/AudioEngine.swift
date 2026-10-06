@@ -5,8 +5,8 @@ import QuartzCore
 import UIKit
 #endif
 
-public final class AudioEngine {
-    public static let shared = AudioEngine()
+final class AudioEngine {
+    static let shared = AudioEngine()
 
     private let engine = AVAudioEngine()
     private let sfxMixer = AVAudioMixerNode()
@@ -28,11 +28,11 @@ public final class AudioEngine {
     private var drumBuffers: [String: [AVAudioPCMBuffer]] = [:]
     private var currentDroneBuffer: AVAudioPCMBuffer?
 
-    private(set) public var isReady = false
+    private(set) var isReady = false
     private var isStarted = false
 
-    private(set) public var musicVolume: Double = 0.8
-    private(set) public var sfxVolume: Double = 0.9
+    private(set) var musicVolume: Double = 0.8
+    private(set) var sfxVolume: Double = 0.9
     private var outputLatencyCompensationMs: Double = 0.0
 
     // Music scheduler state
@@ -53,7 +53,7 @@ public final class AudioEngine {
         setupAudioSessionObservers()
     }
 
-    public func start() {
+    func start() {
         guard !isStarted else { return }
         isStarted = true
 
@@ -65,7 +65,7 @@ public final class AudioEngine {
         }
     }
 
-    public func stop() {
+    func stop() {
         stopMusic()
         stopDrone()
 
@@ -73,7 +73,7 @@ public final class AudioEngine {
         isStarted = false
     }
 
-    public func setVolumes(music: Double, sfx: Double) {
+    func setVolumes(music: Double, sfx: Double) {
         musicVolume = max(0.0, min(1.0, music))
         sfxVolume = max(0.0, min(1.0, sfx))
 
@@ -81,7 +81,7 @@ public final class AudioEngine {
         sfxMixer.outputVolume = Float(sfxVolume)
     }
 
-    public func sfx(_ kind: SfxKind, intensity: Double = 1.0) {
+    func sfx(_ kind: SfxKind, intensity: Double = 1.0) {
         guard isReady, isStarted else { return }
         guard let variants = sfxBuffers[kind], !variants.isEmpty else { return }
 
@@ -98,7 +98,7 @@ public final class AudioEngine {
         player.play()
     }
 
-    public func drum(_ kind: String, intensity: Double = 1.0) {
+    func drum(_ kind: String, intensity: Double = 1.0) {
         guard isReady, isStarted else { return }
         let k = kind.lowercased()
         guard let variants = drumBuffers[k], !variants.isEmpty else { return }
@@ -115,7 +115,7 @@ public final class AudioEngine {
         player.play()
     }
 
-    public func startDrone(root: Int, scale: String) {
+    func startDrone(root: Int, scale: String) {
         guard isStarted else { return }
 
         synthQueue.async { [weak self] in
@@ -133,15 +133,15 @@ public final class AudioEngine {
         }
     }
 
-    public func startDrone() {
+    func startDrone() {
         startDrone(root: 45, scale: "minor")
     }
 
-    public func stopDrone() {
+    func stopDrone() {
         dronePlayer.stop()
     }
 
-    public func startMusic(root: Int, scale: String, bpm: Double) {
+    func startMusic(root: Int, scale: String, bpm: Double) {
         stopMusic()
 
         musicRoot = root
@@ -163,19 +163,19 @@ public final class AudioEngine {
         musicTimer = timer
     }
 
-    public func startMusic(root: Int = 45, scale: String = "minor") {
+    func startMusic(root: Int = 45, scale: String = "minor") {
         startMusic(root: root, scale: scale, bpm: 80.0)
     }
 
-    public func setMusicBPM(_ bpm: Double) {
+    func setMusicBPM(_ bpm: Double) {
         musicBPM = max(30.0, min(240.0, bpm))
     }
 
-    public func setMusicIntensity(_ v: Double) {
+    func setMusicIntensity(_ v: Double) {
         musicIntensity = max(0.0, min(1.0, v))
     }
 
-    public func stopMusic() {
+    func stopMusic() {
         isMusicPlaying = false
         musicTimer?.cancel()
         musicTimer = nil
@@ -187,24 +187,24 @@ public final class AudioEngine {
         musicBassPlayer.stop()
     }
 
-    public func beatTime() -> Double {
+    func beatTime() -> Double {
         guard isMusicPlaying else { return 0.0 }
         let now = CACurrentMediaTime()
         let comp = outputLatencyCompensationMs / 1000.0
         return max(0.0, now - musicStartTime - comp)
     }
 
-    public func pauseAll() {
+    func pauseAll() {
         engine.pause()
     }
 
-    public func resumeAll() {
+    func resumeAll() {
         if isStarted && !engine.isRunning {
             try? engine.start()
         }
     }
 
-    public func setOutputLatencyCompensationMs(_ ms: Double) {
+    func setOutputLatencyCompensationMs(_ ms: Double) {
         outputLatencyCompensationMs = max(-500.0, min(500.0, ms))
     }
 

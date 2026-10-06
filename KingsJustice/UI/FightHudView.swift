@@ -1,11 +1,11 @@
 import SwiftUI
 
-public struct FightHudView<Engine: UIEngine>: View {
-    @ObservedObject public var engine: Engine
+struct FightHudView<Engine: UIEngine>: View {
+    @ObservedObject var engine: Engine
     
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     
-    public init(engine: Engine) {
+    init(engine: Engine) {
         self.engine = engine
     }
     
@@ -13,7 +13,7 @@ public struct FightHudView<Engine: UIEngine>: View {
         verticalSizeClass == .compact
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             VStack(spacing: 0) {
                 // Top HUD Bar

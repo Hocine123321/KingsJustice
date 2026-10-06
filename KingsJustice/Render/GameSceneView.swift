@@ -1,18 +1,18 @@
 import SwiftUI
 
-public struct GameSceneView<S: RenderSource>: View {
-    @ObservedObject public var source: S
+struct GameSceneView<S: RenderSource & ObservableObject>: View {
+    @ObservedObject var source: S
     @StateObject private var model = SceneModel()
 
-    public init(source: S) {
+    init(source: S) {
         self.source = source
     }
 
-    public var body: some View {
+    var body: some View {
         GeometryReader { geometry in
             TimelineView(.animation) { timeline in
-                let now = timeline.date.timeIntervalSince1900
-                let time = source.rsTime > 0 ? source.rsTime : now
+                let now: Double = timeline.date.timeIntervalSinceReferenceDate
+                let time: Double = source.rsTime > 0 ? source.rsTime : now
 
                 Canvas { context, size in
                     model.update(time: time, source: source)

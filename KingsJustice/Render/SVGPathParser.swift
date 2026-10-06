@@ -1,7 +1,7 @@
 import SwiftUI
 
-public struct SVGPathParser {
-    public static func parsePath(d: String) -> Path {
+struct SVGPathParser {
+    static func parsePath(d: String) -> Path {
         var path = Path()
         let tokens = tokenize(d)
         var idx = 0

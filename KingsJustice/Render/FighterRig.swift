@@ -1,28 +1,28 @@
 import SwiftUI
 import CoreGraphics
 
-public struct FighterRigConfig: Sendable {
-    public let id: String
-    public let colors: [Color]       // [dark, mid, light]
-    public let colorHexes: [String]  // 3 hex colors
-    public let trim: Color
-    public let eye: Color
-    public let helm: String          // greathelm | horned | crown | hood | cowl | skull | bare
-    public let cape: String          // cloak | cloakK | rags | none
-    public let weapon: String        // longsword | greatsword | axe | mace | spear | scythe | twinblades
-    public let size: Double
-    public let shield: Bool
-    public let glow: Color?
-    public let facing: Double        // 1 = player right, -1 = enemy left
-    public let ph: Double            // phase offset
-    public let bigShoulders: Bool
-    public let spiked: Bool
-    public let shieldShape: String   // heater | round
-    public let emblem: String?       // cross | crown | skull | chains
-    public let emblemCol: Color?
-    public let plumeCol: Color?
+struct FighterRigConfig: Sendable {
+    let id: String
+    let colors: [Color]       // [dark, mid, light]
+    let colorHexes: [String]  // 3 hex colors
+    let trim: Color
+    let eye: Color
+    let helm: String          // greathelm | horned | crown | hood | cowl | skull | bare
+    let cape: String          // cloak | cloakK | rags | none
+    let weapon: String        // longsword | greatsword | axe | mace | spear | scythe | twinblades
+    let size: Double
+    let shield: Bool
+    let glow: Color?
+    let facing: Double        // 1 = player right, -1 = enemy left
+    let ph: Double            // phase offset
+    let bigShoulders: Bool
+    let spiked: Bool
+    let shieldShape: String   // heater | round
+    let emblem: String?       // cross | crown | skull | chains
+    let emblemCol: Color?
+    let plumeCol: Color?
 
-    public init(
+    init(
         id: String = "fighter",
         colors: [Color] = [Color.black, Color.gray, Color.white],
         colorHexes: [String] = ["#0a0807", "#5d6877", "#a7b4c2"],
@@ -64,7 +64,7 @@ public struct FighterRigConfig: Sendable {
         self.plumeCol = plumeCol
     }
 
-    public static func from(look: LookDef, facing: Double = 1.0, id: String = "fighter") -> FighterRigConfig {
+    static func from(look: LookDef, facing: Double = 1.0, id: String = "fighter") -> FighterRigConfig {
         let hexes = look.colors.count >= 3 ? look.colors : ["#0a0807", "#5d6877", "#a7b4c2"]
         let c0 = SVGColorParser.parseColor(hexes[0]) ?? Color.black
         let c1 = SVGColorParser.parseColor(hexes[1]) ?? Color.gray
@@ -91,8 +91,8 @@ public struct FighterRigConfig: Sendable {
     }
 }
 
-public struct FighterRig {
-    public static func draw(
+struct FighterRig {
+    static func draw(
         in context: GraphicsContext,
         config: FighterRigConfig,
         pose: [Double],
@@ -441,7 +441,7 @@ public struct FighterRig {
                             shDeco.addLine(to: CGPoint(x: 30, y: -10))
                             shDeco.move(to: CGPoint(x: 0, y: -58))
                             shDeco.addLine(to: CGPoint(x: 0, y: 70))
-                            shCtx.stroke(shDeco, with: .color(config.emblemCol ?? Color(red: 0.48, green: 0.09, blue: 0.09)).opacity(0.8), style: StrokeStyle(lineWidth: 6.0))
+                            shCtx.stroke(shDeco, with: .color((config.emblemCol ?? Color(red: 0.48, green: 0.09, blue: 0.09)).opacity(0.8)), style: StrokeStyle(lineWidth: 6.0))
 
                             let bossRect = CGRect(x: -9, y: -9, width: 18, height: 18)
                             shCtx.fill(Path(ellipseIn: bossRect), with: .color(Color(red: 0.96, green: 0.85, blue: 0.52)))

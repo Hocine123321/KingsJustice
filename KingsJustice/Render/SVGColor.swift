@@ -1,13 +1,13 @@
 import SwiftUI
 
-public enum SVGFill: Equatable {
+enum SVGFill: Equatable {
     case none
     case color(Color)
     case url(id: String, fallback: Color?)
 }
 
-public struct SVGColorParser {
-    public static func parseColor(_ string: String) -> Color? {
+struct SVGColorParser {
+    static func parseColor(_ string: String) -> Color? {
         let str = string.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if str == "none" || str == "transparent" {
             return Color.clear
@@ -38,7 +38,7 @@ public struct SVGColorParser {
         }
     }
 
-    public static func parseHexColor(_ hexString: String) -> Color? {
+    static func parseHexColor(_ hexString: String) -> Color? {
         let hex = hexString.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var intVal: UInt64 = 0
         guard Scanner(string: hex).scanHexInt64(&intVal) else { return nil }
@@ -91,7 +91,7 @@ public struct SVGColorParser {
         return nil
     }
 
-    public static func parseFill(_ string: String) -> SVGFill {
+    static func parseFill(_ string: String) -> SVGFill {
         let str = string.trimmingCharacters(in: .whitespacesAndNewlines)
         if str.lowercased() == "none" || str.isEmpty {
             return .none
@@ -119,7 +119,7 @@ public struct SVGColorParser {
         return .none
     }
 
-    public static func shadeHex(_ hex: String, _ k: Double) -> String {
+    static func shadeHex(_ hex: String, _ k: Double) -> String {
         let clean = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         guard clean.count == 6, let val = UInt32(clean, radix: 16) else { return hex }
         var r = Double((val >> 16) & 0xFF)

@@ -2,25 +2,25 @@ import SwiftUI
 import Combine
 
 @MainActor
-public final class SceneModel: ObservableObject {
-    @Published public var currentArenaKey: String = ""
+final class SceneModel: ObservableObject {
+    @Published var currentArenaKey: String = ""
 
-    public var bgImage: Image?
-    public var clImage: Image?
-    public var gndImage: Image?
-    public var fgImage: Image?
+    var bgImage: Image?
+    var clImage: Image?
+    var gndImage: Image?
+    var fgImage: Image?
 
-    public var bgDoc: SVGDocument?
-    public var clDoc: SVGDocument?
-    public var gndDoc: SVGDocument?
-    public var fgDoc: SVGDocument?
+    var bgDoc: SVGDocument?
+    var clDoc: SVGDocument?
+    var gndDoc: SVGDocument?
+    var fgDoc: SVGDocument?
 
-    public let particleSystem = ParticleSystem()
+    let particleSystem = ParticleSystem()
     private var lastTime: Double = 0.0
 
-    public init() {}
+    init() {}
 
-    public func updateArenaIfNeeded(arenaKey: String, arenaDef: ArenaDef?) {
+    func updateArenaIfNeeded(arenaKey: String, arenaDef: ArenaDef?) {
         guard arenaKey != currentArenaKey, let arena = arenaDef else { return }
         currentArenaKey = arenaKey
 
@@ -46,7 +46,7 @@ public final class SceneModel: ObservableObject {
         )
     }
 
-    public func update(time: Double, source: (any RenderSource)?) {
+    func update(time: Double, source: (any RenderSource)?) {
         let dt = lastTime > 0 ? max(0.001, min(0.1, time - lastTime)) : 0.016
         lastTime = time
 
@@ -90,7 +90,7 @@ public final class SceneModel: ObservableObject {
         return nil
     }
 
-    public func drawBgLayer(in context: GraphicsContext, size: CGSize) {
+    func drawBgLayer(in context: GraphicsContext, size: CGSize) {
         if let img = bgImage {
             context.draw(img, in: CGRect(origin: .zero, size: CGSize(width: 1600, height: 900)))
         } else if let doc = bgDoc {
@@ -98,7 +98,7 @@ public final class SceneModel: ObservableObject {
         }
     }
 
-    public func drawClLayer(in context: GraphicsContext, size: CGSize) {
+    func drawClLayer(in context: GraphicsContext, size: CGSize) {
         if let img = clImage {
             context.draw(img, in: CGRect(origin: .zero, size: CGSize(width: 1600, height: 900)))
         } else if let doc = clDoc {
@@ -106,7 +106,7 @@ public final class SceneModel: ObservableObject {
         }
     }
 
-    public func drawGndLayer(in context: GraphicsContext, size: CGSize) {
+    func drawGndLayer(in context: GraphicsContext, size: CGSize) {
         if let img = gndImage {
             context.draw(img, in: CGRect(origin: .zero, size: CGSize(width: 1600, height: 900)))
         } else if let doc = gndDoc {
@@ -114,7 +114,7 @@ public final class SceneModel: ObservableObject {
         }
     }
 
-    public func drawFgLayer(in context: GraphicsContext, size: CGSize) {
+    func drawFgLayer(in context: GraphicsContext, size: CGSize) {
         if let img = fgImage {
             context.draw(img, in: CGRect(origin: .zero, size: CGSize(width: 1600, height: 900)))
         } else if let doc = fgDoc {

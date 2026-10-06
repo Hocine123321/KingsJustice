@@ -1,59 +1,59 @@
 import SwiftUI
 import CoreGraphics
 
-public struct WeatherParticle: Sendable {
-    public var x: Double
-    public var y: Double
-    public var vx: Double
-    public var vy: Double
-    public var size: Double
-    public var opacity: Double
-    public var life: Double
-    public var maxLife: Double
-    public var phase: Double
+struct WeatherParticle: Sendable {
+    var x: Double
+    var y: Double
+    var vx: Double
+    var vy: Double
+    var size: Double
+    var opacity: Double
+    var life: Double
+    var maxLife: Double
+    var phase: Double
 }
 
-public struct SparkParticle: Sendable {
-    public var x: Double
-    public var y: Double
-    public var vx: Double
-    public var vy: Double
-    public var size: Double
-    public var opacity: Double
-    public var life: Double
-    public var maxLife: Double
+struct SparkParticle: Sendable {
+    var x: Double
+    var y: Double
+    var vx: Double
+    var vy: Double
+    var size: Double
+    var opacity: Double
+    var life: Double
+    var maxLife: Double
 }
 
-public struct BloodParticle: Sendable {
-    public var x: Double
-    public var y: Double
-    public var vx: Double
-    public var vy: Double
-    public var size: Double
-    public var opacity: Double
-    public var life: Double
-    public var maxLife: Double
+struct BloodParticle: Sendable {
+    var x: Double
+    var y: Double
+    var vx: Double
+    var vy: Double
+    var size: Double
+    var opacity: Double
+    var life: Double
+    var maxLife: Double
 }
 
-public struct GroundStain: Sendable {
-    public var x: Double
-    public var y: Double
-    public var radius: Double
-    public var opacity: Double
+struct GroundStain: Sendable {
+    var x: Double
+    var y: Double
+    var radius: Double
+    var opacity: Double
 }
 
-public final class ParticleSystem: @unchecked Sendable {
-    public var weatherParticles: [WeatherParticle] = []
-    public var sparkParticles: [SparkParticle] = []
-    public var bloodParticles: [BloodParticle] = []
-    public var groundStains: [GroundStain] = []
+final class ParticleSystem: @unchecked Sendable {
+    var weatherParticles: [WeatherParticle] = []
+    var sparkParticles: [SparkParticle] = []
+    var bloodParticles: [BloodParticle] = []
+    var groundStains: [GroundStain] = []
 
     private var currentArenaKey: String = ""
     private var lastTime: Double = 0.0
 
-    public init() {}
+    init() {}
 
-    public func setupWeather(type: String, count: Int, color: String, wind: Double) {
+    func setupWeather(type: String, count: Int, color: String, wind: Double) {
         let n = max(0, min(150, count))
         weatherParticles.removeAll()
         weatherParticles.reserveCapacity(n)
@@ -114,7 +114,7 @@ public final class ParticleSystem: @unchecked Sendable {
         }
     }
 
-    public func update(dt: Double, time: Double, weatherType: String, wind: Double) {
+    func update(dt: Double, time: Double, weatherType: String, wind: Double) {
         // Update weather
         for i in 0..<weatherParticles.count {
             var p = weatherParticles[i]
@@ -163,7 +163,7 @@ public final class ParticleSystem: @unchecked Sendable {
         bloodParticles = newBlood
     }
 
-    public func spawnSpark(x: Double, y: Double, count: Int) {
+    func spawnSpark(x: Double, y: Double, count: Int) {
         let n = max(1, min(30, count))
         for _ in 0..<n {
             let angle = Double.random(in: 0...(2 * .pi))
@@ -181,7 +181,7 @@ public final class ParticleSystem: @unchecked Sendable {
         }
     }
 
-    public func spawnBlood(x: Double, y: Double, count: Int, dir: Double, power: Double) {
+    func spawnBlood(x: Double, y: Double, count: Int, dir: Double, power: Double) {
         let n = max(1, min(40, count))
         for _ in 0..<n {
             let baseAngle = dir < 0 ? .pi : 0.0
@@ -200,7 +200,7 @@ public final class ParticleSystem: @unchecked Sendable {
         }
     }
 
-    public func addStain(x: Double, y: Double, r: Double) {
+    func addStain(x: Double, y: Double, r: Double) {
         if groundStains.count > 50 {
             groundStains.removeFirst()
         }
@@ -208,7 +208,7 @@ public final class ParticleSystem: @unchecked Sendable {
         groundStains.append(stain)
     }
 
-    public func drawWeather(in context: GraphicsContext, type: String, defaultColor: Color) {
+    func drawWeather(in context: GraphicsContext, type: String, defaultColor: Color) {
         for p in weatherParticles {
             let rect = CGRect(x: p.x - p.size / 2.0, y: p.y - p.size / 2.0, width: p.size, height: p.size)
 
@@ -238,7 +238,7 @@ public final class ParticleSystem: @unchecked Sendable {
         }
     }
 
-    public func drawSparks(in context: GraphicsContext) {
+    func drawSparks(in context: GraphicsContext) {
         for p in sparkParticles {
             let rect = CGRect(x: p.x - p.size / 2.0, y: p.y - p.size / 2.0, width: p.size, height: p.size)
             let col = Color(red: 1.0, green: 0.8, blue: 0.3, opacity: p.opacity)
@@ -250,7 +250,7 @@ public final class ParticleSystem: @unchecked Sendable {
         }
     }
 
-    public func drawBlood(in context: GraphicsContext) {
+    func drawBlood(in context: GraphicsContext) {
         let bloodCol = Color(red: 0.54, green: 0.03, blue: 0.03)
         for p in bloodParticles {
             let rect = CGRect(x: p.x - p.size / 2.0, y: p.y - p.size / 2.0, width: p.size, height: p.size)
@@ -258,7 +258,7 @@ public final class ParticleSystem: @unchecked Sendable {
         }
     }
 
-    public func drawStains(in context: GraphicsContext) {
+    func drawStains(in context: GraphicsContext) {
         for s in groundStains {
             let rect = CGRect(x: s.x - s.radius, y: s.y - s.radius * 0.25, width: s.radius * 2.0, height: s.radius * 0.5)
             let bloodCol = Color(red: 0.42, green: 0.02, blue: 0.02, opacity: s.opacity)

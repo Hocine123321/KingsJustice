@@ -2,14 +2,14 @@ import Foundation
 import Combine
 
 /// Information about a purchasable tonic item.
-public struct TonicInfo: Identifiable, Equatable {
-    public let id: String
-    public let name: String
-    public let desc: String
-    public let price: Int
-    public let owned: Int
+struct TonicInfo: Identifiable, Equatable {
+    let id: String
+    let name: String
+    let desc: String
+    let price: Int
+    let owned: Int
     
-    public init(id: String, name: String, desc: String, price: Int, owned: Int) {
+    init(id: String, name: String, desc: String, price: Int, owned: Int) {
         self.id = id
         self.name = name
         self.desc = desc
@@ -19,7 +19,7 @@ public struct TonicInfo: Identifiable, Equatable {
 }
 
 /// Protocol defining the exact engine interface required by the UI.
-public protocol UIEngine: ObservableObject {
+protocol UIEngine: ObservableObject {
     var hp: Double { get }
     var maxhp: Double { get }
     var khp: Double { get }
@@ -42,7 +42,7 @@ public protocol UIEngine: ObservableObject {
     var enemyTitle: String { get }
     
     var settings: GameSettings { get set }
-    var save: SaveData { get }
+    var save: SaveData { get set }
     
     func startRun(mode: String, enemyIndex: Int)
     func beginFight(index: Int)
@@ -61,84 +61,84 @@ public protocol UIEngine: ObservableObject {
 }
 
 /// Mock implementation of UIEngine for previewing and isolated UI testing.
-public final class MockGameEngine: UIEngine, ObservableObject {
-    @Published public var hp: Double = 100.0
-    @Published public var maxhp: Double = 100.0
-    @Published public var khp: Double = 90.0
-    @Published public var kmax: Double = 100.0
-    @Published public var focus: Double = 45.0
-    @Published public var score: Int = 1250
-    @Published public var combo: Int = 7
-    @Published public var gold: Int = 120
-    @Published public var judgeText: String = "PERFECT"
-    @Published public var judgeColorHex: String = "#d9b45a"
-    @Published public var judgeStamp: Double = 1.0
-    @Published public var roundIsDefend: Bool = true
-    @Published public var paused: Bool = false
-    @Published public var over: Bool = false
-    @Published public var won: Bool = false
-    @Published public var tipText: String? = "Parry when the ring closes on the center target!"
-    @Published public var potionCount: Int = 1
-    @Published public var started: Bool = false
-    @Published public var enemyName: String = "Hollow Conscript"
-    @Published public var enemyTitle: String = "Broken Foot-Soldier"
+final class MockGameEngine: UIEngine, ObservableObject {
+    @Published var hp: Double = 100.0
+    @Published var maxhp: Double = 100.0
+    @Published var khp: Double = 90.0
+    @Published var kmax: Double = 100.0
+    @Published var focus: Double = 45.0
+    @Published var score: Int = 1250
+    @Published var combo: Int = 7
+    @Published var gold: Int = 120
+    @Published var judgeText: String = "PERFECT"
+    @Published var judgeColorHex: String = "#d9b45a"
+    @Published var judgeStamp: Double = 1.0
+    @Published var roundIsDefend: Bool = true
+    @Published var paused: Bool = false
+    @Published var over: Bool = false
+    @Published var won: Bool = false
+    @Published var tipText: String? = "Parry when the ring closes on the center target!"
+    @Published var potionCount: Int = 1
+    @Published var started: Bool = false
+    @Published var enemyName: String = "Hollow Conscript"
+    @Published var enemyTitle: String = "Broken Foot-Soldier"
     
-    public var settings: GameSettings = GameSettings()
-    public var save: SaveData = SaveData()
+    var settings: GameSettings = GameSettings()
+    var save: SaveData = SaveData()
     
-    public init() {}
+    init() {}
     
-    public func startRun(mode: String, enemyIndex: Int) {
+    func startRun(mode: String, enemyIndex: Int) {
         started = true
         paused = false
         over = false
     }
     
-    public func beginFight(index: Int) {
+    func beginFight(index: Int) {
         started = true
         paused = false
         over = false
     }
     
-    public func input(kind: String, lane: Int) {
+    func input(kind: String, lane: Int) {
         judgeText = "GOOD"
         judgeColorHex = "#8fd0a0"
         combo += 1
         score += 100
     }
     
-    public func useFocus() {
+    func useFocus() {
         if focus >= 50.0 {
             focus -= 50.0
         }
     }
     
-    public func drinkPotion() {
+    func drinkPotion() {
         if potionCount > 0 {
             potionCount -= 1
             hp = min(maxhp, hp + maxhp * 0.35)
         }
     }
     
-    public func pause() {
+    func pause() {
         paused = true
     }
     
-    public func resume() {
+    func resume() {
         paused = false
     }
     
-    public func quitToMenu() {
+    func quitToMenu() {
         started = false
         paused = false
         over = false
     }
     
-    public func saveAll() {}
+    func saveAll() {}
     
-    public func tick(dt: Double) {}
+    func tick(dt: Double) {}
     
-    public func tonicCatalog() -> [TonicInfo] {
+    func tonicCatalog() -> [TonicInfo] {
         return [
             TonicInfo(id: "heal", name: "Healing Draught", desc: "Restore 35% health mid-fight.", price: 60, owned: potionCount),
             TonicInfo(id: "focus", name: "Battle Focus", desc: "Start fight with half Focus meter.", price: 50, owned: save.invFocus),
@@ -147,18 +147,18 @@ public final class MockGameEngine: UIEngine, ObservableObject {
         ]
     }
     
-    public func buy(_ id: String) -> Bool {
+    func buy(_ id: String) -> Bool {
         guard canBuy(id) else { return false }
         gold -= 50
         if id == "heal" { potionCount += 1 }
         return true
     }
     
-    public func canBuy(_ id: String) -> Bool {
+    func canBuy(_ id: String) -> Bool {
         return gold >= 50
     }
     
-    public func unlockedStyles() -> [String] {
+    func unlockedStyles() -> [String] {
         var result: [String] = ["knight"]
         if save.unlockedDuelist { result.append("duelist") }
         if save.unlockedBerserker { result.append("berserker") }
