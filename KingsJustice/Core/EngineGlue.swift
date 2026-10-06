@@ -10,6 +10,10 @@ extension GameEngine: UIEngine {
     var tipText: String? { return tutorialTip }
     var potionCount: Int { return potion }
 
+    func beginFight(index: Int) {
+        beginFight(index: index, keepHp: false)
+    }
+
     func tonicCatalog() -> [TonicInfo] {
         var out: [TonicInfo] = []
         for t in tonics {
