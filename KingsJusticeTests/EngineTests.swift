@@ -43,7 +43,7 @@ final class EngineTests: XCTestCase {
         engine.windUsed = false
 
         // Cause lethal hit
-        engine.chip(200.0)
+        engine.chip(100000.0)
 
         XCTAssertEqual(engine.hp, expectedSecondWindHp)
         XCTAssertTrue(engine.windUsed)
@@ -51,7 +51,7 @@ final class EngineTests: XCTestCase {
 
         // Second lethal hit ends fight (once the post-Wind invulnerability has lapsed)
         engine.invulnUntil = 0.0
-        engine.chip(200.0)
+        engine.chip(100000.0)
 
         XCTAssertTrue(engine.over)
         XCTAssertFalse(engine.won)
