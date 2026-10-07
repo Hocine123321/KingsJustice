@@ -37,6 +37,11 @@ final class EngineTests: XCTestCase {
         let initialMaxHp = engine.maxhp
         let expectedSecondWindHp = Double(Int(initialMaxHp * 0.25))
 
+        // Deterministic setup: full HP, no invulnerability, wind not yet used
+        engine.hp = engine.maxhp
+        engine.invulnUntil = 0.0
+        engine.windUsed = false
+
         // Cause lethal hit
         engine.chip(200.0)
 
@@ -44,7 +49,8 @@ final class EngineTests: XCTestCase {
         XCTAssertTrue(engine.windUsed)
         XCTAssertFalse(engine.over)
 
-        // Second lethal hit ends fight
+        // Second lethal hit ends fight (once the post-Wind invulnerability has lapsed)
+        engine.invulnUntil = 0.0
         engine.chip(200.0)
 
         XCTAssertTrue(engine.over)
