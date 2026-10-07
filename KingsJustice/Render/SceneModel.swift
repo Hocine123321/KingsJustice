@@ -9,8 +9,10 @@ struct TrailPoint {
 
 @MainActor
 final class SceneModel: ObservableObject {
-    @Published var currentArenaKey: String = ""
-    @Published var effectiveTime: Double = 0.0
+    // Deliberately NOT @Published: these are written from inside the Canvas draw closure on every frame.
+    // Publishing them re-invalidated the view during rendering and froze the main thread.
+    var currentArenaKey: String = ""
+    var effectiveTime: Double = 0.0
 
     var bgImage: Image?
     var clImage: Image?

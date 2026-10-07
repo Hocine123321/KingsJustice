@@ -1,5 +1,6 @@
 import XCTest
 import SwiftUI
+import Combine
 @testable import KingsJustice
 
 @MainActor
@@ -74,5 +75,22 @@ final class RenderTests: XCTestCase {
         } else {
             XCTFail("Should parse url(#kS) #5d6877 as url fill with fallback")
         }
+    }
+
+    /// Regression: SceneModel.update runs inside the Canvas draw closure every frame. If it publishes changes,
+    /// the view is invalidated mid-render in a loop and the game freezes when a fight starts.
+    func testSceneModelUpdateDoesNotPublishDuringRender() {
+        let model = SceneModel()
+        let engine = GameEngine()
+        engine.startRun(mode: "duel", enemyIndex: 0)
+
+        var emissions = 0
+        let cancellable = model.objectWillChange.sink { _ in emissions += 1 }
+
+        for i in 0..<30 {
+            model.update(time: 1.0 + Double(i) * 0.016, source: engine)
+        }
+        XCTAssertEqual(emissions, 0, "SceneModel must not publish while rendering")
+        cancellable.cancel()
     }
 }
