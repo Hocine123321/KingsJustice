@@ -275,7 +275,7 @@ final class AudioEngine {
     /// Schedules a buffer only when it is safe to do so. Prevents the AVAudioPlayerNode
     /// channel-count assertion (and silent players) if the engine is down or formats differ.
     private func safeSchedule(_ player: AVAudioPlayerNode, _ buffer: AVAudioPCMBuffer, loops: Bool = false) {
-        guard engine.isRunning else {
+        if !engine.isRunning {
             do { try engine.start() } catch { return }
             if !engine.isRunning { return }
         }
