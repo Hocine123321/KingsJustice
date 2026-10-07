@@ -70,4 +70,34 @@ final class AudioTests: XCTestCase {
             XCTAssertFalse(sample.isInfinite)
         }
     }
+
+    /// Regression: scheduling a mono synth buffer on a player connected to a stereo mixer
+    /// asserted "_outputFormat.channelCount == buffer.format.channelCount" and crashed the game.
+    func testMonoBufferSchedulesOnMonoConnectedPlayer() throws {
+        let engine = AVAudioEngine()
+        let mixer = AVAudioMixerNode()
+        let player = AVAudioPlayerNode()
+        engine.attach(mixer)
+        engine.attach(player)
+
+        let mono = AVAudioFormat(standardFormatWithSampleRate: 44100.0, channels: 1)
+        engine.connect(mixer, to: engine.mainMixerNode, format: nil)
+        engine.connect(player, to: mixer, format: mono)
+
+        let stereo = AVAudioFormat(standardFormatWithSampleRate: 48000.0, channels: 2)!
+        try engine.enableManualRenderingMode(.offline, format: stereo, maximumFrameCount: 4096)
+        try engine.start()
+
+        let samples = Synth.buffer(for: .clang, variant: 0, sampleRate: 44100.0)
+        let buffer = try XCTUnwrap(Synth.pcmBuffer(from: samples))
+        XCTAssertEqual(player.outputFormat(forBus: 0).channelCount, buffer.format.channelCount)
+
+        player.scheduleBuffer(buffer, at: nil, options: [], completionHandler: nil)
+        player.play()
+
+        let out = AVAudioPCMBuffer(pcmFormat: stereo, frameCapacity: 4096)!
+        let status = try engine.renderOffline(1024, to: out)
+        XCTAssertNotEqual(status, .error)
+        engine.stop()
+    }
 }

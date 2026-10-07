@@ -94,7 +94,7 @@ final class AudioEngine {
 
         player.volume = clampedIntensity
         player.stop()
-        player.scheduleBuffer(buffer, at: nil, options: [], completionHandler: nil)
+        safeSchedule(player, buffer)
         player.play()
     }
 
@@ -111,7 +111,7 @@ final class AudioEngine {
 
         player.volume = clampedIntensity
         player.stop()
-        player.scheduleBuffer(buffer, at: nil, options: [], completionHandler: nil)
+        safeSchedule(player, buffer)
         player.play()
     }
 
@@ -127,7 +127,7 @@ final class AudioEngine {
                 self.currentDroneBuffer = buf
                 self.dronePlayer.stop()
                 self.dronePlayer.volume = 0.5
-                self.dronePlayer.scheduleBuffer(buf, at: nil, options: .loops, completionHandler: nil)
+                safeSchedule(self.dronePlayer, buf, loops: true)
                 self.dronePlayer.play()
             }
         }
@@ -272,6 +272,19 @@ final class AudioEngine {
         resumeAll()
     }
 
+    /// Schedules a buffer only when it is safe to do so. Prevents the AVAudioPlayerNode
+    /// channel-count assertion (and silent players) if the engine is down or formats differ.
+    private func safeSchedule(_ player: AVAudioPlayerNode, _ buffer: AVAudioPCMBuffer, loops: Bool = false) {
+        guard engine.isRunning else {
+            do { try engine.start() } catch { return }
+            if !engine.isRunning { return }
+        }
+        let out = player.outputFormat(forBus: 0)
+        guard out.channelCount == buffer.format.channelCount else { return }
+        player.scheduleBuffer(buffer, at: nil, options: loops ? .loops : [], completionHandler: nil)
+        if !player.isPlaying { player.play() }
+    }
+
     private func setupNodes() {
         engine.attach(sfxMixer)
         engine.attach(musicMixer)
@@ -280,20 +293,24 @@ final class AudioEngine {
         engine.connect(sfxMixer, to: mainMixer, format: nil)
         engine.connect(musicMixer, to: mainMixer, format: nil)
 
+        // All synthesized buffers are mono 44.1 kHz. Players must be connected with exactly that
+        // format, otherwise scheduling a buffer asserts on channelCount mismatch.
+        let monoFormat = AVAudioFormat(standardFormatWithSampleRate: 44100.0, channels: 1)
+
         for _ in 0..<poolSize {
             let player = AVAudioPlayerNode()
             engine.attach(player)
-            engine.connect(player, to: sfxMixer, format: nil)
+            engine.connect(player, to: sfxMixer, format: monoFormat)
             sfxPlayerPool.append(player)
         }
 
         engine.attach(dronePlayer)
-        engine.connect(dronePlayer, to: sfxMixer, format: nil)
+        engine.connect(dronePlayer, to: sfxMixer, format: monoFormat)
 
         let musicPlayers = [musicKickPlayer, musicSnarePlayer, musicHatPlayer, musicTomPlayer, musicBassPlayer]
         for p in musicPlayers {
             engine.attach(p)
-            engine.connect(p, to: musicMixer, format: nil)
+            engine.connect(p, to: musicMixer, format: monoFormat)
         }
 
         sfxMixer.outputVolume = Float(sfxVolume)
@@ -406,7 +423,7 @@ final class AudioEngine {
             if let buf = Synth.pcmBuffer(from: bassSamples, sampleRate: 44100.0) {
                 musicBassPlayer.stop()
                 musicBassPlayer.volume = Float(0.5 + intensity * 0.3)
-                musicBassPlayer.scheduleBuffer(buf, at: nil, options: [], completionHandler: nil)
+                safeSchedule(musicBassPlayer, buf)
                 musicBassPlayer.play()
             }
         }
@@ -417,7 +434,7 @@ final class AudioEngine {
         let buf = variants[0]
         player.stop()
         player.volume = volume
-        player.scheduleBuffer(buf, at: nil, options: [], completionHandler: nil)
+        safeSchedule(player, buf)
         player.play()
     }
 }
