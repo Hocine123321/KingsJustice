@@ -89,7 +89,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
 
                         // 4. Fighters
                         let playerLook = source.rsStyle.look
-                        let playerConfig = FighterRigConfig.from(look: playerLook, facing: 1.0, id: "player")
+                        let playerConfig = model.rigConfig(look: playerLook, facing: 1.0, id: "player")
                         let playerPose = source.rsPlayerPose.count >= 8 ? source.rsPlayerPose : [450.0, 0.0, -40.0, 40.0, 80.0, 0.0, 0.0, 0.0]
 
                         FighterRig.draw(
@@ -101,7 +101,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         )
 
                         if let enemy = source.rsEnemy {
-                            let enemyConfig = FighterRigConfig.from(look: enemy.look, facing: -1.0, id: enemy.id)
+                            let enemyConfig = model.rigConfig(look: enemy.look, facing: -1.0, id: enemy.id)
                             let enemyPose = source.rsEnemyPose.count >= 8 ? source.rsEnemyPose : [900.0, 0.0, -40.0, 45.0, 70.0, 0.0, 0.0, 0.0]
 
                             FighterRig.draw(

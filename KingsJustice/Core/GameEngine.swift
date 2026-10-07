@@ -35,6 +35,7 @@ final class GameEngine: ObservableObject {
     @Published var promptText: String = ""
     @Published var tauntText: String = ""
     var hitBarkCount: Int = 0
+    var lowHealthBarked: Bool = false
     var musicIntensityTick: Double = 0.0
     @Published var started: Bool = false
     @Published var on: Bool = false

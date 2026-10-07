@@ -27,6 +27,17 @@ final class SceneModel: ObservableObject {
 
     private var lastRealTime: Double = 0.0
     private var lastTipPositions: [String: (CGPoint, Double)] = [:]
+    private var rigConfigCache: [String: FighterRigConfig] = [:]
+
+    /// Builds a fighter rig config once per distinct look and reuses it every frame.
+    func rigConfig(look: LookDef, facing: Double, id: String) -> FighterRigConfig {
+        let key = "\(id)|\(facing)|\(look.colors.joined(separator: ","))|\(look.helm)|\(look.cape)|\(look.weapon)"
+        if let cached = rigConfigCache[key] { return cached }
+        let cfg = FighterRigConfig.from(look: look, facing: facing, id: id)
+        if rigConfigCache.count > 24 { rigConfigCache.removeAll() }
+        rigConfigCache[key] = cfg
+        return cfg
+    }
     private var lastFighterPoses: [String: (cr: Double, x: Double)] = [:]
 
     init() {}
@@ -122,12 +133,12 @@ final class SceneModel: ObservableObject {
 
             // Update Weapon Trails
             let pLook = src.rsStyle.look
-            let pConfig = FighterRigConfig.from(look: pLook, facing: 1.0, id: "player")
+            let pConfig = rigConfig(look: pLook, facing: 1.0, id: "player")
             let pTip = FighterRig.weaponTip(config: pConfig, pose: pPose, time: timeToUse)
             updateTrail(id: "player", tip: pTip, time: timeToUse)
 
             if let enemy = src.rsEnemy {
-                let eConfig = FighterRigConfig.from(look: enemy.look, facing: -1.0, id: enemy.id)
+                let eConfig = rigConfig(look: enemy.look, facing: -1.0, id: enemy.id)
                 let ePose = src.rsEnemyPose
                 let eTip = FighterRig.weaponTip(config: eConfig, pose: ePose, time: timeToUse)
                 updateTrail(id: "enemy", tip: eTip, time: timeToUse)

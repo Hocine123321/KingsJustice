@@ -32,6 +32,7 @@ extension GameEngine {
         self.enemyTitle = E.title
 
         self.hitBarkCount = 0
+        self.lowHealthBarked = false
         self.on = true
         self.over = false
         self.paused = false

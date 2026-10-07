@@ -458,6 +458,11 @@ extension GameEngine {
         khp -= d
         if khp <= 0 {
             end2(win: true)
+        } else if !lowHealthBarked && kmax > 0 && (khp / kmax) < 0.25 {
+            lowHealthBarked = true
+            if let bark = Dialogue.line(.onLowHealth, enemyId: enemyDef?.id ?? "", seed: hitBarkCount &+ 7) {
+                taunt(bark)
+            }
         }
     }
 
