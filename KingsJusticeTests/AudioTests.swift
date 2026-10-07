@@ -153,4 +153,22 @@ final class AudioTests: XCTestCase {
         UIAudio.startMenuMusic()
         UIAudio.stopMusic(fadeDuration: 0.1)
     }
+
+    func testMusicNoteSetsStaySmallForEveryArena() {
+        // Starting a track must only render a handful of notes, never the whole library (this caused a freeze at fight start).
+        for (_, arena) in GameData.arenas {
+            let sets = AudioEngine.musicNoteSets(root: arena.music.root, scale: arena.music.scale)
+            XCTAssertFalse(sets.pad.isEmpty, "\(arena.key) needs pad notes")
+            XCTAssertLessThanOrEqual(sets.pad.count, 4)
+            XCTAssertLessThanOrEqual(sets.bass.count, 4)
+            XCTAssertLessThanOrEqual(sets.lead.count, 8)
+        }
+        let menu = AudioEngine.musicNoteSets(root: 45, scale: "aeolian")
+        XCTAssertFalse(menu.lead.isEmpty)
+    }
+
+    func testRepeatedMenuMusicStartsDoNotCrash() {
+        for _ in 0..<5 { AudioEngine.shared.startMenuMusic() }
+        AudioEngine.shared.stopMusic(fadeDuration: 0.0)
+    }
 }

@@ -26,6 +26,19 @@ final class SceneModel: ObservableObject {
     var weaponTrails: [String: [TrailPoint]] = [:]
 
     private var lastRealTime: Double = 0.0
+    private var pendingBakes: Int = 0
+
+    /// Bakes at most one static layer into a bitmap. Called once per frame.
+    private func bakeNextLayer() {
+        guard pendingBakes > 0 else { return }
+        switch pendingBakes {
+        case 4: if let doc = bgDoc { bgImage = bakeLayer(doc) }
+        case 3: if let doc = clDoc { clImage = bakeLayer(doc) }
+        case 2: if let doc = gndDoc { gndImage = bakeLayer(doc) }
+        default: if let doc = fgDoc { fgImage = bakeLayer(doc) }
+        }
+        pendingBakes -= 1
+    }
     private var lastTipPositions: [String: (CGPoint, Double)] = [:]
     private var rigConfigCache: [String: FighterRigConfig] = [:]
 
@@ -52,11 +65,13 @@ final class SceneModel: ObservableObject {
         gndDoc = SVGDocument(markup: arena.gnd)
         fgDoc = SVGDocument(markup: arena.fg)
 
-        // Pre-render/Bake static layer bitmaps
-        if let doc = bgDoc { bgImage = bakeLayer(doc) }
-        if let doc = clDoc { clImage = bakeLayer(doc) }
-        if let doc = gndDoc { gndImage = bakeLayer(doc) }
-        if let doc = fgDoc { fgImage = bakeLayer(doc) }
+        // Drop old bitmaps; layers draw from their vector documents until each bitmap is baked.
+        bgImage = nil
+        clImage = nil
+        gndImage = nil
+        fgImage = nil
+        // Bake one layer per frame (see bakeNextLayer) so entering a fight never stalls on four renders at once.
+        pendingBakes = 4
 
         // Setup Weather
         particleSystem.setupWeather(
@@ -70,6 +85,7 @@ final class SceneModel: ObservableObject {
     func update(time: Double, source: (any RenderSource)?) {
         let dtReal = lastRealTime > 0 ? max(0.001, min(0.1, time - lastRealTime)) : 0.016
         lastRealTime = time
+        bakeNextLayer()
 
         let isHitStop = source?.rsHitStop ?? false
         let dt = isHitStop ? dtReal * 0.05 : dtReal

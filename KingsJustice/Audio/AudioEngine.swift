@@ -42,6 +42,11 @@ final class AudioEngine {
     private var bassBuffers: [Int: AVAudioPCMBuffer] = [:] // midiNote -> PCMBuffer
     private var padBuffers: [String: AVAudioPCMBuffer] = [:] // "midiNote_chordType" -> PCMBuffer
     private var leadBuffers: [String: AVAudioPCMBuffer] = [:] // "midiNote_style" -> PCMBuffer
+    /// Guards bassBuffers / padBuffers / leadBuffers, which are written on the synth queue and read on the music queue.
+    private let musicBufferLock = NSLock()
+    /// Incremented on every start/stop so stale background renders can't start an old track.
+    private var musicGeneration: Int = 0
+    private var isMenuTrackActive = false
     private var stingerWinBuffer: AVAudioPCMBuffer?
     private var stingerLoseBuffer: AVAudioPCMBuffer?
     private var currentDroneBuffer: AVAudioPCMBuffer?
@@ -174,18 +179,35 @@ final class AudioEngine {
     func startMusic(root: Int, scale: String, bpm: Double, style: String = "default", isMenu: Bool = false) {
         cancelFadeTimer()
         stopMusic(fadeDuration: 0.0)
+        musicGeneration += 1
+        let generation = musicGeneration
 
         musicRoot = root
         musicScale = scale
         musicBPM = max(30.0, min(240.0, bpm))
         musicStyle = style
         isMenuMusicMode = isMenu
+        isMenuTrackActive = isMenu
         musicIntensity = isMenu ? 0.3 : 0.5
+        musicMixer.outputVolume = Float(musicVolume)
+
+        // Render only the notes this track needs, off the main thread, then start the scheduler.
+        let isChoir = (scale.lowercased() == "aeolian" || style == "choir" || scale.lowercased() == "cathedral")
+        let isDark = (scale.lowercased() == "phrygian" || scale.lowercased() == "locrian" || scale.lowercased() == "swamp")
+        synthQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.renderMusicBuffers(root: root, scale: scale, isChoir: isChoir, isDark: isDark)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self, self.musicGeneration == generation else { return }
+                self.beginMusicScheduler()
+            }
+        }
+    }
+
+    private func beginMusicScheduler() {
         musicStartTime = CACurrentMediaTime()
         musicStepIndex = 0
         nextBeatTime = musicStartTime
-
-        musicMixer.outputVolume = Float(musicVolume)
         isMusicPlaying = true
 
         let timer = DispatchSource.makeTimerSource(queue: musicQueue)
@@ -197,7 +219,87 @@ final class AudioEngine {
         musicTimer = timer
     }
 
+    /// The distinct pad, bass and lead notes a track can reach. Small by design, so starting music never renders a whole library.
+    static func musicNoteSets(root: Int, scale: String) -> (pad: Set<Int>, bass: Set<Int>, lead: Set<Int>) {
+        let offsets = Synth.scaleOffsets(for: scale)
+        guard !offsets.isEmpty else { return ([], [], []) }
+
+        var padNotes = Set<Int>()
+        var bassNotes = Set<Int>()
+        for degree in [0, 5, 2, 6] {
+            let d = min(degree, offsets.count - 1)
+            let chordRoot = root + offsets[d]
+            padNotes.insert(max(36, min(60, chordRoot - 12)))
+            bassNotes.insert(max(24, min(55, chordRoot - 12)))
+        }
+        var leadNotes = Set<Int>()
+        for i in 0..<offsets.count {
+            leadNotes.insert(max(48, min(72, root + offsets[i])))
+        }
+        return (padNotes, bassNotes, leadNotes)
+    }
+
+    /// Synthesizes just the pad, bass and lead notes a track can reach. Runs on the synth queue.
+    private func renderMusicBuffers(root: Int, scale: String, isChoir: Bool, isDark: Bool) {
+        let sr = 44100.0
+        let sets = AudioEngine.musicNoteSets(root: root, scale: scale)
+        let padNotes = sets.pad
+        let bassNotes = sets.bass
+        let leadNotes = sets.lead
+        if padNotes.isEmpty { return }
+
+        let padType = isChoir ? "choir" : (isDark ? "drone" : "minor")
+        let leadStyle = isChoir ? "choir" : "plucked"
+
+        for note in bassNotes {
+            if hasMusicBuffer(bass: note) { continue }
+            let samples = Synth.bassBuffer(midiNote: note, duration: 0.35, sampleRate: sr)
+            if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) { storeMusicBuffer(bass: note, buf) }
+        }
+        for note in padNotes {
+            let key = "\(note)_\(padType)"
+            if hasMusicBuffer(pad: key) { continue }
+            let samples = Synth.padBuffer(midiNote: note, chordType: padType, duration: 3.5, sampleRate: sr)
+            if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) { storeMusicBuffer(pad: key, buf) }
+        }
+        for note in leadNotes {
+            let key = "\(note)_\(leadStyle)"
+            if hasMusicBuffer(lead: key) { continue }
+            let samples = Synth.leadBuffer(midiNote: note, style: leadStyle, duration: 0.6, sampleRate: sr)
+            if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) { storeMusicBuffer(lead: key, buf) }
+        }
+    }
+
+    // MARK: - Thread-safe music buffer access
+
+    private func musicBuffer(bass note: Int) -> AVAudioPCMBuffer? {
+        musicBufferLock.lock(); defer { musicBufferLock.unlock() }
+        return bassBuffers[note]
+    }
+    private func musicBuffer(pad key: String) -> AVAudioPCMBuffer? {
+        musicBufferLock.lock(); defer { musicBufferLock.unlock() }
+        return padBuffers[key]
+    }
+    private func musicBuffer(lead key: String) -> AVAudioPCMBuffer? {
+        musicBufferLock.lock(); defer { musicBufferLock.unlock() }
+        return leadBuffers[key]
+    }
+    private func hasMusicBuffer(bass note: Int) -> Bool { musicBuffer(bass: note) != nil }
+    private func hasMusicBuffer(pad key: String) -> Bool { musicBuffer(pad: key) != nil }
+    private func hasMusicBuffer(lead key: String) -> Bool { musicBuffer(lead: key) != nil }
+    private func storeMusicBuffer(bass note: Int, _ buf: AVAudioPCMBuffer) {
+        musicBufferLock.lock(); bassBuffers[note] = buf; musicBufferLock.unlock()
+    }
+    private func storeMusicBuffer(pad key: String, _ buf: AVAudioPCMBuffer) {
+        musicBufferLock.lock(); padBuffers[key] = buf; musicBufferLock.unlock()
+    }
+    private func storeMusicBuffer(lead key: String, _ buf: AVAudioPCMBuffer) {
+        musicBufferLock.lock(); leadBuffers[key] = buf; musicBufferLock.unlock()
+    }
+
+    /// Starts menu music only if it is not already playing, so moving between menu pages never restarts it.
     func startMenuMusic() {
+        if isMenuTrackActive { return }
         startMusic(root: 45, scale: "aeolian", bpm: 60.0, style: "choir", isMenu: true)
     }
 
@@ -215,6 +317,8 @@ final class AudioEngine {
 
     func stopMusic(fadeDuration: Double) {
         cancelFadeTimer()
+        isMenuTrackActive = false
+        musicGeneration += 1
 
         if fadeDuration <= 0.0 {
             isMusicPlaying = false
@@ -458,39 +562,6 @@ final class AudioEngine {
             newDrumBuffers[dk] = variants
         }
 
-        // Pre-render Bass Buffers (MIDI notes 24 to 60)
-        var newBassBuffers: [Int: AVAudioPCMBuffer] = [:]
-        for note in 24...60 {
-            let samples = Synth.bassBuffer(midiNote: note, duration: 0.35, sampleRate: sr)
-            if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) {
-                newBassBuffers[note] = buf
-            }
-        }
-
-        // Pre-render Pad Buffers (MIDI notes 36 to 60) for chord types ("minor", "major", "choir", "drone")
-        var newPadBuffers: [String: AVAudioPCMBuffer] = [:]
-        let padNotes = Array(36...60)
-        let chordTypes = ["minor", "major", "choir", "drone"]
-        for note in padNotes {
-            for chord in chordTypes {
-                let samples = Synth.padBuffer(midiNote: note, chordType: chord, duration: 3.5, sampleRate: sr)
-                if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) {
-                    newPadBuffers["\(note)_\(chord)"] = buf
-                }
-            }
-        }
-
-        // Pre-render Lead Buffers (MIDI notes 48 to 72) for styles ("plucked", "choir")
-        var newLeadBuffers: [String: AVAudioPCMBuffer] = [:]
-        for note in 48...72 {
-            for style in ["plucked", "choir"] {
-                let samples = Synth.leadBuffer(midiNote: note, style: style, duration: 0.6, sampleRate: sr)
-                if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) {
-                    newLeadBuffers["\(note)_\(style)"] = buf
-                }
-            }
-        }
-
         // Pre-render Stingers
         let winSamples = Synth.stingerBuffer(win: true, sampleRate: sr)
         let winBuf = Synth.pcmBuffer(from: winSamples, sampleRate: sr)
@@ -502,9 +573,6 @@ final class AudioEngine {
             guard let self = self else { return }
             self.sfxBuffers = newSfxBuffers
             self.drumBuffers = newDrumBuffers
-            self.bassBuffers = newBassBuffers
-            self.padBuffers = newPadBuffers
-            self.leadBuffers = newLeadBuffers
             self.stingerWinBuffer = winBuf
             self.stingerLoseBuffer = loseBuf
             self.isReady = true
@@ -577,7 +645,7 @@ final class AudioEngine {
             let padType = isChoirStyle ? "choir" : (isDarkStyle ? "drone" : "minor")
             let padNote = max(36, min(60, chordRootNote - 12))
             let key = "\(padNote)_\(padType)"
-            if let buf = padBuffers[key] ?? padBuffers["\(padNote)_minor"] {
+            if let buf = musicBuffer(pad: key) ?? musicBuffer(pad: "\(padNote)_minor") {
                 let p = musicPadPlayers[nextPadPlayerIndex]
                 nextPadPlayerIndex = (nextPadPlayerIndex + 1) % musicPadPlayers.count
                 p.volume = Float(0.35 + intensity * 0.25)
@@ -590,7 +658,7 @@ final class AudioEngine {
         let playBass = (stepInBar % 4 == 0) || (stepInBar == 6 && intensity > 0.3) || (stepInBar == 10 && intensity > 0.5) || (stepInBar == 14)
         if playBass {
             let bassOctaveNote = max(24, min(55, chordRootNote - 12))
-            if let buf = bassBuffers[bassOctaveNote] {
+            if let buf = musicBuffer(bass: bassOctaveNote) {
                 let p = musicBassPlayers[nextBassPlayerIndex]
                 nextBassPlayerIndex = (nextBassPlayerIndex + 1) % musicBassPlayers.count
                 p.volume = Float(0.5 + intensity * 0.35)
@@ -618,7 +686,7 @@ final class AudioEngine {
             let leadNote = max(48, min(72, root + scaleOffsets[melodyDegreeIndex]))
             let leadStyleName = isChoirStyle ? "choir" : "plucked"
             let key = "\(leadNote)_\(leadStyleName)"
-            if let buf = leadBuffers[key] ?? leadBuffers["\(leadNote)_plucked"] {
+            if let buf = musicBuffer(lead: key) ?? musicBuffer(lead: "\(leadNote)_plucked") {
                 let p = musicLeadPlayers[nextLeadPlayerIndex]
                 nextLeadPlayerIndex = (nextLeadPlayerIndex + 1) % musicLeadPlayers.count
                 p.volume = Float(0.3 + intensity * 0.3)
