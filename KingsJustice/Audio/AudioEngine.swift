@@ -127,7 +127,7 @@ final class AudioEngine {
                 self.currentDroneBuffer = buf
                 self.dronePlayer.stop()
                 self.dronePlayer.volume = 0.5
-                safeSchedule(self.dronePlayer, buf, loops: true)
+                self.safeSchedule(self.dronePlayer, buf, loops: true)
                 self.dronePlayer.play()
             }
         }
