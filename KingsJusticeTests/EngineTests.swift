@@ -27,10 +27,12 @@ final class EngineTests: XCTestCase {
         engine.startRun(mode: "duel", enemyIndex: 0)
 
         // Advance until fight starts
-        for _ in 0..<200 {
+        for _ in 0..<2000 {
             engine.tick(dt: 0.016)
+            if engine.started && engine.t > 0.5 { break }
         }
         XCTAssertTrue(engine.started)
+        XCTAssertGreaterThan(engine.t, 0.0)
 
         let initialMaxHp = engine.maxhp
         let expectedSecondWindHp = Double(Int(initialMaxHp * 0.25))

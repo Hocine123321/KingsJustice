@@ -485,6 +485,7 @@ private final class SVGFragmentParser: NSObject, XMLParserDelegate {
     var defNodes: [String: SVGNode] = [:]
 
     private var nodeStack: [SVGNode] = []
+    private var wrapperSeen: Bool = false
     private var currentStops: [Gradient.Stop] = []
 
     init(markup: String) {
@@ -519,9 +520,14 @@ private final class SVGFragmentParser: NSObject, XMLParserDelegate {
             currentStops = []
         }
 
+        // The synthetic wrapper <svg> is only a container and is never pushed on the stack.
+        if elementName == "svg" && !wrapperSeen {
+            wrapperSeen = true
+            return
+        }
         if let parent = nodeStack.last {
             parent.children.append(node)
-        } else if elementName != "svg" {
+        } else {
             rootNodes.append(node)
         }
 
@@ -531,6 +537,7 @@ private final class SVGFragmentParser: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         // <stop> elements are consumed in didStartElement and never pushed on the stack.
         if elementName == "stop" { return }
+        if elementName == "svg" && nodeStack.isEmpty { return }
         guard let node = nodeStack.popLast() else { return }
 
         if let id = node.attributes["id"] {
