@@ -125,6 +125,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         // Sparks and Blood
                         model.particleSystem.drawBlood(in: sceneCtx)
                         model.particleSystem.drawSparks(in: sceneCtx)
+                        model.particleSystem.drawFloatTexts(in: sceneCtx)
 
                         // 7. Torch light overlays
                         if let light = arena?.light {

@@ -352,6 +352,15 @@ extension GameEngine {
         }
 
         damageEnemy(dmg)
+        if dmg > 0 && !training {
+            let shown = Int((dmg / max(kmax, 1.0) * 1000.0).rounded())
+            if shown > 0 {
+                onSpawnFX?(.floatText(text: "\(shown)", x: 760.0, y: 350.0, color: col, big: perfect))
+            }
+        }
+        if combo > 0 && combo % 8 == 0 {
+            onSpawnFX?(.floatText(text: "\(combo) COMBO", x: 640.0, y: 300.0, color: "#ffe08a", big: true))
+        }
 
         let lanePose = (events[index].lane == 0) ? EnginePoses.kSlash : ((events[index].lane == 1) ? EnginePoses.kThrust : EnginePoses.kOver)
         playerPoseState.setAction(lanePose, speed: 28.0, hold: 0.28)

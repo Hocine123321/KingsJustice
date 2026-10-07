@@ -101,6 +101,8 @@ extension GameEngine: RenderSource {
                 out.append(RenderFX.flashHurt)
             case .flashScreen:
                 break
+            case .floatText(let text, let x, let y, let color, let big):
+                out.append(RenderFX.floatText(text: text, x: x, y: y, color: color, big: big))
             }
         }
         fxQueue.removeAll()

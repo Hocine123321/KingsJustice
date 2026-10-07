@@ -53,7 +53,19 @@ struct GroundStain: Sendable {
     var opacity: Double
 }
 
+struct FloatText: Sendable {
+    var text: String
+    var x: Double
+    var y: Double
+    var vy: Double
+    var color: Color
+    var big: Bool
+    var age: Double
+    var life: Double
+}
+
 final class ParticleSystem: @unchecked Sendable {
+    var floatTexts: [FloatText] = []
     var weatherParticles: [WeatherParticle] = []
     var sparkParticles: [SparkParticle] = []
     var bloodParticles: [BloodParticle] = []
@@ -126,7 +138,37 @@ final class ParticleSystem: @unchecked Sendable {
         }
     }
 
+    func spawnFloatText(text: String, x: Double, y: Double, color: Color, big: Bool) {
+        if floatTexts.count > 24 { floatTexts.removeFirst() }
+        floatTexts.append(FloatText(text: text, x: x + Double.random(in: -26...26), y: y, vy: big ? -150.0 : -110.0, color: color, big: big, age: 0.0, life: big ? 1.1 : 0.85))
+    }
+
+    func drawFloatTexts(in context: GraphicsContext) {
+        for f in floatTexts {
+            let t = f.age / f.life
+            let pop = 1.0 + 0.45 * max(0.0, 1.0 - f.age / 0.14)
+            let size = (f.big ? 46.0 : 32.0) * pop
+            let alpha = t < 0.65 ? 1.0 : max(0.0, 1.0 - (t - 0.65) / 0.35)
+            context.drawLayer { ctx in
+                ctx.opacity = alpha
+                let shadow = Text(f.text).font(.system(size: size, weight: .heavy, design: .serif)).foregroundColor(Color.black.opacity(0.85))
+                ctx.draw(shadow, at: CGPoint(x: f.x + 2.0, y: f.y + 3.0))
+                let label = Text(f.text).font(.system(size: size, weight: .heavy, design: .serif)).foregroundColor(f.color)
+                ctx.draw(label, at: CGPoint(x: f.x, y: f.y))
+            }
+        }
+    }
+
     func update(dt: Double, time: Double, weatherType: String, wind: Double) {
+        // Floating combat text
+        var i = floatTexts.count - 1
+        while i >= 0 {
+            floatTexts[i].age += dt
+            floatTexts[i].y += floatTexts[i].vy * dt
+            floatTexts[i].vy *= max(0.0, 1.0 - 3.0 * dt)
+            if floatTexts[i].age >= floatTexts[i].life { floatTexts.remove(at: i) }
+            i -= 1
+        }
         // Update weather
         for i in 0..<weatherParticles.count {
             var p = weatherParticles[i]

@@ -8,6 +8,7 @@ enum FXEvent: Equatable {
     case stain(x: Double, y: Double, radius: Double)
     case flashHurt(opacity: Double)
     case flashScreen(color: String, opacity: Double)
+    case floatText(text: String, x: Double, y: Double, color: String, big: Bool)
 }
 
 // MARK: - Pose Request

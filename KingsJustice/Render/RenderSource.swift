@@ -54,6 +54,7 @@ enum RenderFX: Sendable {
     case blood(x: Double, y: Double, n: Int, dir: Double, power: Double)
     case stain(x: Double, y: Double, r: Double)
     case flashHurt
+    case floatText(text: String, x: Double, y: Double, color: String, big: Bool)
 }
 
 protocol RenderSource: AnyObject {

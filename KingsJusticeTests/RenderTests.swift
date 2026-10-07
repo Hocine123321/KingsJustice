@@ -93,4 +93,15 @@ final class RenderTests: XCTestCase {
         XCTAssertEqual(emissions, 0, "SceneModel must not publish while rendering")
         cancellable.cancel()
     }
+
+    func testFloatTextSpawnsAndExpires() {
+        let ps = ParticleSystem()
+        ps.spawnFloatText(text: "42", x: 700, y: 350, color: Color.white, big: true)
+        XCTAssertEqual(ps.floatTexts.count, 1)
+        ps.update(dt: 0.5, time: 0.5, weatherType: "embers", wind: 0)
+        XCTAssertEqual(ps.floatTexts.count, 1)
+        XCTAssertLessThan(ps.floatTexts[0].y, 350)
+        ps.update(dt: 1.0, time: 1.5, weatherType: "embers", wind: 0)
+        XCTAssertTrue(ps.floatTexts.isEmpty)
+    }
 }
