@@ -124,21 +124,21 @@ final class EngineTests: XCTestCase {
 
     // Test 5: buildRound is deterministic for a fixed seed
     func testBuildRoundDeterminism() {
+        // "daily" mode seeds from the date, so two engines must build identical rounds.
         let engine1 = GameEngine()
-        engine1.rng = MulberryRNG(seed: 99999)
-        engine1.startRun(mode: "duel", enemyIndex: 0)
+        engine1.startRun(mode: "daily", enemyIndex: 0)
 
         let engine2 = GameEngine()
-        engine2.rng = MulberryRNG(seed: 99999)
-        engine2.startRun(mode: "duel", enemyIndex: 0)
+        engine2.startRun(mode: "daily", enemyIndex: 0)
 
         for _ in 0..<200 {
             engine1.tick(dt: 0.016)
             engine2.tick(dt: 0.016)
         }
 
+        XCTAssertGreaterThan(engine1.events.count, 0)
         XCTAssertEqual(engine1.events.count, engine2.events.count)
-        for i in 0..<engine1.events.count {
+        for i in 0..<min(engine1.events.count, engine2.events.count) {
             XCTAssertEqual(engine1.events[i].kind, engine2.events[i].kind)
             XCTAssertEqual(engine1.events[i].input, engine2.events[i].input)
             XCTAssertEqual(engine1.events[i].lane, engine2.events[i].lane)
