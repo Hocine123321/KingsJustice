@@ -100,8 +100,8 @@ struct FighterRig {
         wound: Double = 0.0
     ) {
         let p = pose.count >= 8 ? pose : [500.0, 0.0, -40.0, 40.0, 80.0, 0.0, 0.0, 0.0]
-        let x = p[0]
-        let lean = p[1]
+        let rawX = p[0]
+        let rawLean = p[1]
         let a1 = p[2]
         let a2 = p[3]
         let a3 = p[4]
@@ -111,7 +111,14 @@ struct FighterRig {
 
         let sz = config.size
         let ph = config.ph
-        let br = sin(time * 2.3 + ph) * 2.8
+
+        // Richer idle sway (weight shift on x/lean, chest breathing, head bob)
+        let swayX = sin(time * 1.8 + ph) * 3.5 * config.facing
+        let idleLean = sin(time * 1.8 + ph + 0.4) * 1.2
+        let x = rawX + swayX
+        let lean = rawLean + idleLean
+
+        let br = sin(time * 2.3 + ph) * 3.2
         let w = sin(time * 1.7 + ph) * 2.2
         let dy = 715.0 + f * 20.0 + cr * sz
 
@@ -131,15 +138,21 @@ struct FighterRig {
         ]
         let fallbackBodyColor = C[1]
 
-        // 1. Ground Shadow
+        // 1. Ground Contact Shadow (scales with jump height / crouch)
         let shadowCx = x - (config.facing > 0 ? f * 160.0 : 0.0)
-        let shadowRx = (78.0 + f * 120.0) * sz
-        let shadowRect = CGRect(x: shadowCx - shadowRx, y: 714.0 - 13.0, width: shadowRx * 2.0, height: 26.0)
+        let jumpHeight = max(0.0, -cr * sz)
+        let crouchDepth = max(0.0, cr * sz)
+        let shadowScale = max(0.22, min(1.3, 1.0 - jumpHeight / 140.0 + crouchDepth / 220.0))
+        let shadowOpacity = max(0.12, min(0.75, 0.6 * (1.0 - jumpHeight / 160.0) + crouchDepth / 180.0))
+
+        let shadowRx = (78.0 + f * 120.0) * sz * shadowScale
+        let shadowRy = 13.0 * shadowScale
+        let shadowRect = CGRect(x: shadowCx - shadowRx, y: 714.0 - shadowRy, width: shadowRx * 2.0, height: shadowRy * 2.0)
         let shadowPath = Path(ellipseIn: shadowRect)
 
         context.drawLayer { ctx in
-            ctx.addFilter(.blur(radius: 4.0))
-            ctx.fill(shadowPath, with: .color(Color.black.opacity(0.6)))
+            ctx.addFilter(.blur(radius: max(1.0, 4.0 * shadowScale)))
+            ctx.fill(shadowPath, with: .color(Color.black.opacity(shadowOpacity)))
         }
 
         // Main Fighter Layer
@@ -161,12 +174,12 @@ struct FighterRig {
                 }
             }
 
-            // Cape
+            // Cape (secondary motion with lag)
             if config.cape != "none" {
                 var lPath = Path()
                 let cl = 230.0
                 let cw = config.cape == "rags" ? 7.0 : 6.0
-                let wv = config.cape == "rags" ? 4.2 : 3.0
+                let wv = config.cape == "rags" ? 5.5 : 3.8
 
                 var leftPts: [CGPoint] = []
                 var rightPts: [CGPoint] = []
@@ -174,7 +187,8 @@ struct FighterRig {
                 for i in 0...6 {
                     let fi = Double(i)
                     let py = -316.0 + fi * cl / 6.0
-                    let k = sin(time * 2.2 + fi * 0.8 + ph) * fi * wv - lean * (fi * 0.5)
+                    let lagTime = time - fi * 0.08
+                    let k = sin(lagTime * 2.3 + ph) * fi * wv + cos(lagTime * 3.2 + ph) * (fi * 1.2) - lean * (fi * 0.5)
                     leftPts.append(CGPoint(x: -30.0 - fi * cw + k, y: py))
                     rightPts.append(CGPoint(x: 26.0 - fi * cw * 0.4 + k, y: py))
                 }
@@ -282,9 +296,11 @@ struct FighterRig {
 
                     // Head
                     upCtx.drawLayer { hdCtx in
-                        hdCtx.concatenate(CGAffineTransform(translationX: 0, y: br * 0.6))
+                        let headBobY = sin(time * 2.3 + ph + 0.5) * 1.8
+                        let headBobAngle = sin(time * 1.6 + ph) * 1.2 * .pi / 180.0
+                        hdCtx.concatenate(CGAffineTransform(translationX: 0, y: br * 0.6 + headBobY))
                         hdCtx.concatenate(CGAffineTransform(translationX: 0, y: -320.0))
-                        hdCtx.concatenate(CGAffineTransform(rotationAngle: -lean * 0.25 * .pi / 180.0))
+                        hdCtx.concatenate(CGAffineTransform(rotationAngle: (-lean * 0.25 * .pi / 180.0) + headBobAngle))
                         hdCtx.concatenate(CGAffineTransform(translationX: 0, y: 320.0))
 
                         let H = config.helm
@@ -320,23 +336,22 @@ struct FighterRig {
                             }
 
                             if H == "horned" {
-                                for sx in [-1.0, 1.0] {
+                                for side in [-1.0, 1.0] {
                                     var horn = Path()
-                                    horn.move(to: CGPoint(x: sx * 20.0, y: -376))
-                                    horn.addQuadCurve(to: CGPoint(x: sx * 50.0, y: -424), control: CGPoint(x: sx * 52.0, y: -382))
-                                    horn.addQuadCurve(to: CGPoint(x: sx * 14.0, y: -388), control: CGPoint(x: sx * 38.0, y: -396))
+                                    horn.move(to: CGPoint(x: side * 18, y: -370))
+                                    horn.addQuadCurve(to: CGPoint(x: side * 44, y: -410), control: CGPoint(x: side * 36, y: -385))
+                                    horn.addQuadCurve(to: CGPoint(x: side * 22, y: -364), control: CGPoint(x: side * 28, y: -390))
                                     horn.closeSubpath()
-                                    hdCtx.fill(horn, with: .color(Color(red: 0.84, green: 0.8, blue: 0.72)))
-                                    hdCtx.stroke(horn, with: .color(Color(red: 0.16, green: 0.13, blue: 0.09)), style: StrokeStyle(lineWidth: 1.6))
-                                }
-                            }
 
-                            if H == "crown" {
+                                    hdCtx.fill(horn, with: .color(Color(red: 0.12, green: 0.11, blue: 0.11)))
+                                    hdCtx.stroke(horn, with: .color(config.trim), style: StrokeStyle(lineWidth: 1.5))
+                                }
+                            } else if H == "crown" {
                                 var crownPath = Path()
                                 crownPath.move(to: CGPoint(x: -22, y: -380))
                                 crownPath.addLine(to: CGPoint(x: -30, y: -418))
                                 crownPath.addLine(to: CGPoint(x: -12, y: -398))
-                                crownPath.addLine(to: CGPoint(x: 0, y: -428))
+                                crownPath.addLine(to: CGPoint(x: 0, y: -425))
                                 crownPath.addLine(to: CGPoint(x: 12, y: -398))
                                 crownPath.addLine(to: CGPoint(x: 30, y: -418))
                                 crownPath.addLine(to: CGPoint(x: 22, y: -380))
@@ -494,9 +509,10 @@ struct FighterRig {
 
                         upCtx.drawLayer { sw2Ctx in
                             sw2Ctx.concatenate(CGAffineTransform(translationX: H2.x, y: H2.y))
-                            let wAngle2 = -(a3 * 0.6 + w + 20.0) * .pi / 180.0
-                            sw2Ctx.concatenate(CGAffineTransform(rotationAngle: wAngle2))
-                            drawWeapon(in: sw2Ctx, weapon: "longsword")
+                            let weaponAngle2 = -(a3 * 0.8 + 20.0 + w) * .pi / 180.0
+                            sw2Ctx.concatenate(CGAffineTransform(rotationAngle: weaponAngle2))
+
+                            drawWeapon(in: sw2Ctx, weapon: "twinblades")
                         }
                     }
                 }
@@ -504,18 +520,76 @@ struct FighterRig {
         }
     }
 
-    private static func drawLimb(in context: GraphicsContext, path: Path, colors: [Color], width: Double) {
-        let style1 = StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round)
-        let style2 = StrokeStyle(lineWidth: width * 0.62, lineCap: .round, lineJoin: .round)
-        let style3 = StrokeStyle(lineWidth: width * 0.18, lineCap: .round, lineJoin: .round)
+    static func weaponTip(config: FighterRigConfig, pose: [Double], time: Double) -> CGPoint {
+        let p = pose.count >= 8 ? pose : [500.0, 0.0, -40.0, 40.0, 80.0, 0.0, 0.0, 0.0]
+        let rawX = p[0]
+        let rawLean = p[1]
+        let a1 = p[2]
+        let a2 = p[3]
+        let a3 = p[4]
+        let f = p[6]
+        let cr = p[7]
 
-        context.stroke(path, with: .color(colors[0]), style: style1)
-        context.stroke(path, with: .color(colors[1]), style: style2)
+        let sz = config.size
+        let ph = config.ph
 
-        context.drawLayer { ctx in
-            ctx.concatenate(CGAffineTransform(translationX: -width * 0.2, y: -width * 0.22))
-            ctx.stroke(path, with: .color(colors[2].opacity(0.8)), style: style3)
+        let swayX = sin(time * 1.8 + ph) * 3.5 * config.facing
+        let idleLean = sin(time * 1.8 + ph + 0.4) * 1.2
+        let x = rawX + swayX
+        let lean = rawLean + idleLean
+
+        let br = sin(time * 2.3 + ph) * 3.2
+        let w = sin(time * 1.7 + ph) * 2.2
+        let dy = 715.0 + f * 20.0 + cr * sz
+
+        let tipLocalX: Double
+        let tipLocalY: Double
+        switch config.weapon {
+        case "longsword": tipLocalX = 170.0; tipLocalY = 0.0
+        case "greatsword": tipLocalX = 245.0; tipLocalY = 0.0
+        case "axe": tipLocalX = 184.0; tipLocalY = -20.0
+        case "mace": tipLocalX = 172.0; tipLocalY = 0.0
+        case "spear": tipLocalX = 280.0; tipLocalY = 0.0
+        case "scythe": tipLocalX = 290.0; tipLocalY = -20.0
+        case "twinblades": tipLocalX = 145.0; tipLocalY = 0.0
+        default: tipLocalX = 150.0; tipLocalY = 0.0
         }
+
+        let S = CGPoint(x: 20.0, y: -306.0 + br)
+        let Ee = P(S, a1, 70.0)
+        let Hh = P(Ee, a2, 66.0)
+
+        let weaponRad = -(a3 + w) * .pi / 180.0
+        let wTipX = Hh.x + tipLocalX * cos(weaponRad) - tipLocalY * sin(weaponRad)
+        let wTipY = Hh.y + tipLocalX * sin(weaponRad) + tipLocalY * cos(weaponRad)
+
+        let leanRad = lean * .pi / 180.0
+        let relY = wTipY + 165.0
+        let torsoTipX = wTipX * cos(leanRad) - relY * sin(leanRad)
+        let torsoTipY = -165.0 + wTipX * sin(leanRad) + relY * cos(leanRad)
+
+        var bodyX = torsoTipX * sz
+        var bodyY = torsoTipY * sz
+
+        if f != 0 {
+            let fRad = -f * 88.0 * .pi / 180.0
+            let rx = bodyX * cos(fRad) - bodyY * sin(fRad)
+            let ry = bodyX * sin(fRad) + bodyY * cos(fRad)
+            bodyX = rx
+            bodyY = ry
+        }
+
+        bodyX *= config.facing
+
+        return CGPoint(x: x + bodyX, y: dy + bodyY)
+    }
+
+    private static func drawLimb(in context: GraphicsContext, path: Path, colors: [Color], width: Double) {
+        let fallbackCol = colors.indices.contains(1) ? colors[1] : Color.gray
+        let mainCol = colors.indices.contains(2) ? colors[2] : Color.white
+        context.stroke(path, with: .color(fallbackCol), style: StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round))
+        context.stroke(path, with: .color(mainCol.opacity(0.85)), style: StrokeStyle(lineWidth: width * 0.65, lineCap: .round, lineJoin: .round))
+        context.stroke(path, with: .color(Color.black), style: StrokeStyle(lineWidth: 2.2))
     }
 
     private static func P(_ origin: CGPoint, _ angleDeg: Double, _ length: Double) -> CGPoint {

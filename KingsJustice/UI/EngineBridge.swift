@@ -36,6 +36,7 @@ protocol UIEngine: ObservableObject {
     var over: Bool { get }
     var won: Bool { get }
     var tipText: String? { get }
+    var tauntText: String { get }
     var potionCount: Int { get }
     var started: Bool { get }
     var enemyName: String { get }
@@ -77,6 +78,7 @@ final class MockGameEngine: UIEngine, ObservableObject {
     @Published var paused: Bool = false
     @Published var over: Bool = false
     @Published var won: Bool = false
+    @Published var tauntText: String = ""
     @Published var tipText: String? = "Parry when the ring closes on the center target!"
     @Published var potionCount: Int = 1
     @Published var started: Bool = false

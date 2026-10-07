@@ -18,14 +18,32 @@ final class AudioEngine {
 
     private let dronePlayer = AVAudioPlayerNode()
 
+    // Drum players
     private let musicKickPlayer = AVAudioPlayerNode()
     private let musicSnarePlayer = AVAudioPlayerNode()
     private let musicHatPlayer = AVAudioPlayerNode()
     private let musicTomPlayer = AVAudioPlayerNode()
-    private let musicBassPlayer = AVAudioPlayerNode()
 
+    // Player pools for round-robin overlapping notes (click-free)
+    private var musicBassPlayers: [AVAudioPlayerNode] = []
+    private var nextBassPlayerIndex = 0
+
+    private var musicPadPlayers: [AVAudioPlayerNode] = []
+    private var nextPadPlayerIndex = 0
+
+    private var musicLeadPlayers: [AVAudioPlayerNode] = []
+    private var nextLeadPlayerIndex = 0
+
+    private let stingerPlayer = AVAudioPlayerNode()
+
+    // Pre-rendered Buffers
     private var sfxBuffers: [SfxKind: [AVAudioPCMBuffer]] = [:]
     private var drumBuffers: [String: [AVAudioPCMBuffer]] = [:]
+    private var bassBuffers: [Int: AVAudioPCMBuffer] = [:] // midiNote -> PCMBuffer
+    private var padBuffers: [String: AVAudioPCMBuffer] = [:] // "midiNote_chordType" -> PCMBuffer
+    private var leadBuffers: [String: AVAudioPCMBuffer] = [:] // "midiNote_style" -> PCMBuffer
+    private var stingerWinBuffer: AVAudioPCMBuffer?
+    private var stingerLoseBuffer: AVAudioPCMBuffer?
     private var currentDroneBuffer: AVAudioPCMBuffer?
 
     private(set) var isReady = false
@@ -37,15 +55,19 @@ final class AudioEngine {
 
     // Music scheduler state
     private var isMusicPlaying = false
+    private var isMenuMusicMode = false
     private var musicRoot: Int = 45
     private var musicScale: String = "minor"
     private var musicBPM: Double = 80.0
     private var musicIntensity: Double = 0.5
+    private var musicStyle: String = "default"
     private var musicStartTime: Double = 0.0
     private var musicStepIndex: Int = 0
     private var nextBeatTime: Double = 0.0
 
     private var musicTimer: DispatchSourceTimer?
+    private var fadeTimer: DispatchSourceTimer?
+
     private let musicQueue = DispatchQueue(label: "com.kingsjustice.audio.music", qos: .userInteractive)
     private let synthQueue = DispatchQueue(label: "com.kingsjustice.audio.synth", qos: .userInitiated)
 
@@ -66,7 +88,7 @@ final class AudioEngine {
     }
 
     func stop() {
-        stopMusic()
+        stopMusic(fadeDuration: 0.0)
         stopDrone()
 
         engine.stop()
@@ -142,16 +164,28 @@ final class AudioEngine {
     }
 
     func startMusic(root: Int, scale: String, bpm: Double) {
-        stopMusic()
+        startMusic(root: root, scale: scale, bpm: bpm, style: "default", isMenu: false)
+    }
+
+    func startMusic(root: Int = 45, scale: String = "minor") {
+        startMusic(root: root, scale: scale, bpm: 80.0, style: "default", isMenu: false)
+    }
+
+    func startMusic(root: Int, scale: String, bpm: Double, style: String = "default", isMenu: Bool = false) {
+        cancelFadeTimer()
+        stopMusic(fadeDuration: 0.0)
 
         musicRoot = root
         musicScale = scale
         musicBPM = max(30.0, min(240.0, bpm))
-        musicIntensity = 0.5
+        musicStyle = style
+        isMenuMusicMode = isMenu
+        musicIntensity = isMenu ? 0.3 : 0.5
         musicStartTime = CACurrentMediaTime()
         musicStepIndex = 0
         nextBeatTime = musicStartTime
 
+        musicMixer.outputVolume = Float(musicVolume)
         isMusicPlaying = true
 
         let timer = DispatchSource.makeTimerSource(queue: musicQueue)
@@ -163,8 +197,8 @@ final class AudioEngine {
         musicTimer = timer
     }
 
-    func startMusic(root: Int = 45, scale: String = "minor") {
-        startMusic(root: root, scale: scale, bpm: 80.0)
+    func startMenuMusic() {
+        startMusic(root: 45, scale: "aeolian", bpm: 60.0, style: "choir", isMenu: true)
     }
 
     func setMusicBPM(_ bpm: Double) {
@@ -176,15 +210,61 @@ final class AudioEngine {
     }
 
     func stopMusic() {
-        isMusicPlaying = false
-        musicTimer?.cancel()
-        musicTimer = nil
+        stopMusic(fadeDuration: 0.0)
+    }
 
-        musicKickPlayer.stop()
-        musicSnarePlayer.stop()
-        musicHatPlayer.stop()
-        musicTomPlayer.stop()
-        musicBassPlayer.stop()
+    func stopMusic(fadeDuration: Double) {
+        cancelFadeTimer()
+
+        if fadeDuration <= 0.0 {
+            isMusicPlaying = false
+            musicTimer?.cancel()
+            musicTimer = nil
+            stopAllMusicPlayers()
+            musicMixer.outputVolume = Float(musicVolume)
+        } else {
+            guard isMusicPlaying else { return }
+            let startVol = musicMixer.outputVolume
+            let steps = 20
+            let stepInterval = max(0.01, fadeDuration / Double(steps))
+            var currentStep = 0
+
+            let fTimer = DispatchSource.makeTimerSource(queue: musicQueue)
+            fTimer.schedule(deadline: .now(), repeating: .milliseconds(Int(stepInterval * 1000)))
+            fTimer.setEventHandler { [weak self] in
+                guard let self = self else { return }
+                currentStep += 1
+                let progress = Float(currentStep) / Float(steps)
+                let newVol = max(0.0, startVol * (1.0 - progress))
+
+                DispatchQueue.main.async {
+                    self.musicMixer.outputVolume = newVol
+                }
+
+                if currentStep >= steps {
+                    self.cancelFadeTimer()
+                    self.isMusicPlaying = false
+                    self.musicTimer?.cancel()
+                    self.musicTimer = nil
+                    self.stopAllMusicPlayers()
+                    DispatchQueue.main.async {
+                        self.musicMixer.outputVolume = Float(self.musicVolume)
+                    }
+                }
+            }
+            fTimer.resume()
+            fadeTimer = fTimer
+        }
+    }
+
+    func playStinger(win: Bool) {
+        guard isReady, isStarted else { return }
+        guard let buf = win ? stingerWinBuffer : stingerLoseBuffer else { return }
+
+        stingerPlayer.volume = 1.0
+        stingerPlayer.stop()
+        safeSchedule(stingerPlayer, buf)
+        stingerPlayer.play()
     }
 
     func beatTime() -> Double {
@@ -307,15 +387,37 @@ final class AudioEngine {
         engine.attach(dronePlayer)
         engine.connect(dronePlayer, to: sfxMixer, format: monoFormat)
 
-        let musicPlayers = [musicKickPlayer, musicSnarePlayer, musicHatPlayer, musicTomPlayer, musicBassPlayer]
-        for p in musicPlayers {
+        let drumPlayers = [musicKickPlayer, musicSnarePlayer, musicHatPlayer, musicTomPlayer, stingerPlayer]
+        for p in drumPlayers {
             engine.attach(p)
             engine.connect(p, to: musicMixer, format: monoFormat)
         }
 
-        sfxMixer.outputVolume = Float(sfxVolume)
-        musicMixer.outputVolume = Float(musicVolume)
+        // Bass round-robin pool
+        for _ in 0..<4 {
+            let p = AVAudioPlayerNode()
+            engine.attach(p)
+            engine.connect(p, to: musicMixer, format: monoFormat)
+            musicBassPlayers.append(p)
+        }
 
+        // Pad round-robin pool
+        for _ in 0..<4 {
+            let p = AVAudioPlayerNode()
+            engine.attach(p)
+            engine.connect(p, to: musicMixer, format: monoFormat)
+            musicPadPlayers.append(p)
+        }
+
+        // Lead round-robin pool
+        for _ in 0..<4 {
+            let p = AVAudioPlayerNode()
+            engine.attach(p)
+            engine.connect(p, to: musicMixer, format: monoFormat)
+            musicLeadPlayers.append(p)
+        }
+
+        engine.prepare()
         do {
             try engine.start()
         } catch {
@@ -343,7 +445,7 @@ final class AudioEngine {
             newSfxBuffers[kind] = variants
         }
 
-        let drumKinds = ["kick", "snare", "hat", "tom"]
+        let drumKinds = ["kick", "snare", "hat", "openhat", "ghosthat", "tom"]
         var newDrumBuffers: [String: [AVAudioPCMBuffer]] = [:]
         for dk in drumKinds {
             var variants: [AVAudioPCMBuffer] = []
@@ -356,12 +458,72 @@ final class AudioEngine {
             newDrumBuffers[dk] = variants
         }
 
+        // Pre-render Bass Buffers (MIDI notes 24 to 60)
+        var newBassBuffers: [Int: AVAudioPCMBuffer] = [:]
+        for note in 24...60 {
+            let samples = Synth.bassBuffer(midiNote: note, duration: 0.35, sampleRate: sr)
+            if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) {
+                newBassBuffers[note] = buf
+            }
+        }
+
+        // Pre-render Pad Buffers (MIDI notes 36 to 60) for chord types ("minor", "major", "choir", "drone")
+        var newPadBuffers: [String: AVAudioPCMBuffer] = [:]
+        let padNotes = Array(36...60)
+        let chordTypes = ["minor", "major", "choir", "drone"]
+        for note in padNotes {
+            for chord in chordTypes {
+                let samples = Synth.padBuffer(midiNote: note, chordType: chord, duration: 3.5, sampleRate: sr)
+                if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) {
+                    newPadBuffers["\(note)_\(chord)"] = buf
+                }
+            }
+        }
+
+        // Pre-render Lead Buffers (MIDI notes 48 to 72) for styles ("plucked", "choir")
+        var newLeadBuffers: [String: AVAudioPCMBuffer] = [:]
+        for note in 48...72 {
+            for style in ["plucked", "choir"] {
+                let samples = Synth.leadBuffer(midiNote: note, style: style, duration: 0.6, sampleRate: sr)
+                if let buf = Synth.pcmBuffer(from: samples, sampleRate: sr) {
+                    newLeadBuffers["\(note)_\(style)"] = buf
+                }
+            }
+        }
+
+        // Pre-render Stingers
+        let winSamples = Synth.stingerBuffer(win: true, sampleRate: sr)
+        let winBuf = Synth.pcmBuffer(from: winSamples, sampleRate: sr)
+
+        let loseSamples = Synth.stingerBuffer(win: false, sampleRate: sr)
+        let loseBuf = Synth.pcmBuffer(from: loseSamples, sampleRate: sr)
+
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.sfxBuffers = newSfxBuffers
             self.drumBuffers = newDrumBuffers
+            self.bassBuffers = newBassBuffers
+            self.padBuffers = newPadBuffers
+            self.leadBuffers = newLeadBuffers
+            self.stingerWinBuffer = winBuf
+            self.stingerLoseBuffer = loseBuf
             self.isReady = true
         }
+    }
+
+    private func cancelFadeTimer() {
+        fadeTimer?.cancel()
+        fadeTimer = nil
+    }
+
+    private func stopAllMusicPlayers() {
+        musicKickPlayer.stop()
+        musicSnarePlayer.stop()
+        musicHatPlayer.stop()
+        musicTomPlayer.stop()
+        for p in musicBassPlayers { p.stop() }
+        for p in musicPadPlayers { p.stop() }
+        for p in musicLeadPlayers { p.stop() }
     }
 
     private func tickMusicScheduler() {
@@ -382,7 +544,7 @@ final class AudioEngine {
                 self?.playMusicStep(step: step, root: currentRoot, scale: currentScale, intensity: currentIntensity)
             }
 
-            musicStepIndex = (musicStepIndex + 1) % 16
+            musicStepIndex = (musicStepIndex + 1) % 64
             nextBeatTime += stepDuration
         }
     }
@@ -390,41 +552,109 @@ final class AudioEngine {
     private func playMusicStep(step: Int, root: Int, scale: String, intensity: Double) {
         guard isMusicPlaying, isReady else { return }
 
-        if step % 4 == 0 {
-            playDrumPlayer(musicKickPlayer, kind: "kick", volume: 0.8)
-        } else if step == 9 && intensity > 0.4 {
-            playDrumPlayer(musicKickPlayer, kind: "kick", volume: 0.6)
+        let scaleOffsets = Synth.scaleOffsets(for: scale)
+        guard !scaleOffsets.isEmpty else { return }
+
+        let bar = (step / 16) % 4
+        let stepInBar = step % 16
+
+        // 4-bar harmonic chord progression: bar 0 -> Root (deg 0), bar 1 -> deg 5/3, bar 2 -> deg 2/4, bar 3 -> deg 6/4
+        let chordDegreeIndex: Int
+        switch bar {
+        case 0: chordDegreeIndex = 0
+        case 1: chordDegreeIndex = min(5, scaleOffsets.count - 1)
+        case 2: chordDegreeIndex = min(2, scaleOffsets.count - 1)
+        case 3: chordDegreeIndex = min(6, scaleOffsets.count - 1)
+        default: chordDegreeIndex = 0
+        }
+        let chordRootNote = root + scaleOffsets[chordDegreeIndex]
+
+        let isChoirStyle = (scale.lowercased() == "aeolian" || musicStyle == "choir" || scale.lowercased() == "cathedral")
+        let isDarkStyle = (scale.lowercased() == "phrygian" || scale.lowercased() == "locrian" || scale.lowercased() == "swamp")
+
+        // 1. SUSTAINED PAD / DRONE LAYER (Bar changes)
+        if stepInBar == 0 {
+            let padType = isChoirStyle ? "choir" : (isDarkStyle ? "drone" : "minor")
+            let padNote = max(36, min(60, chordRootNote - 12))
+            let key = "\(padNote)_\(padType)"
+            if let buf = padBuffers[key] ?? padBuffers["\(padNote)_minor"] {
+                let p = musicPadPlayers[nextPadPlayerIndex]
+                nextPadPlayerIndex = (nextPadPlayerIndex + 1) % musicPadPlayers.count
+                p.volume = Float(0.35 + intensity * 0.25)
+                safeSchedule(p, buf)
+                p.play()
+            }
         }
 
-        if step == 4 || step == 12 {
-            playDrumPlayer(musicSnarePlayer, kind: "snare", volume: 0.75)
+        // 2. BASS LAYER
+        let playBass = (stepInBar % 4 == 0) || (stepInBar == 6 && intensity > 0.3) || (stepInBar == 10 && intensity > 0.5) || (stepInBar == 14)
+        if playBass {
+            let bassOctaveNote = max(24, min(55, chordRootNote - 12))
+            if let buf = bassBuffers[bassOctaveNote] {
+                let p = musicBassPlayers[nextBassPlayerIndex]
+                nextBassPlayerIndex = (nextBassPlayerIndex + 1) % musicBassPlayers.count
+                p.volume = Float(0.5 + intensity * 0.35)
+                safeSchedule(p, buf)
+                p.play()
+            }
         }
 
-        if step % 2 == 0 || intensity > 0.6 {
-            playDrumPlayer(musicHatPlayer, kind: "hat", volume: Float(0.3 + intensity * 0.2))
+        // 3. LEAD / MELODY LAYER
+        let playLeadNote: Bool
+        if isMenuMusicMode {
+            playLeadNote = (stepInBar == 2 || stepInBar == 8 || stepInBar == 12)
+        } else {
+            switch bar {
+            case 0: playLeadNote = (stepInBar == 2 || stepInBar == 6 || stepInBar == 10)
+            case 1: playLeadNote = (stepInBar == 2 || stepInBar == 6 || stepInBar == 9 || stepInBar == 12)
+            case 2: playLeadNote = (stepInBar == 0 || stepInBar == 4 || stepInBar == 8 || stepInBar == 11 || stepInBar == 14)
+            case 3: playLeadNote = (stepInBar == 2 || stepInBar == 6 || stepInBar == 10 || stepInBar == 14)
+            default: playLeadNote = false
+            }
         }
 
-        if (step == 14 && intensity > 0.3) || (step == 15 && intensity > 0.5) {
-            playDrumPlayer(musicTomPlayer, kind: "tom", volume: 0.6)
+        if playLeadNote && (intensity > 0.2 || isMenuMusicMode) {
+            let melodyDegreeIndex = (stepInBar / 2) % scaleOffsets.count
+            let leadNote = max(48, min(72, root + scaleOffsets[melodyDegreeIndex]))
+            let leadStyleName = isChoirStyle ? "choir" : "plucked"
+            let key = "\(leadNote)_\(leadStyleName)"
+            if let buf = leadBuffers[key] ?? leadBuffers["\(leadNote)_plucked"] {
+                let p = musicLeadPlayers[nextLeadPlayerIndex]
+                nextLeadPlayerIndex = (nextLeadPlayerIndex + 1) % musicLeadPlayers.count
+                p.volume = Float(0.3 + intensity * 0.3)
+                safeSchedule(p, buf)
+                p.play()
+            }
         }
 
-        if step % 3 == 0 || step == 7 || step == 11 {
-            let scaleOffsets = Synth.scaleOffsets(for: scale)
-            let degreeIdx: Int
-            switch step {
-            case 0, 6, 12: degreeIdx = 0
-            case 3, 9: degreeIdx = min(2, scaleOffsets.count - 1)
-            case 7, 11: degreeIdx = min(4, scaleOffsets.count - 1)
-            default: degreeIdx = 0
+        // 4. DRUMS LAYER (Muted in Menu mode)
+        if !isMenuMusicMode {
+            // Kick
+            if stepInBar == 0 || stepInBar == 8 {
+                playDrumPlayer(musicKickPlayer, kind: "kick", volume: 0.85)
+            } else if (stepInBar == 4 && intensity > 0.6) || (stepInBar == 10 && intensity > 0.4) {
+                playDrumPlayer(musicKickPlayer, kind: "kick", volume: 0.65)
             }
 
-            let midiNote = root - 12 + scaleOffsets[degreeIdx]
-            let bassSamples = Synth.bassBuffer(midiNote: midiNote, duration: 0.25, sampleRate: 44100.0)
-            if let buf = Synth.pcmBuffer(from: bassSamples, sampleRate: 44100.0) {
-                musicBassPlayer.stop()
-                musicBassPlayer.volume = Float(0.5 + intensity * 0.3)
-                safeSchedule(musicBassPlayer, buf)
-                musicBassPlayer.play()
+            // Snare
+            if stepInBar == 4 || stepInBar == 12 {
+                playDrumPlayer(musicSnarePlayer, kind: "snare", volume: 0.8)
+            } else if bar == 3 && stepInBar == 15 && intensity > 0.5 {
+                playDrumPlayer(musicSnarePlayer, kind: "snare", volume: 0.6)
+            }
+
+            // Hats & Ghost Hats
+            if stepInBar % 2 == 0 {
+                playDrumPlayer(musicHatPlayer, kind: "hat", volume: Float(0.3 + intensity * 0.25))
+            } else if intensity > 0.45 {
+                playDrumPlayer(musicHatPlayer, kind: "ghosthat", volume: Float(0.2 + intensity * 0.15))
+            }
+
+            // Tom Fills (4th bar or high intensity)
+            if bar == 3 && (stepInBar >= 12 && stepInBar <= 15) {
+                playDrumPlayer(musicTomPlayer, kind: "tom", volume: Float(0.5 + intensity * 0.3))
+            } else if (stepInBar == 6 || stepInBar == 14) && intensity > 0.75 {
+                playDrumPlayer(musicTomPlayer, kind: "tom", volume: 0.55)
             }
         }
     }

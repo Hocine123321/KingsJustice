@@ -152,7 +152,7 @@ extension GameEngine {
                         let B = 60.0 / bpm
                         counterWin = t + B * 10.0
                         say("Counter window", col: "#ffd070")
-                        taunt("You read him.")
+                        taunt(Dialogue.line(.onPlayerPerfect, enemyId: enemyDef?.id ?? "", seed: maxCombo &+ Int(t * 10.0)) ?? "You read him.")
                     }
                 } else {
                     pStreak = 0
@@ -209,6 +209,11 @@ extension GameEngine {
         let D = difficultyParams(settings.difficulty)
         let enemyDmgMul = enemyDef?.ai.aggression != nil ? 1.0 : 1.0
         let dmg = e.dmg * k * D.enemyDmg * enemyDmgMul
+
+        hitBarkCount += 1
+        if hitBarkCount % 3 == 0, let bark = Dialogue.line(.onEnemyHitsPlayer, enemyId: enemyDef?.id ?? "", seed: hitBarkCount) {
+            taunt(bark)
+        }
 
         let poseVec = (e.pose == "low") ? EnginePoses.gStrikeL : EnginePoses.gStrike
         enemyPoseState.setTarget(poseVec, speed: 30.0)

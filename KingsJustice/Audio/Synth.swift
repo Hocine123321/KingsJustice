@@ -16,6 +16,14 @@ enum Synth {
             return [0, 2, 4, 5, 7, 9, 11]
         case "harmonicminor":
             return [0, 2, 3, 5, 7, 8, 11]
+        case "mixolydian":
+            return [0, 2, 4, 5, 7, 9, 10]
+        case "lydian":
+            return [0, 2, 4, 6, 7, 9, 11]
+        case "melodicminor":
+            return [0, 2, 3, 5, 7, 9, 11]
+        case "pentatonicminor":
+            return [0, 3, 5, 7, 10]
         default:
             return [0, 2, 3, 5, 7, 8, 10]
         }
@@ -63,9 +71,9 @@ enum Synth {
         case .potion:
             samples = synthPotion(variant: variant, sampleRate: sr)
         case .win:
-            samples = synthWin(variant: variant, sampleRate: sr)
+            samples = stingerBuffer(win: true, sampleRate: sr)
         case .lose:
-            samples = synthLose(variant: variant, sampleRate: sr)
+            samples = stingerBuffer(win: false, sampleRate: sr)
         }
 
         normalize(&samples, targetPeak: 0.95)
@@ -83,6 +91,11 @@ enum Synth {
             samples = synthSnare(variant: variant, sampleRate: sr)
         case "hat", "tick":
             samples = synthHat(variant: variant, sampleRate: sr)
+        case "openhat":
+            samples = synthOpenHat(variant: variant, sampleRate: sr)
+        case "ghosthat":
+            samples = synthHat(variant: variant, sampleRate: sr)
+            for i in 0..<samples.count { samples[i] *= 0.4 }
         case "tom":
             samples = synthTom(variant: variant, sampleRate: sr)
         default:
@@ -105,7 +118,8 @@ enum Synth {
 
         for i in 0..<samples.count {
             let t = Double(i) / sr
-            let env = Float(exp(-t * 6.0))
+            let attackRamp = min(1.0, t / 0.002)
+            let env = Float(attackRamp * exp(-t * 5.5))
 
             let s1 = Float(2.0 * (phase1 - floor(phase1 + 0.5)))
             let s2 = Float(2.0 * (phase2 - floor(phase2 + 0.5)))
@@ -118,7 +132,7 @@ enum Synth {
             if phase2 >= 1.0 { phase2 -= 1.0 }
         }
 
-        normalize(&samples, targetPeak: 0.9)
+        normalize(&samples, targetPeak: 0.90)
         return samples
     }
 
@@ -163,6 +177,187 @@ enum Synth {
 
         normalize(&samples, targetPeak: 0.85)
         return samples
+    }
+
+    static func padBuffer(midiNote: Int, chordType: String = "minor", duration: Double = 3.5, sampleRate: Double = 44100.0) -> [Float] {
+        let sr = max(8000.0, sampleRate)
+        let totalFrames = Int(sr * duration)
+        var samples = [Float](repeating: 0, count: max(1, totalFrames))
+
+        let rootFreq = midiToFreq(midiNote)
+        let thirdInterval = (chordType.lowercased() == "major") ? 4 : 3
+        let fifthInterval = (chordType.lowercased() == "diminished") ? 6 : 7
+
+        let thirdFreq = midiToFreq(midiNote + thirdInterval)
+        let fifthFreq = midiToFreq(midiNote + fifthInterval)
+
+        var phaseR1 = 0.0, phaseR2 = 0.0
+        var phase3rd = 0.0
+        var phase5th = 0.0
+        var lpState = 0.0
+
+        for i in 0..<samples.count {
+            let t = Double(i) / sr
+            let attack = min(1.0, t / 0.25)
+            let release = min(1.0, (duration - t) / 0.45)
+            let env = Float(max(0.0, attack * release))
+
+            let lfo = 0.5 + 0.5 * sin(2.0 * .pi * 0.18 * t)
+            let cutoff = (chordType == "choir" ? 550.0 : 220.0) + lfo * 380.0
+            let rc = 1.0 / (2.0 * .pi * cutoff)
+            let alpha = (1.0 / sr) / (rc + 1.0 / sr)
+
+            let sR1 = 2.0 * (phaseR1 - floor(phaseR1 + 0.5))
+            let sR2 = 4.0 * abs(phaseR2 - floor(phaseR2 + 0.5)) - 1.0
+            let s3rd = 2.0 * (phase3rd - floor(phase3rd + 0.5))
+            let s5th = 2.0 * (phase5th - floor(phase5th + 0.5))
+
+            let raw = (sR1 * 0.35 + sR2 * 0.25 + s3rd * 0.22 + s5th * 0.18)
+
+            lpState += alpha * (raw - lpState)
+            samples[i] = Float(lpState) * env
+
+            phaseR1 += rootFreq / sr
+            if phaseR1 >= 1.0 { phaseR1 -= 1.0 }
+            phaseR2 += (rootFreq * 1.003) / sr
+            if phaseR2 >= 1.0 { phaseR2 -= 1.0 }
+            phase3rd += thirdFreq / sr
+            if phase3rd >= 1.0 { phase3rd -= 1.0 }
+            phase5th += fifthFreq / sr
+            if phase5th >= 1.0 { phase5th -= 1.0 }
+        }
+
+        applyReverb(&samples, delaySec: 0.04, feedback: 0.3, sampleRate: sr)
+        normalize(&samples, targetPeak: 0.85)
+        return samples
+    }
+
+    static func leadBuffer(midiNote: Int, style: String = "plucked", duration: Double = 0.6, sampleRate: Double = 44100.0) -> [Float] {
+        let sr = max(8000.0, sampleRate)
+        let totalFrames = Int(sr * duration)
+        var samples = [Float](repeating: 0, count: max(1, totalFrames))
+        let freq = midiToFreq(midiNote)
+
+        if style == "choir" || style == "ooh" {
+            var phase1 = 0.0
+            var lp1 = 0.0, lp2 = 0.0
+
+            for i in 0..<samples.count {
+                let t = Double(i) / sr
+                let attack = min(1.0, t / 0.05)
+                let release = min(1.0, (duration - t) / 0.15)
+                let env = Float(max(0.0, attack * release))
+
+                let vibrato = 1.0 + 0.003 * sin(2.0 * .pi * 5.0 * t)
+                let currentFreq = freq * vibrato
+
+                let saw = 2.0 * (phase1 - floor(phase1 + 0.5))
+                let sub = sin(2.0 * .pi * (currentFreq * 0.5) * t)
+
+                let rc1 = 1.0 / (2.0 * .pi * 400.0)
+                let alpha1 = (1.0 / sr) / (rc1 + 1.0 / sr)
+                lp1 += alpha1 * (saw - lp1)
+
+                let rc2 = 1.0 / (2.0 * .pi * 900.0)
+                let alpha2 = (1.0 / sr) / (rc2 + 1.0 / sr)
+                lp2 += alpha2 * (saw - lp2)
+
+                let raw = lp1 * 0.5 + lp2 * 0.3 + sub * 0.2
+                samples[i] = Float(raw) * env
+
+                phase1 += currentFreq / sr
+                if phase1 >= 1.0 { phase1 -= 1.0 }
+            }
+        } else {
+            var phase1 = 0.0
+            var phase2 = 0.0
+
+            for i in 0..<samples.count {
+                let t = Double(i) / sr
+                let env = Float(exp(-t * 7.5))
+
+                let tri = 4.0 * abs(phase1 - floor(phase1 + 0.5)) - 1.0
+                let saw = 2.0 * (phase2 - floor(phase2 + 0.5))
+                let pluckNoise = (t < 0.012) ? Double.random(in: -0.2...0.2) * (1.0 - t / 0.012) : 0.0
+
+                let val = (tri * 0.65 + saw * 0.35 + pluckNoise) * Double(env)
+                samples[i] = Float(val)
+
+                phase1 += freq / sr
+                if phase1 >= 1.0 { phase1 -= 1.0 }
+                phase2 += (freq * 2.001) / sr
+                if phase2 >= 1.0 { phase2 -= 1.0 }
+            }
+        }
+
+        applyReverb(&samples, delaySec: 0.03, feedback: 0.25, sampleRate: sr)
+        normalize(&samples, targetPeak: 0.90)
+        return samples
+    }
+
+    static func stingerBuffer(win: Bool, sampleRate: Double = 44100.0) -> [Float] {
+        let sr = max(8000.0, sampleRate)
+        let duration = 2.0
+        let totalFrames = Int(sr * duration)
+        var samples = [Float](repeating: 0, count: max(1, totalFrames))
+
+        if win {
+            let chordNotes = [60, 64, 67, 72]
+            for (idx, note) in chordNotes.enumerated() {
+                let noteStart = Double(idx) * 0.16
+                let freq = midiToFreq(note)
+                var phase = 0.0
+
+                for i in 0..<samples.count {
+                    let t = Double(i) / sr
+                    if t >= noteStart {
+                        let noteT = t - noteStart
+                        let env = exp(-noteT * 1.8)
+                        let saw = 2.0 * (phase - floor(phase + 0.5))
+                        let chime = sin(2.0 * .pi * (freq * 2.0) * noteT) * 0.25
+
+                        samples[i] += Float((saw * 0.65 + chime) * env)
+                        phase += freq / sr
+                        if phase >= 1.0 { phase -= 1.0 }
+                    }
+                }
+            }
+        } else {
+            let notes = [48, 44, 41, 36]
+            for (idx, note) in notes.enumerated() {
+                let noteStart = Double(idx) * 0.25
+                let freq = midiToFreq(note)
+                var phase = 0.0
+
+                for i in 0..<samples.count {
+                    let t = Double(i) / sr
+                    if t >= noteStart {
+                        let noteT = t - noteStart
+                        let env = exp(-noteT * 1.3)
+                        let tri = 4.0 * abs(phase - floor(phase + 0.5)) - 1.0
+                        let noise = Double.random(in: -0.08...0.08) * exp(-noteT * 3.0)
+
+                        samples[i] += Float((tri * 0.75 + noise) * env)
+                        phase += freq / sr
+                        if phase >= 1.0 { phase -= 1.0 }
+                    }
+                }
+            }
+        }
+
+        applyReverb(&samples, delaySec: 0.045, feedback: 0.35, sampleRate: sr)
+        normalize(&samples, targetPeak: 0.95)
+        return samples
+    }
+
+    static func applyReverb(_ samples: inout [Float], delaySec: Double = 0.035, feedback: Float = 0.25, sampleRate: Double = 44100.0) {
+        let delayFrames = Int(sampleRate * delaySec)
+        guard delayFrames > 0, delayFrames < samples.count else { return }
+
+        for i in delayFrames..<samples.count {
+            let echo = samples[i - delayFrames] * feedback
+            samples[i] += echo
+        }
     }
 
     static func pcmBuffer(from samples: [Float], sampleRate: Double = 44100.0) -> AVAudioPCMBuffer? {
@@ -282,95 +477,76 @@ enum Synth {
         let thudSamples = synthThud(variant: variant, sampleRate: sampleRate)
         let mixCount = min(samples.count, thudSamples.count)
         for i in 0..<mixCount {
-            samples[i] += thudSamples[i] * 0.6
+            samples[i] += thudSamples[i] * 0.4
         }
 
         return samples
     }
 
     private static func synthWhoosh(variant: Int, sampleRate: Double) -> [Float] {
-        let duration = 0.6
+        let duration = 0.35
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
-        var lpState = 0.0
-        var hpState = 0.0
-        var prevInput = 0.0
+        var bpState1 = 0.0
+        var bpState2 = 0.0
 
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
-            var freq = 400.0
-            if t < 0.3 {
-                freq = 400.0 + (2200.0 - 400.0) * (t / 0.3)
-            } else {
-                freq = 2200.0 - 1700.0 * min(1.0, (t - 0.3) / 0.28)
-            }
+            let envelope = sin(.pi * (t / duration))
+            let centerFreq = 300.0 + 1200.0 * sin(.pi * (t / duration))
 
-            var env = 0.0
-            if t < 0.25 {
-                env = 0.3 * (t / 0.25)
-            } else {
-                env = 0.3 * max(0.0, 1.0 - (t - 0.25) / 0.33)
-            }
+            let rc = 1.0 / (2.0 * .pi * centerFreq)
+            let alpha = (1.0 / sampleRate) / (rc + 1.0 / sampleRate)
 
             let noise = Double.random(in: -1.0...1.0)
+            bpState1 += alpha * (noise - bpState1)
+            bpState2 += alpha * (bpState1 - bpState2)
 
-            let rcLp = 1.0 / (2.0 * .pi * (freq * 1.4))
-            let alphaLp = (1.0 / sampleRate) / (rcLp + 1.0 / sampleRate)
-            lpState += alphaLp * (noise - lpState)
-
-            let rcHp = 1.0 / (2.0 * .pi * max(50.0, freq * 0.7))
-            let alphaHp = rcHp / (rcHp + 1.0 / sampleRate)
-            hpState = alphaHp * (hpState + lpState - prevInput)
-            prevInput = lpState
-
-            samples[i] = Float(hpState * env * 2.0)
+            samples[i] = Float((bpState1 - bpState2) * 2.5 * envelope)
         }
 
         return samples
     }
 
     private static func synthHeartbeat(variant: Int, sampleRate: Double) -> [Float] {
-        let duration = 0.55
+        let duration = 0.85
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
-        let delays = [0.0, 0.22]
-        let gains = [0.75, 0.50]
+        let pulse1 = synthThud(variant: 0, sampleRate: sampleRate)
+        let pulse2 = synthThud(variant: 1, sampleRate: sampleRate)
 
-        for (k, dl) in delays.enumerated() {
-            let startFrame = Int(dl * sampleRate)
-            let pulseFrames = Int(0.25 * sampleRate)
-            var phase = 0.0
-            let peakGain = gains[k]
+        for i in 0..<samples.count {
+            let t = Double(i) / sampleRate
+            var val: Float = 0.0
 
-            for i in 0..<pulseFrames {
-                let frameIdx = startFrame + i
-                if frameIdx >= samples.count { break }
-                let t = Double(i) / sampleRate
-                let currentFreq = 64.0 * pow(34.0 / 64.0, min(1.0, t / 0.2))
-
-                var env = 0.0
-                if t < 0.02 {
-                    env = peakGain * (t / 0.02)
-                } else {
-                    env = peakGain * exp(-(t - 0.02) / 0.06)
-                }
-
-                let val = sin(2.0 * .pi * phase) * env
-                samples[frameIdx] += Float(val)
-
-                phase += currentFreq / sampleRate
-                if phase >= 1.0 { phase -= 1.0 }
+            if i < pulse1.count {
+                val += pulse1[i] * 0.9
             }
+
+            let p2Offset = Int(sampleRate * 0.22)
+            if i >= p2Offset && (i - p2Offset) < pulse2.count {
+                val += pulse2[i - p2Offset] * 0.65
+            }
+
+            samples[i] = val
         }
 
         return samples
     }
 
     private static func synthBell(variant: Int, sampleRate: Double) -> [Float] {
-        let freqs = [98.0, 147.0, 196.6, 294.5, 392.0]
-        let duration = 3.5
+        let pitchMul = 1.0 + Double(variant - 1) * 0.08
+        let baseFreq = 880.0 * pitchMul
+        let partials: [(Double, Double, Double)] = [
+            (1.0, 1.0, 1.2),
+            (2.0, 0.5, 0.8),
+            (3.01, 0.3, 0.5),
+            (4.15, 0.2, 0.3),
+            (5.43, 0.15, 0.2)
+        ]
+        let duration = 1.8
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
@@ -378,121 +554,130 @@ enum Synth {
             let t = Double(i) / sampleRate
             var val = 0.0
 
-            for (idx, f) in freqs.enumerated() {
-                let amp = 0.2 / Double(idx + 1)
-                let env: Double
-                if t < 0.03 {
-                    env = amp * (t / 0.03)
-                } else {
-                    env = amp * exp(-(t - 0.03) / 1.0)
-                }
-                val += sin(2.0 * .pi * f * t) * env
+            for (mult, amp, decay) in partials {
+                let f = baseFreq * mult
+                let env = exp(-t / max(0.01, decay))
+                val += sin(2.0 * .pi * f * t) * amp * env
             }
 
             samples[i] = Float(val)
         }
 
+        applyDelay(&samples, delaySec: 0.05, feedback: 0.3, sampleRate: sampleRate)
         return samples
     }
 
     private static func synthHeavy(variant: Int, sampleRate: Double) -> [Float] {
-        var samples = synthThud(variant: variant, sampleRate: sampleRate)
-        let clangSamples = synthClang(variant: variant, sampleRate: sampleRate)
-        let mixCount = min(samples.count, clangSamples.count)
-        for i in 0..<mixCount {
-            samples[i] += clangSamples[i] * 0.7
+        let thud = synthThud(variant: variant, sampleRate: sampleRate)
+        let clang = synthClang(variant: variant, sampleRate: sampleRate)
+
+        let totalFrames = max(thud.count, clang.count)
+        var samples = [Float](repeating: 0, count: totalFrames)
+
+        for i in 0..<totalFrames {
+            var val: Float = 0.0
+            if i < thud.count { val += thud[i] * 0.7 }
+            if i < clang.count { val += clang[i] * 0.5 }
+            samples[i] = val
         }
+
         return samples
     }
 
     private static func synthParry(variant: Int, sampleRate: Double) -> [Float] {
-        let freqs = [1400.0, 2100.0, 2800.0, 3500.0]
-        let duration = 0.4
-        let totalFrames = Int(sampleRate * duration)
-        var samples = [Float](repeating: 0, count: max(1, totalFrames))
+        let clang = synthClang(variant: variant, sampleRate: sampleRate)
+        let bell = synthBell(variant: variant, sampleRate: sampleRate)
 
-        for i in 0..<samples.count {
-            let t = Double(i) / sampleRate
-            var val = 0.0
-            let env = exp(-t / 0.08)
+        let totalFrames = max(clang.count, bell.count)
+        var samples = [Float](repeating: 0, count: totalFrames)
 
-            for f in freqs {
-                val += sin(2.0 * .pi * f * t) * 0.25 * env
-            }
-
-            if t < 0.05 {
-                val += Double.random(in: -1.0...1.0) * 0.3 * (1.0 - t / 0.05)
-            }
-
-            samples[i] = Float(val)
+        for i in 0..<totalFrames {
+            var val: Float = 0.0
+            if i < clang.count { val += clang[i] * 0.6 }
+            if i < bell.count { val += bell[i] * 0.5 }
+            samples[i] = val
         }
 
         return samples
     }
 
     private static func synthPerfect(variant: Int, sampleRate: Double) -> [Float] {
-        let chord = [523.25, 659.25, 783.99, 1046.50]
-        let duration = 0.6
+        let bell = synthBell(variant: 2, sampleRate: sampleRate)
+        let duration = 1.2
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
+        let shimmerFreqs = [1760.0, 2640.0, 3520.0]
+
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
-            var val = 0.0
+            var val: Float = 0.0
 
-            for (idx, f) in chord.enumerated() {
-                let offset = Double(idx) * 0.03
-                if t >= offset {
-                    let noteT = t - offset
-                    let noteEnv = exp(-noteT / 0.12)
-                    val += sin(2.0 * .pi * f * noteT) * 0.25 * noteEnv
-                }
+            if i < bell.count {
+                val += bell[i] * 0.6
             }
 
-            samples[i] = Float(val)
+            let shimmerEnv = exp(-t / 0.4)
+            for f in shimmerFreqs {
+                val += Float(sin(2.0 * .pi * f * t) * 0.1 * shimmerEnv)
+            }
+
+            samples[i] = val
         }
 
         return samples
     }
 
     private static func synthHurt(variant: Int, sampleRate: Double) -> [Float] {
-        var samples = synthSlash(variant: variant, sampleRate: sampleRate)
-        let thud = synthThud(variant: variant, sampleRate: sampleRate)
-        let count = min(samples.count, thud.count)
-        for i in 0..<count {
-            samples[i] = samples[i] + thud[i] * 0.8
+        let duration = 0.4
+        let totalFrames = Int(sampleRate * duration)
+        var samples = [Float](repeating: 0, count: max(1, totalFrames))
+
+        let baseFreq = 90.0
+        var phase = 0.0
+
+        for i in 0..<samples.count {
+            let t = Double(i) / sampleRate
+            let env = exp(-t / 0.1)
+            let pitchDrop = baseFreq * exp(-t * 8.0)
+
+            let noise = Double.random(in: -1.0...1.0) * 0.3
+            let saw = 2.0 * (phase - floor(phase + 0.5))
+
+            samples[i] = Float((saw * 0.7 + noise) * env)
+
+            phase += pitchDrop / sampleRate
+            if phase >= 1.0 { phase -= 1.0 }
         }
+
         return samples
     }
 
     private static func synthBlock(variant: Int, sampleRate: Double) -> [Float] {
-        let duration = 0.45
+        let duration = 0.35
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
-        var lpState = 0.0
+        var phase = 0.0
+        let freq = 130.0
+
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
             let env = exp(-t / 0.08)
-            let noise = Double.random(in: -1.0...1.0)
+            let tri = 4.0 * abs(phase - floor(phase + 0.5)) - 1.0
+            let noise = Double.random(in: -0.5...0.5) * exp(-t / 0.03)
 
-            let rc = 1.0 / (2.0 * .pi * 800.0)
-            let alpha = (1.0 / sampleRate) / (rc + 1.0 / sampleRate)
-            lpState += alpha * (noise - lpState)
+            samples[i] = Float((tri * 0.6 + noise * 0.4) * env)
 
-            let val = lpState * 0.9 * env + sin(2.0 * .pi * 120.0 * t) * 0.4 * env
-            samples[i] = Float(val)
+            phase += freq / sampleRate
+            if phase >= 1.0 { phase -= 1.0 }
         }
 
         return samples
     }
 
     private static func synthMiss(variant: Int, sampleRate: Double) -> [Float] {
-        var samples = synthWhoosh(variant: variant, sampleRate: sampleRate)
-        for i in 0..<samples.count {
-            samples[i] *= 0.4
-        }
-        return samples
+        return synthWhoosh(variant: variant, sampleRate: sampleRate)
     }
 
     private static func synthUiTap(variant: Int, sampleRate: Double) -> [Float] {
@@ -500,51 +685,50 @@ enum Synth {
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
+        let freq = 1200.0
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
             let env = exp(-t / 0.008)
-            let val = sin(2.0 * .pi * 1100.0 * t) * env
-            samples[i] = Float(val)
+            samples[i] = Float(sin(2.0 * .pi * freq * t) * 0.5 * env)
         }
 
         return samples
     }
 
     private static func synthUiConfirm(variant: Int, sampleRate: Double) -> [Float] {
-        let duration = 0.14
+        let duration = 0.25
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
+        let f1 = 600.0
+        let f2 = 900.0
+
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
-            var val = 0.0
-            if t < 0.06 {
-                let env = exp(-t / 0.02)
-                val = sin(2.0 * .pi * 440.0 * t) * env
-            } else {
-                let t2 = t - 0.06
-                let env = exp(-t2 / 0.025)
-                val = sin(2.0 * .pi * 880.0 * t2) * env
-            }
-            samples[i] = Float(val)
+            let env1 = exp(-t / 0.08)
+            let env2 = (t > 0.06) ? exp(-(t - 0.06) / 0.1) : 0.0
+
+            let s1 = sin(2.0 * .pi * f1 * t) * 0.4 * env1
+            let s2 = sin(2.0 * .pi * f2 * t) * 0.4 * env2
+
+            samples[i] = Float(s1 + s2)
         }
 
         return samples
     }
 
     private static func synthFocus(variant: Int, sampleRate: Double) -> [Float] {
-        let duration = 0.5
+        let duration = 0.6
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
         var phase = 0.0
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
-            let freq = 220.0 + (880.0 - 220.0) * (t / duration)
+            let freq = 200.0 + 600.0 * (t / duration)
             let env = sin(.pi * (t / duration))
 
-            let val = sin(2.0 * .pi * phase) * env
-            samples[i] = Float(val)
+            samples[i] = Float(sin(2.0 * .pi * phase) * 0.4 * env)
 
             phase += freq / sampleRate
             if phase >= 1.0 { phase -= 1.0 }
@@ -554,64 +738,32 @@ enum Synth {
     }
 
     private static func synthPotion(variant: Int, sampleRate: Double) -> [Float] {
-        let duration = 0.35
+        let duration = 0.5
         let totalFrames = Int(sampleRate * duration)
         var samples = [Float](repeating: 0, count: max(1, totalFrames))
 
-        let pitches = [350.0, 450.0, 550.0, 700.0]
+        var phase = 0.0
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
-            let step = Int(t / 0.08) % pitches.count
-            let stepT = t.truncatingRemainder(dividingBy: 0.08)
-            let f = pitches[step]
-            let env = exp(-stepT / 0.02)
+            let bubble = sin(2.0 * .pi * 25.0 * t)
+            let freq = 400.0 + 300.0 * bubble
+            let env = exp(-t / 0.25)
 
-            samples[i] = Float(sin(2.0 * .pi * f * stepT) * env)
+            samples[i] = Float(sin(2.0 * .pi * phase) * 0.35 * env)
+
+            phase += freq / sampleRate
+            if phase >= 1.0 { phase -= 1.0 }
         }
 
         return samples
     }
 
     private static func synthWin(variant: Int, sampleRate: Double) -> [Float] {
-        let duration = 1.5
-        let totalFrames = Int(sampleRate * duration)
-        var samples = [Float](repeating: 0, count: max(1, totalFrames))
-
-        let chord = [261.63, 329.63, 392.00, 523.25]
-        for i in 0..<samples.count {
-            let t = Double(i) / sampleRate
-            var val = 0.0
-            let env = exp(-t / 0.5)
-
-            for f in chord {
-                val += sin(2.0 * .pi * f * t) * 0.25 * env
-                val += sin(2.0 * .pi * (f * 2.0) * t) * 0.08 * env
-            }
-
-            samples[i] = Float(val)
-        }
-
-        return samples
+        return stingerBuffer(win: true, sampleRate: sampleRate)
     }
 
     private static func synthLose(variant: Int, sampleRate: Double) -> [Float] {
-        let duration = 1.4
-        let totalFrames = Int(sampleRate * duration)
-        var samples = [Float](repeating: 0, count: max(1, totalFrames))
-
-        let freqs = [174.61, 155.56, 130.81, 123.47]
-        for i in 0..<samples.count {
-            let t = Double(i) / sampleRate
-            let idx = min(freqs.count - 1, Int(t / 0.3))
-            let stepT = t - Double(idx) * 0.3
-            let f = freqs[idx]
-            let env = exp(-stepT / 0.25)
-            let val = (2.0 * abs((f * stepT) - floor((f * stepT) + 0.5)) - 1.0) * env
-
-            samples[i] = Float(val * 0.7)
-        }
-
-        return samples
+        return stingerBuffer(win: false, sampleRate: sampleRate)
     }
 
     private static func synthKick(variant: Int, sampleRate: Double) -> [Float] {
@@ -622,13 +774,13 @@ enum Synth {
         var phase = 0.0
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
-            let f = 110.0 * pow(38.0 / 110.0, min(1.0, t / 0.22))
+            let f = 120.0 * pow(35.0 / 120.0, min(1.0, t / 0.22))
 
             var env = 0.0
             if t < 0.008 {
-                env = 0.9 * (t / 0.008)
+                env = 0.95 * (t / 0.008)
             } else {
-                env = 0.9 * exp(-(t - 0.008) / 0.08)
+                env = 0.95 * exp(-(t - 0.008) / 0.08)
             }
 
             samples[i] = Float(sin(2.0 * .pi * phase) * env)
@@ -685,6 +837,29 @@ enum Synth {
         return samples
     }
 
+    private static func synthOpenHat(variant: Int, sampleRate: Double) -> [Float] {
+        let duration = 0.18
+        let totalFrames = Int(sampleRate * duration)
+        var samples = [Float](repeating: 0, count: max(1, totalFrames))
+
+        var hpState = 0.0
+        var prevInput = 0.0
+
+        for i in 0..<samples.count {
+            let t = Double(i) / sampleRate
+            let env = exp(-t / 0.05)
+            let noise = Double.random(in: -1.0...1.0)
+
+            let rc = 1.0 / (2.0 * .pi * 4800.0)
+            let alpha = rc / (rc + 1.0 / sampleRate)
+            hpState = alpha * (hpState + noise - prevInput)
+            prevInput = noise
+
+            samples[i] = Float(hpState * env * 0.45)
+        }
+        return samples
+    }
+
     private static func synthTom(variant: Int, sampleRate: Double) -> [Float] {
         let duration = 0.25
         let totalFrames = Int(sampleRate * duration)
@@ -693,7 +868,9 @@ enum Synth {
         var phase = 0.0
         for i in 0..<samples.count {
             let t = Double(i) / sampleRate
-            let f = 190.0 * pow(90.0 / 190.0, min(1.0, t / 0.18))
+            let startF = (variant == 1) ? 220.0 : 160.0
+            let endF = (variant == 1) ? 100.0 : 70.0
+            let f = startF * pow(endF / startF, min(1.0, t / 0.18))
 
             var env = 0.0
             if t < 0.008 {

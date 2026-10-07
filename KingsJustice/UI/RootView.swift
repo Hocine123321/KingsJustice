@@ -67,6 +67,11 @@ struct RootView: View {
         .onChange(of: engine.started) { _ in
             if engine.on == false && screen == .fight { leaveFight() }
         }
+        .onChange(of: screen) { newScreen in
+            if newScreen == .menu || newScreen == .campaign || newScreen == .style || newScreen == .shop {
+                UIAudio.startMenuMusic()
+            }
+        }
     }
 
     @ViewBuilder
@@ -122,7 +127,7 @@ struct RootView: View {
         ZStack {
             GameSceneView(source: engine)
                 .ignoresSafeArea()
-            FightHudView(engine: engine)
+            FightHudView(engine: engine, tauntOverlayText: engine.tauntText)
             if engine.paused && !engine.over {
                 PauseView(engine: engine, onSelectSettings: {
                     settingsFromPause = true
@@ -178,7 +183,6 @@ struct RootView: View {
     private func leaveFight() {
         UIApplication.shared.isIdleTimerDisabled = false
         engine.quitToMenu()
-        AudioEngine.shared.stopMusic()
         AudioEngine.shared.stopDrone()
         screen = .menu
     }

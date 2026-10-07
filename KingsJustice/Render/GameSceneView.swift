@@ -32,18 +32,36 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         ty = (size.height - 900.0 * scale) / 2.0
                     }
 
-                    // Camera Shake
+                    // Camera Shake & Drift
                     let shake = source.rsShake
-                    let sx = sin(time * 83.0) * shake * 14.0
-                    let sy = cos(time * 71.0) * shake * 14.0
-                    let sr = sin(time * 61.0) * shake * 0.01
+                    let hitStop = source.rsHitStop
+
+                    let driftX = sin(time * 0.7) * 3.0 + cos(time * 1.3) * 1.5
+                    let driftY = cos(time * 0.9) * 2.5 + sin(time * 1.1) * 1.0
+                    let driftR = sin(time * 0.5) * 0.0015
+
+                    let shakeX = (sin(time * 83.0) * 0.6 + sin(time * 149.0) * 0.4) * shake * 16.0
+                    let shakeY = (cos(time * 71.0) * 0.6 + cos(time * 127.0) * 0.4) * shake * 16.0
+                    let shakeR = sin(time * 61.0) * shake * 0.012
+
+                    let totalSx = shakeX + driftX
+                    let totalSy = shakeY + driftY
+                    let totalSr = shakeR + driftR
+
+                    // Brief zoom punch on hits
+                    let zoomPunch = 1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))
+                    let effScale = scale * zoomPunch
+                    let txEff = tx + totalSx - 800.0 * scale * (zoomPunch - 1.0)
+                    let tyEff = ty + totalSy - 450.0 * scale * (zoomPunch - 1.0)
+
+                    let renderTime = model.effectiveTime > 0 ? model.effectiveTime : time
 
                     context.drawLayer { sceneCtx in
-                        sceneCtx.concatenate(CGAffineTransform(translationX: tx + sx, y: ty + sy))
-                        sceneCtx.concatenate(CGAffineTransform(scaleX: scale, y: scale))
-                        if sr != 0 {
+                        sceneCtx.concatenate(CGAffineTransform(translationX: txEff, y: tyEff))
+                        sceneCtx.concatenate(CGAffineTransform(scaleX: effScale, y: effScale))
+                        if totalSr != 0 {
                             sceneCtx.concatenate(CGAffineTransform(translationX: 800, y: 450))
-                            sceneCtx.concatenate(CGAffineTransform(rotationAngle: sr))
+                            sceneCtx.concatenate(CGAffineTransform(rotationAngle: totalSr))
                             sceneCtx.concatenate(CGAffineTransform(translationX: -800, y: -450))
                         }
 
@@ -54,7 +72,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
 
                         // 2. Parallax Castle/Clouds (cl .62)
                         sceneCtx.drawLayer { clCtx in
-                            let parallaxX = sin(time * 0.25) * 20.0
+                            let parallaxX = sin(renderTime * 0.25) * 20.0
                             clCtx.concatenate(CGAffineTransform(translationX: parallaxX, y: 0))
                             model.drawClLayer(in: clCtx, size: worldSize)
                         }
@@ -62,8 +80,12 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         // 3. Ground (gnd)
                         model.drawGndLayer(in: sceneCtx, size: worldSize)
 
-                        // Ground Blood Stains
+                        // Ground Blood Stains & Ground Dust Puffs
                         model.particleSystem.drawStains(in: sceneCtx)
+                        model.particleSystem.drawDust(in: sceneCtx)
+
+                        // Weapon Motion Trails
+                        model.drawWeaponTrails(in: sceneCtx)
 
                         // 4. Fighters
                         let playerLook = source.rsStyle.look
@@ -74,7 +96,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                             in: sceneCtx,
                             config: playerConfig,
                             pose: playerPose,
-                            time: time,
+                            time: renderTime,
                             wound: source.rsWound
                         )
 
@@ -86,7 +108,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                                 in: sceneCtx,
                                 config: enemyConfig,
                                 pose: enemyPose,
-                                time: time,
+                                time: renderTime,
                                 wound: source.rsWound
                             )
                         }
@@ -125,6 +147,16 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                             Gradient.Stop(color: Color.black.opacity(0.65), location: 1.0)
                         ])
                         sceneCtx.fill(Path(CGRect(x: 0, y: 0, width: 1600, height: 900)), with: .radialGradient(vignetteGrad, center: CGPoint(x: 800, y: 450), startRadius: 400, endRadius: 900))
+
+                        // Hit Impact Radial Flash
+                        if shake > 0.25 || hitStop {
+                            let flashOp = min(0.35, max(0.1, shake * 0.35 + (hitStop ? 0.15 : 0.0)))
+                            sceneCtx.drawLayer { flashCtx in
+                                flashCtx.addFilter(.blur(radius: 12.0))
+                                let impactRect = CGRect(x: 500, y: 300, width: 600, height: 400)
+                                flashCtx.fill(Path(ellipseIn: impactRect), with: .color(Color.white.opacity(flashOp)))
+                            }
+                        }
 
                         // Hurt Flash Overlay
                         if source.rsHurt > 0 {

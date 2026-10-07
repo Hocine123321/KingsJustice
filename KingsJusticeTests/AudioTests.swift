@@ -34,6 +34,10 @@ final class AudioTests: XCTestCase {
         XCTAssertEqual(Synth.scaleOffsets(for: "aeolian"), [0, 2, 3, 5, 7, 8, 10])
         XCTAssertEqual(Synth.scaleOffsets(for: "dorian"), [0, 2, 3, 5, 7, 9, 10])
         XCTAssertEqual(Synth.scaleOffsets(for: "major"), [0, 2, 4, 5, 7, 9, 11])
+        XCTAssertEqual(Synth.scaleOffsets(for: "mixolydian"), [0, 2, 4, 5, 7, 9, 10])
+        XCTAssertEqual(Synth.scaleOffsets(for: "lydian"), [0, 2, 4, 6, 7, 9, 11])
+        XCTAssertEqual(Synth.scaleOffsets(for: "melodicminor"), [0, 2, 3, 5, 7, 9, 11])
+        XCTAssertEqual(Synth.scaleOffsets(for: "pentatonicminor"), [0, 3, 5, 7, 10])
     }
 
     func testSetVolumesClamping() {
@@ -47,7 +51,7 @@ final class AudioTests: XCTestCase {
     }
 
     func testDrumAndBassSynthesis() {
-        let drumKinds = ["kick", "snare", "hat", "tom"]
+        let drumKinds = ["kick", "snare", "hat", "openhat", "ghosthat", "tom"]
         for d in drumKinds {
             let samples = Synth.drumBuffer(for: d, variant: 0, sampleRate: 44100.0)
             XCTAssertFalse(samples.isEmpty)
@@ -67,6 +71,44 @@ final class AudioTests: XCTestCase {
         let droneSamples = Synth.droneBuffer(root: 45, scaleName: "minor", duration: 1.0, sampleRate: 44100.0)
         XCTAssertFalse(droneSamples.isEmpty)
         for sample in droneSamples {
+            XCTAssertFalse(sample.isNaN)
+            XCTAssertFalse(sample.isInfinite)
+        }
+    }
+
+    func testPadAndLeadAndStingerSynthesis() {
+        let padSamples = Synth.padBuffer(midiNote: 45, chordType: "minor", duration: 1.0, sampleRate: 44100.0)
+        XCTAssertFalse(padSamples.isEmpty, "Pad buffer should not be empty")
+
+        var padPeak: Float = 0.0
+        for sample in padSamples {
+            XCTAssertFalse(sample.isNaN)
+            XCTAssertFalse(sample.isInfinite)
+            padPeak = max(padPeak, abs(sample))
+        }
+        XCTAssertLessThanOrEqual(padPeak, 1.0 + 1e-5, "Pad peak should be <= 1.0, got \(padPeak)")
+
+        let leadSamples = Synth.leadBuffer(midiNote: 60, style: "choir", duration: 0.5, sampleRate: 44100.0)
+        XCTAssertFalse(leadSamples.isEmpty, "Lead buffer should not be empty")
+
+        var leadPeak: Float = 0.0
+        for sample in leadSamples {
+            XCTAssertFalse(sample.isNaN)
+            XCTAssertFalse(sample.isInfinite)
+            leadPeak = max(leadPeak, abs(sample))
+        }
+        XCTAssertLessThanOrEqual(leadPeak, 1.0 + 1e-5, "Lead peak should be <= 1.0, got \(leadPeak)")
+
+        let winStinger = Synth.stingerBuffer(win: true, sampleRate: 44100.0)
+        XCTAssertFalse(winStinger.isEmpty)
+        for sample in winStinger {
+            XCTAssertFalse(sample.isNaN)
+            XCTAssertFalse(sample.isInfinite)
+        }
+
+        let loseStinger = Synth.stingerBuffer(win: false, sampleRate: 44100.0)
+        XCTAssertFalse(loseStinger.isEmpty)
+        for sample in loseStinger {
             XCTAssertFalse(sample.isNaN)
             XCTAssertFalse(sample.isInfinite)
         }
@@ -100,5 +142,15 @@ final class AudioTests: XCTestCase {
         let status = try engine.renderOffline(1024, to: out)
         XCTAssertNotEqual(status, .error)
         engine.stop()
+    }
+
+    func testUIAudioHelpersAndAudioEngineMusicAPIs() {
+        UIAudio.startArenaMusic(root: 48, scale: "minor", bpm: 92.0)
+        UIAudio.setMusicIntensity(0.8)
+        UIAudio.playStinger(win: true)
+        UIAudio.stopMusic(fade: false)
+
+        UIAudio.startMenuMusic()
+        UIAudio.stopMusic(fadeDuration: 0.1)
     }
 }

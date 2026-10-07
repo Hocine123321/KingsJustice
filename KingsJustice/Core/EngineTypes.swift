@@ -28,22 +28,59 @@ struct PoseState: Equatable {
     var cur: [Double]
     var tgt: [Double]
     var spd: Double
+    var vel: [Double]
 
     init(values: [Double], spd: Double = 9.0) {
         self.cur = values
         self.tgt = values
         self.spd = spd
+        self.vel = Array(repeating: 0.0, count: values.count)
     }
 
     mutating func setTarget(_ target: [Double], speed: Double = 14.0) {
         self.tgt = target
         self.spd = speed
+        if self.vel.count != target.count {
+            self.vel = Array(repeating: 0.0, count: target.count)
+        }
     }
 
     mutating func step(dt: Double) {
-        let k = 1.0 - exp(-spd * dt)
-        for i in 0..<min(cur.count, tgt.count) {
-            cur[i] += (tgt[i] - cur[i]) * k
+        let clampedDt = min(max(dt, 0.0), 1.0 / 30.0)
+        if clampedDt <= 0.0 { return }
+
+        if vel.count != cur.count {
+            vel = Array(repeating: 0.0, count: cur.count)
+        }
+
+        if spd <= 0.001 {
+            for i in 0..<min(cur.count, tgt.count) {
+                cur[i] = tgt[i]
+                vel[i] = 0.0
+            }
+            return
+        }
+
+        let zeta = 0.60
+        let omegaN = spd * 1.6
+        let gamma = zeta * omegaN
+        let omegaD = omegaN * sqrt(1.0 - zeta * zeta)
+
+        let expTerm = exp(-gamma * clampedDt)
+        let cosTerm = cos(omegaD * clampedDt)
+        let sinTerm = sin(omegaD * clampedDt)
+
+        let n = min(cur.count, min(tgt.count, vel.count))
+        for i in 0..<n {
+            let x0 = cur[i] - tgt[i]
+            let v0 = vel[i]
+
+            let B = (v0 + gamma * x0) / omegaD
+            let xNew = expTerm * (x0 * cosTerm + B * sinTerm)
+            let vNew = expTerm * (v0 * cosTerm - (gamma * v0 + omegaN * omegaN * x0) / omegaD * sinTerm)
+
+            cur[i] = tgt[i] + xNew
+            vel[i] = vNew
         }
     }
 

@@ -31,6 +31,7 @@ extension GameEngine {
         self.enemyName = E.name
         self.enemyTitle = E.title
 
+        self.hitBarkCount = 0
         self.on = true
         self.over = false
         self.paused = false
@@ -87,7 +88,11 @@ extension GameEngine {
         playerPoseState = PoseState(values: EnginePoses.kIdle)
         enemyPoseState = PoseState(values: EnginePoses.gIdle)
 
-        taunt(E.intro)
+        let introLine = Dialogue.line(.intro, enemyId: E.id, seed: Int(hashStr(E.id)) &+ index) ?? E.intro
+        taunt(introLine)
+        if let arena = GameData.arenas[E.arena] {
+            UIAudio.startArenaMusic(root: arena.music.root, scale: arena.music.scale, bpm: arena.music.tempo)
+        }
         promptText = E.name
 
         // Delayed fight start (handled via tick countdown)
@@ -187,6 +192,11 @@ extension GameEngine {
             flashScreen(color: "#fff", opacity: 0.25)
             onSfx?(.bell, 1.0)
             onSfx?(.win, 1.0)
+            if let dying = Dialogue.line(.onVictory, enemyId: E.id, seed: Int(hashStr(E.id))) {
+                taunt(dying)
+            }
+            UIAudio.stopMusic(fade: true)
+            UIAudio.playStinger(win: true)
         } else {
             playerPoseState.setTarget(EnginePoses.kDead, speed: 2.4)
             enemyPoseState.setTarget(EnginePoses.gWin, speed: 3.0)
@@ -200,6 +210,11 @@ extension GameEngine {
             shake2(2.2)
             onSfx?(.bell, 1.0)
             onSfx?(.lose, 1.0)
+            if let gloat = Dialogue.line(.onDefeat, enemyId: E.id, seed: Int(hashStr(E.id))) {
+                taunt(gloat)
+            }
+            UIAudio.stopMusic(fade: true)
+            UIAudio.playStinger(win: false)
         }
 
         // Rewards logic
@@ -246,6 +261,7 @@ extension GameEngine {
     }
 
     func quitToMenu() {
+        UIAudio.stopMusic(fade: true)
         paused = false
         over = true
         on = false

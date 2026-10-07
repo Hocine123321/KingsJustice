@@ -2,11 +2,14 @@ import SwiftUI
 
 struct FightHudView<Engine: UIEngine>: View {
     @ObservedObject var engine: Engine
+    var tauntOverlayText: String?
     
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @State private var activeTaunt: String? = nil
     
-    init(engine: Engine) {
+    init(engine: Engine, tauntOverlayText: String? = nil) {
         self.engine = engine
+        self.tauntOverlayText = tauntOverlayText
     }
     
     private var isLandscape: Bool {
@@ -38,8 +41,24 @@ struct FightHudView<Engine: UIEngine>: View {
             if let tip = engine.tipText, !tip.isEmpty {
                 tipToastView(text: tip)
             }
+
+            // Taunt bubble overlay: top, below HUD (stacked relative to tip toast)
+            if let taunt = activeTaunt, !taunt.isEmpty {
+                tauntToastView(text: taunt)
+            }
         }
         .ignoresSafeArea(.keyboard, edges: .all)
+        .task(id: tauntOverlayText) {
+            guard let text = tauntOverlayText, !text.isEmpty else {
+                activeTaunt = nil
+                return
+            }
+            activeTaunt = text
+            try? await Task.sleep(nanoseconds: 2_600_000_000)
+            if !Task.isCancelled {
+                activeTaunt = nil
+            }
+        }
     }
 
     // MARK: - Top HUD
@@ -134,7 +153,7 @@ struct FightHudView<Engine: UIEngine>: View {
         )
     }
     
-    // MARK: - Center Judge & Tip Popups
+    // MARK: - Center Judge, Tip & Taunt Popups
     private var judgePopupView: some View {
         VStack {
             Text(engine.judgeText)
@@ -165,6 +184,22 @@ struct FightHudView<Engine: UIEngine>: View {
                     Capsule().stroke(UITheme.textGold.opacity(0.5), lineWidth: 1)
                 )
                 .padding(.top, isLandscape ? 46 : 100)
+
+            Spacer()
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func tauntToastView(text: String) -> some View {
+        let hasTip = engine.tipText != nil && !(engine.tipText?.isEmpty ?? true)
+        let baseTopPadding: CGFloat = isLandscape ? 44 : 52
+        let tipOffset: CGFloat = isLandscape ? 38 : 46
+        let topPadding = hasTip ? ((isLandscape ? 46 : 100) + tipOffset) : baseTopPadding
+
+        return VStack {
+            TauntBubbleView(speaker: engine.enemyName, text: text)
+                .padding(.top, topPadding)
+                .transition(.move(edge: .top).combined(with: .opacity))
 
             Spacer()
         }

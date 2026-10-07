@@ -34,6 +34,8 @@ final class GameEngine: ObservableObject {
     @Published var playerName: String = "KNIGHT"
     @Published var promptText: String = ""
     @Published var tauntText: String = ""
+    var hitBarkCount: Int = 0
+    var musicIntensityTick: Double = 0.0
     @Published var started: Bool = false
     @Published var on: Bool = false
 
@@ -237,6 +239,11 @@ final class GameEngine: ObservableObject {
         if let baseBpm = enemyDef?.bpm {
             bpm = (baseBpm + frac * 10.0 + bpmAddSum) * D.tempo
         }
+        if musicIntensityTick > 0.5 {
+            musicIntensityTick = 0.0
+            UIAudio.setMusicIntensity(min(1.0, 0.35 + frac * 0.65))
+        }
+        musicIntensityTick += dt
 
         // Step pose physics
         playerPoseState.step(dt: dtFrame)
