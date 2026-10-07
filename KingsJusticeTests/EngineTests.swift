@@ -21,6 +21,24 @@ final class EngineTests: XCTestCase {
         XCTAssertEqual(w.miss, 0.234, accuracy: 1e-5)
     }
 
+    // Focus widens the player's timing windows by 1.5x and nothing else
+    func testFocusWidensPlayerWindowsOnly() {
+        let engine = GameEngine()
+        engine.settings.style = "knight"
+        engine.settings.difficulty = "normal"
+        engine.styleDef = GameData.styles.first(where: { $0.id == "knight" })!
+
+        let base = engine.currentWindows()
+        engine.focusUntil = engine.t + 3.5
+        let focused = engine.currentWindows()
+        XCTAssertEqual(focused.perfect, base.perfect * 1.5, accuracy: 1e-6)
+        XCTAssertEqual(focused.good, base.good * 1.5, accuracy: 1e-6)
+        // Enemy difficulty parameters must not depend on Focus.
+        let d = engine.difficultyParams("normal")
+        XCTAssertEqual(d.enemyDmg, 0.85, accuracy: 1e-9)
+        XCTAssertEqual(d.tempo, 0.96, accuracy: 1e-9)
+    }
+
     // Test 2: Second Wind: lethal hit leaves hp == 25% of maxhp once, second lethal hit ends game
     func testSecondWind() {
         let engine = GameEngine()

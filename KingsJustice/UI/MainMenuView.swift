@@ -1,5 +1,67 @@
 import SwiftUI
 
+struct MenuModeEntry {
+    let id: String
+    let name: String
+    let desc: String
+}
+
+/// Two main modes get big cards; the rest are compact extras.
+enum MenuModeCatalog {
+    static let main: [MenuModeEntry] = [
+        MenuModeEntry(id: "duel", name: "Trial by Combat", desc: "Fight seven champions across six battlefields. The King waits at the end."),
+        MenuModeEntry(id: "survival", name: "Survival", desc: "Endless waves. Every kill restores a little health. How long can you stand?")
+    ]
+
+    static let extras: [MenuModeEntry] = [
+        MenuModeEntry(id: "rush", name: "Boss Rush", desc: "Every champion back to back. One health bar."),
+        MenuModeEntry(id: "daily", name: "Daily Challenge", desc: "One seeded fight per day. Beat your best."),
+        MenuModeEntry(id: "training", name: "Training Yard", desc: "No damage dealt or taken. Practice every move.")
+    ]
+}
+
+struct ExtraModeRow: View {
+    let title: String
+    let detail: String
+    let badge: String?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: {
+            UIAudio.onFirstUserTap()
+            UIAudio.triggerHaptic("tap")
+            action()
+        }) {
+            HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title.uppercased())
+                        .font(.system(size: 12, weight: .semibold))
+                        .tracking(1.2)
+                        .foregroundColor(UITheme.textCreamBright)
+                    Text(detail)
+                        .font(.system(size: 10))
+                        .foregroundColor(UITheme.textCream.opacity(0.75))
+                        .lineLimit(1)
+                }
+                Spacer()
+                if let b = badge {
+                    Text(b.uppercased())
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(1.5)
+                        .foregroundColor(UITheme.textGold)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 8).fill(UITheme.bgCard))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(UITheme.borderCream, lineWidth: 1))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(DriftButtonStyle())
+    }
+}
+
 struct MainMenuView<Engine: UIEngine>: View {
     @ObservedObject var engine: Engine
     let onSelectMode: (String) -> Void
@@ -30,16 +92,6 @@ struct MainMenuView<Engine: UIEngine>: View {
         return formatter.string(from: Date())
     }
     
-    private var modesList: [(id: String, name: String, desc: String)] {
-        [
-            ("duel", "Trial by Combat", "Fight seven champions across six battlefields. The King waits at the end."),
-            ("survival", "Survival", "Endless waves. Every kill restores a little health. How long can you stand?"),
-            ("rush", "Boss Rush", "Every champion back to back. One health bar. No mercy."),
-            ("daily", "Daily Challenge", "One seeded fight per day, same for everyone. Beat your own best score."),
-            ("training", "Training Yard", "No damage taken or dealt. Practice every move at your own pace.")
-        ]
-    }
-    
     private func badgeForMode(_ id: String) -> String? {
         if id == "survival", engine.save.bestSurvival > 0 {
             return "BEST \(engine.save.bestSurvival) WAVES"
@@ -60,7 +112,7 @@ struct MainMenuView<Engine: UIEngine>: View {
                         .padding(.top, 16)
                     
                     VStack(spacing: 10) {
-                        ForEach(modesList, id: \.id) { mode in
+                        ForEach(MenuModeCatalog.main, id: \.id) { mode in
                             MenuCard(
                                 title: mode.name,
                                 description: mode.desc,
@@ -70,7 +122,24 @@ struct MainMenuView<Engine: UIEngine>: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                    
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("EXTRAS")
+                            .font(.system(size: 10, weight: .bold))
+                            .tracking(3.0)
+                            .foregroundColor(UITheme.textCream.opacity(0.6))
+                            .padding(.leading, 4)
+                        ForEach(MenuModeCatalog.extras, id: \.id) { mode in
+                            ExtraModeRow(
+                                title: mode.name,
+                                detail: mode.desc,
+                                badge: badgeForMode(mode.id),
+                                action: { onSelectMode(mode.id) }
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 16)
+
                     VStack(spacing: 10) {
                         HStack(spacing: 8) {
                             PillButton(title: "Fighting Style", action: onSelectStyle)

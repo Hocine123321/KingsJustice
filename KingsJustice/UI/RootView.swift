@@ -22,6 +22,7 @@ final class FrameClock: ObservableObject {
         stop()
         last = CACurrentMediaTime()
         let l = CADisplayLink(target: self, selector: #selector(step))
+        l.preferredFrameRateRange = CAFrameRateRange(minimum: 30, maximum: 60, preferred: 60)
         l.add(to: .main, forMode: .common)
         link = l
     }

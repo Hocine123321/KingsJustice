@@ -17,6 +17,11 @@ final class UITests: XCTestCase {
         XCTAssertTrue(e.rsDrainFX().isEmpty)
     }
 
+    func testMenuHasTwoMainModesAndThreeExtras() {
+        XCTAssertEqual(MenuModeCatalog.main.map { $0.id }, ["duel", "survival"])
+        XCTAssertEqual(MenuModeCatalog.extras.map { $0.id }, ["rush", "daily", "training"])
+    }
+
     func testRootViewBuilds() {
         _ = RootView()
     }
