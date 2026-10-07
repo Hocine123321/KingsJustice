@@ -5,3 +5,5 @@ DerivedData/
 Payload/
 *.ipa
 xcuserdata/
+*.pyc
+__pycache__/
