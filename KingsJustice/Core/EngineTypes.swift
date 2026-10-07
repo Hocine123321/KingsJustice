@@ -29,17 +29,29 @@ struct PoseState: Equatable {
     var tgt: [Double]
     var spd: Double
     var vel: [Double]
+    /// Pose to ease back to after an action (strike, parry, hit reaction).
+    var rest: [Double]
+    /// Seconds until the pose returns to `rest`. Zero or less means no recovery pending.
+    var recoverIn: Double = 0.0
 
     init(values: [Double], spd: Double = 9.0) {
         self.cur = values
         self.tgt = values
         self.spd = spd
         self.vel = Array(repeating: 0.0, count: values.count)
+        self.rest = values
+    }
+
+    /// Sets an action pose that automatically relaxes to `rest` after `hold` seconds.
+    mutating func setAction(_ target: [Double], speed: Double = 14.0, hold: Double = 0.28) {
+        setTarget(target, speed: speed)
+        recoverIn = hold
     }
 
     mutating func setTarget(_ target: [Double], speed: Double = 14.0) {
         self.tgt = target
         self.spd = speed
+        self.recoverIn = 0.0
         if self.vel.count != target.count {
             self.vel = Array(repeating: 0.0, count: target.count)
         }
@@ -48,6 +60,15 @@ struct PoseState: Equatable {
     mutating func step(dt: Double) {
         let clampedDt = min(max(dt, 0.0), 1.0 / 30.0)
         if clampedDt <= 0.0 { return }
+
+        if recoverIn > 0.0 {
+            recoverIn -= clampedDt
+            if recoverIn <= 0.0 {
+                recoverIn = 0.0
+                tgt = rest
+                spd = 9.0
+            }
+        }
 
         if vel.count != cur.count {
             vel = Array(repeating: 0.0, count: cur.count)

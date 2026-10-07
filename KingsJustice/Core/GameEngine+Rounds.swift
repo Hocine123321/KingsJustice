@@ -171,9 +171,13 @@ extension GameEngine {
             playerPoseState.setTarget(EnginePoses.kWind, speed: 6.0)
             let enemyBlock = (enemyDef?.look.shield == true) ? EnginePoses.gBlockH : EnginePoses.gIdle
             enemyPoseState.setTarget(enemyBlock, speed: 8.0)
+            playerPoseState.rest = EnginePoses.kWind
+            enemyPoseState.rest = enemyBlock
         } else {
             playerPoseState.setTarget(EnginePoses.kGuard, speed: 8.0)
             enemyPoseState.setTarget(EnginePoses.gIdle, speed: 8.0)
+            playerPoseState.rest = EnginePoses.kGuard
+            enemyPoseState.rest = EnginePoses.gIdle
         }
         updateHud()
         round += 1

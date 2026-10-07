@@ -24,7 +24,7 @@ extension GameEngine {
             guard let idx = bestIndex, bd <= W.miss + 0.05 else {
                 combo = 0
                 let poseVec = (lane == 0) ? EnginePoses.kSlash : ((lane == 1) ? EnginePoses.kThrust : EnginePoses.kOver)
-                playerPoseState.setTarget(poseVec, speed: 20.0)
+                playerPoseState.setAction(poseVec, speed: 20.0, hold: 0.30)
                 onSfx?(.whoosh, 1.0)
                 updateHud()
                 return
@@ -117,7 +117,7 @@ extension GameEngine {
             chip(max(2.0, events[index].dmg * 0.35))
             onSpawnFX?(.spark(x: 660, y: 440, count: 12))
             onSfx?(.clang, 0.6)
-            playerPoseState.setTarget(EnginePoses.kParry, speed: 22.0)
+            playerPoseState.setAction(EnginePoses.kParry, speed: 22.0, hold: 0.30)
             shake2(0.5)
         } else {
             say(perfect ? (events[index].input == "parry" ? "Perfect parry" : "Perfect") : "Good", col: perfect ? "#e8f2ff" : "#c8d4e0")
@@ -137,8 +137,8 @@ extension GameEngine {
                 onSpawnFX?(.spark(x: 650, y: 430, count: perfect ? 36 : 22))
                 onSfx?(.clang, perfect ? 1.2 : 0.9)
                 shake2(perfect ? 0.8 : 0.5)
-                playerPoseState.setTarget(EnginePoses.kParry, speed: 26.0)
-                enemyPoseState.setTarget(EnginePoses.gParried, speed: 26.0)
+                playerPoseState.setAction(EnginePoses.kParry, speed: 26.0, hold: 0.32)
+                enemyPoseState.setAction(EnginePoses.gParried, speed: 26.0, hold: 0.55)
                 hitStop = perfect ? 0.09 : 0.05
 
                 let dmg = (perfect ? 2.2 : 1.2) * lenFactor() * kmax / 100.0 * (1.0 + styleDef.parryBonus)
@@ -165,7 +165,7 @@ extension GameEngine {
             } else {
                 onSfx?(.whoosh, 1.0)
                 let poseVec = (events[index].input == "duck") ? EnginePoses.kDuck : ((events[index].input == "jump") ? EnginePoses.kJump : EnginePoses.kDodge)
-                playerPoseState.setTarget(poseVec, speed: 24.0)
+                playerPoseState.setAction(poseVec, speed: 24.0, hold: 0.45)
                 if perfect {
                     onSpawnFX?(.spark(x: 560, y: 520, count: 10))
                 }
@@ -216,8 +216,8 @@ extension GameEngine {
         }
 
         let poseVec = (e.pose == "low") ? EnginePoses.gStrikeL : EnginePoses.gStrike
-        enemyPoseState.setTarget(poseVec, speed: 30.0)
-        playerPoseState.setTarget(EnginePoses.kHurt, speed: 26.0)
+        enemyPoseState.setAction(poseVec, speed: 30.0, hold: 0.35)
+        playerPoseState.setAction(EnginePoses.kHurt, speed: 26.0, hold: 0.45)
 
         let bloodCount = (settings.blood == 0) ? 0 : ((settings.blood == 1) ? 30 : ((settings.blood == 2) ? 60 : 90))
         onSpawnFX?(.blood(x: 600, y: 540, count: bloodCount, dir: -1.0, power: 1.0))
@@ -283,7 +283,7 @@ extension GameEngine {
                 col = "#8fb0d0"
                 dmg *= 0.15
                 combo = 0
-                enemyPoseState.setTarget(EnginePoses.gBlockH, speed: 26.0)
+                enemyPoseState.setAction(EnginePoses.gBlockH, speed: 26.0, hold: 0.35)
                 onSfx?(.clang, 0.8)
                 onSpawnFX?(.spark(x: 710, y: 430, count: 16))
             }
@@ -292,14 +292,14 @@ extension GameEngine {
             msg = "Blocked high"
             col = "#8fb0d0"
             combo = 0
-            enemyPoseState.setTarget(EnginePoses.gBlockH, speed: 26.0)
+            enemyPoseState.setAction(EnginePoses.gBlockH, speed: 26.0, hold: 0.35)
             onSfx?(.clang, 0.7)
         } else if events[index].flag == "BL" && events[index].lane == 0 {
             dmg *= 0.2
             msg = "Blocked low"
             col = "#8fb0d0"
             combo = 0
-            enemyPoseState.setTarget(EnginePoses.gBlockL, speed: 26.0)
+            enemyPoseState.setAction(EnginePoses.gBlockL, speed: 26.0, hold: 0.35)
             onSfx?(.clang, 0.7)
         } else if events[index].flag == "C" {
             msg = "Countered"
@@ -354,10 +354,10 @@ extension GameEngine {
         damageEnemy(dmg)
 
         let lanePose = (events[index].lane == 0) ? EnginePoses.kSlash : ((events[index].lane == 1) ? EnginePoses.kThrust : EnginePoses.kOver)
-        playerPoseState.setTarget(lanePose, speed: 28.0)
+        playerPoseState.setAction(lanePose, speed: 28.0, hold: 0.28)
 
         if events[index].flag == nil || events[index].flag == "A2" || (events[index].flag == "P" && perfect) {
-            enemyPoseState.setTarget(EnginePoses.gHurt, speed: 24.0)
+            enemyPoseState.setAction(EnginePoses.gHurt, speed: 24.0, hold: 0.40)
             let sparkCount = perfect ? 30 : 16
             onSpawnFX?(.spark(x: 720, y: 430, count: sparkCount))
             let bloodCount = (settings.blood == 0) ? 0 : ((settings.blood == 1) ? (perfect ? 14 : 8) : ((settings.blood == 2) ? (perfect ? 34 : 18) : (perfect ? 50 : 26)))
