@@ -156,19 +156,19 @@ struct TouchPadButton: View {
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(isPressed ? Color(hex: colorHex).opacity(0.6) : Color(hex: "#0e0a08").opacity(0.4))
+            RoundedRectangle(cornerRadius: 14)
+                .fill(isPressed ? Color(hex: colorHex).opacity(0.6) : Color(hex: "#0e0a08").opacity(0.18))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color(hex: colorHex), lineWidth: 2)
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color(hex: colorHex).opacity(0.75), lineWidth: 1.5)
                 )
                 .scaleEffect(isPressed ? 0.95 : 1.0)
                 .animation(.easeOut(duration: 0.06), value: isPressed)
             
             Text(title.uppercased())
-                .font(.system(size: 13, weight: .bold))
-                .tracking(2.0)
-                .foregroundColor(Color(hex: colorHex))
+                .font(.system(size: 11, weight: .bold))
+                .tracking(1.5)
+                .foregroundColor(Color(hex: colorHex).opacity(0.9))
         }
         .frame(minHeight: minHeight)
         .contentShape(Rectangle())
@@ -221,7 +221,7 @@ struct CircularActionButton: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(Color(hex: "#0e0a08").opacity(0.6))
+                .fill(Color(hex: "#0e0a08").opacity(0.4))
             
             if fillFraction > 0 {
                 GeometryReader { geo in

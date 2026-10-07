@@ -16,102 +16,105 @@ struct FightHudView<Engine: UIEngine>: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                // Top HUD Bar
+                // Top HUD Bar (single slim row)
                 topHudBar
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
-                
-                Spacer()
-                
-                // Bottom Dock Controls
+                    .padding(.horizontal, isLandscape ? 14 : 16)
+                    .padding(.top, isLandscape ? 4 : 8)
+
+                Spacer(minLength: 0)
+
+                // Bottom controls: hugging the screen edges so the arena stays visible
                 bottomDockControls
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 12)
+                    .padding(.horizontal, isLandscape ? 10 : 16)
+                    .padding(.bottom, isLandscape ? 6 : 12)
             }
-            
+
             // Center Judge Popup
             if !engine.judgeText.isEmpty {
                 judgePopupView
             }
-            
-            // Center Tip Toast
+
+            // Tip toast: top, under the HUD
             if let tip = engine.tipText, !tip.isEmpty {
                 tipToastView(text: tip)
             }
         }
         .ignoresSafeArea(.keyboard, edges: .all)
     }
-    
+
     // MARK: - Top HUD
     private var topHudBar: some View {
-        VStack(spacing: 6) {
-            HStack(alignment: .top, spacing: 12) {
-                // Player HP
-                VStack(alignment: .leading, spacing: 4) {
+        HStack(alignment: .center, spacing: 10) {
+            // Player HP
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
                     Text("YOU")
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(2.0)
-                        .foregroundColor(UITheme.textCream)
-                    
-                    hpBar(current: engine.hp, max: engine.maxhp, color: Color(hex: "#4a8a5a"))
-                }
-                .frame(maxWidth: .infinity)
-                
-                // Pause Button
-                Button(action: {
-                    UIAudio.onFirstUserTap()
-                    UIAudio.triggerHaptic("tap")
-                    engine.pause()
-                }) {
-                    Text("II")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(UITheme.textCreamBright)
-                        .frame(width: 36, height: 36)
-                        .background(Circle().fill(UITheme.bgPanel))
-                        .overlay(Circle().stroke(UITheme.borderCream, lineWidth: 1))
-                }
-                .buttonStyle(DriftButtonStyle())
-                
-                // Enemy HP
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(engine.enemyName.uppercased())
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(1.5)
-                        .foregroundColor(UITheme.textCream)
-                        .lineLimit(1)
-                    
-                    hpBar(current: engine.khp, max: engine.kmax, color: UITheme.bloodRed)
-                }
-                .frame(maxWidth: .infinity)
-            }
-            
-            // HUD Stats Row
-            HStack(spacing: 16) {
-                Text("SCORE \(engine.score)")
-                Spacer()
-                if engine.combo > 1 {
-                    Text("\(engine.combo)x COMBO")
+                    Spacer(minLength: 4)
+                    Text("\(engine.score)")
                         .foregroundColor(UITheme.textGold)
                 }
-                Spacer()
-                Text("GOLD \(engine.gold)")
+                .font(.system(size: 9, weight: .bold))
+                .tracking(1.5)
+                .foregroundColor(UITheme.textCream)
+
+                hpBar(current: engine.hp, max: engine.maxhp, color: Color(hex: "#4a8a5a"))
             }
-            .font(.system(size: 10, weight: .bold))
-            .tracking(1.5)
-            .foregroundColor(UITheme.textCream)
-            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity)
+
+            // Pause Button
+            Button(action: {
+                UIAudio.onFirstUserTap()
+                UIAudio.triggerHaptic("tap")
+                engine.pause()
+            }) {
+                Text("II")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(UITheme.textCreamBright)
+                    .frame(width: 30, height: 30)
+                    .background(Circle().fill(UITheme.bgPanel))
+                    .overlay(Circle().stroke(UITheme.borderCream, lineWidth: 1))
+            }
+            .buttonStyle(DriftButtonStyle())
+
+            // Enemy HP
+            VStack(alignment: .trailing, spacing: 2) {
+                HStack {
+                    Text("\(engine.gold)g")
+                        .foregroundColor(UITheme.textGold)
+                    Spacer(minLength: 4)
+                    Text(engine.enemyName.uppercased())
+                        .lineLimit(1)
+                }
+                .font(.system(size: 9, weight: .bold))
+                .tracking(1.5)
+                .foregroundColor(UITheme.textCream)
+
+                hpBar(current: engine.khp, max: engine.kmax, color: UITheme.bloodRed)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .padding(10)
+        .overlay(alignment: .bottom) {
+            if engine.combo > 1 {
+                Text("\(engine.combo)x COMBO")
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(1.5)
+                    .foregroundColor(UITheme.textGold)
+                    .offset(y: 14)
+                    .allowsHitTesting(false)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(UITheme.bgPanel)
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(hex: "#140e0c").opacity(0.55))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(UITheme.borderCream.opacity(0.2), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(UITheme.borderCream.opacity(0.15), lineWidth: 1)
         )
     }
-    
+
     private func hpBar(current: Double, max maxVal: Double, color: Color) -> some View {
         let fillFraction = maxVal > 0 ? min(max(current / maxVal, 0.0), 1.0) : 0.0
         return GeometryReader { geo in
@@ -124,7 +127,7 @@ struct FightHudView<Engine: UIEngine>: View {
                     .frame(width: geo.size.width * CGFloat(fillFraction))
             }
         }
-        .frame(height: 12)
+        .frame(height: 8)
         .overlay(
             RoundedRectangle(cornerRadius: 4)
                 .stroke(UITheme.borderCream.opacity(0.3), lineWidth: 1)
@@ -135,7 +138,7 @@ struct FightHudView<Engine: UIEngine>: View {
     private var judgePopupView: some View {
         VStack {
             Text(engine.judgeText)
-                .font(.system(size: 38, weight: .bold, design: .serif).italic())
+                .font(.system(size: 30, weight: .bold, design: .serif).italic())
                 .tracking(3.0)
                 .foregroundColor(Color(hex: engine.judgeColorHex))
                 .shadow(color: Color(hex: engine.judgeColorHex).opacity(0.8), radius: 12)
@@ -149,117 +152,108 @@ struct FightHudView<Engine: UIEngine>: View {
     
     private func tipToastView(text: String) -> some View {
         VStack {
-            Spacer()
-            
             Text(text)
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .medium))
                 .foregroundColor(UITheme.textCreamBright)
                 .multilineTextAlignment(.center)
-                .padding(.vertical, 10)
-                .padding(.horizontal, 20)
+                .padding(.vertical, 5)
+                .padding(.horizontal, 14)
                 .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(UITheme.bgPanel)
+                    Capsule().fill(Color(hex: "#140e0c").opacity(0.7))
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(UITheme.textGold.opacity(0.6), lineWidth: 1)
+                    Capsule().stroke(UITheme.textGold.opacity(0.5), lineWidth: 1)
                 )
-                .padding(.bottom, 220)
+                .padding(.top, isLandscape ? 46 : 100)
+
+            Spacer()
         }
         .allowsHitTesting(false)
     }
-    
+
     // MARK: - Bottom Dock Controls
     private var bottomDockControls: some View {
-        VStack(spacing: 12) {
-            // Action Buttons (Focus & Potion)
-            HStack {
-                Spacer()
-                
-                CircularActionButton(
-                    title: "Heal",
-                    badgeText: "\(engine.potionCount)",
-                    colorHex: "#8fd0a0",
-                    size: 58,
-                    action: { engine.drinkPotion() }
-                )
-                
-                CircularActionButton(
-                    title: "Focus",
-                    fillFraction: engine.focus / 100.0,
-                    isReady: engine.focus >= 100.0,
-                    colorHex: "#9fd0ff",
-                    size: 68,
-                    action: { engine.useFocus() }
-                )
-            }
-            .padding(.horizontal, 8)
-            
-            // Main Pad Controls: Attack (3 lanes) vs Defend (4 buttons)
+        let isLeftHand = engine.settings.leftHand
+        let padH: CGFloat = isLandscape ? 54 : 90
+
+        return HStack(alignment: .bottom, spacing: 0) {
             if engine.roundIsDefend {
-                defendControls
+                if isLeftHand {
+                    parryCluster(h: padH * 1.6)
+                    Spacer(minLength: 0)
+                    actionButtons
+                    evadeCluster(h: padH * 0.8)
+                } else {
+                    evadeCluster(h: padH * 0.8)
+                    actionButtons
+                    Spacer(minLength: 0)
+                    parryCluster(h: padH * 1.6)
+                }
             } else {
-                attackControls
+                attackControls(h: padH)
             }
         }
     }
-    
-    // Attack Pads Layout (3 Lanes)
-    private var attackControls: some View {
-        HStack(spacing: 10) {
-            TouchPadButton(title: "Slash", colorHex: "#d9b45a", minHeight: 90) {
+
+    // Heal / Focus sit in the middle of the dock, tucked between the pad groups
+    private var actionButtons: some View {
+        HStack(spacing: 8) {
+            CircularActionButton(
+                title: "Heal",
+                badgeText: "\(engine.potionCount)",
+                colorHex: "#8fd0a0",
+                size: isLandscape ? 46 : 58,
+                action: { engine.drinkPotion() }
+            )
+            CircularActionButton(
+                title: "Focus",
+                fillFraction: engine.focus / 100.0,
+                isReady: engine.focus >= 100.0,
+                colorHex: "#9fd0ff",
+                size: isLandscape ? 52 : 68,
+                action: { engine.useFocus() }
+            )
+        }
+        .padding(.horizontal, 8)
+        .padding(.bottom, 2)
+    }
+
+    // Attack Pads Layout (3 Lanes), compact and low
+    private func attackControls(h: CGFloat) -> some View {
+        HStack(spacing: 8) {
+            TouchPadButton(title: "Slash", colorHex: "#d9b45a", minHeight: h) {
                 engine.input(kind: "lane", lane: 0)
             }
-            
-            TouchPadButton(title: "Thrust", colorHex: "#c8d4e0", minHeight: 90) {
+            TouchPadButton(title: "Thrust", colorHex: "#c8d4e0", minHeight: h) {
                 engine.input(kind: "lane", lane: 1)
             }
-            
-            TouchPadButton(title: "Overhead", colorHex: "#c23a2a", minHeight: 90) {
+            TouchPadButton(title: "Overhead", colorHex: "#c23a2a", minHeight: h) {
                 engine.input(kind: "lane", lane: 2)
             }
         }
     }
-    
-    // Defend Controls Layout (Jump, Dodge, Duck + Parry) with Left-Hand Swap
-    private var defendControls: some View {
-        let isLeftHand = engine.settings.leftHand
-        
-        return HStack(spacing: 12) {
-            if isLeftHand {
-                parryCluster
-                evadeCluster
-            } else {
-                evadeCluster
-                parryCluster
-            }
-        }
-    }
-    
-    private var evadeCluster: some View {
-        VStack(spacing: 8) {
-            TouchPadButton(title: "Jump", colorHex: "#8fc4a0", minHeight: 44) {
+
+    private func evadeCluster(h: CGFloat) -> some View {
+        VStack(spacing: 6) {
+            TouchPadButton(title: "Jump", colorHex: "#8fc4a0", minHeight: h) {
                 engine.input(kind: "jump", lane: 0)
             }
-            
-            HStack(spacing: 8) {
-                TouchPadButton(title: "Dodge", colorHex: "#ff9a8a", minHeight: 44) {
+            HStack(spacing: 6) {
+                TouchPadButton(title: "Dodge", colorHex: "#ff9a8a", minHeight: h) {
                     engine.input(kind: "dodge", lane: 0)
                 }
-                
-                TouchPadButton(title: "Duck", colorHex: "#f1d98e", minHeight: 44) {
+                TouchPadButton(title: "Duck", colorHex: "#f1d98e", minHeight: h) {
                     engine.input(kind: "duck", lane: 0)
                 }
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: isLandscape ? 300 : .infinity)
     }
-    
-    private var parryCluster: some View {
-        TouchPadButton(title: "Parry", colorHex: "#c8d4e0", minHeight: 96) {
+
+    private func parryCluster(h: CGFloat) -> some View {
+        TouchPadButton(title: "Parry", colorHex: "#c8d4e0", minHeight: h) {
             engine.input(kind: "parry", lane: 0)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: isLandscape ? 220 : .infinity)
     }
 }
