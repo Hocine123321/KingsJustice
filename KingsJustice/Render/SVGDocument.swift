@@ -529,6 +529,8 @@ private final class SVGFragmentParser: NSObject, XMLParserDelegate {
     }
 
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        // <stop> elements are consumed in didStartElement and never pushed on the stack.
+        if elementName == "stop" { return }
         guard let node = nodeStack.popLast() else { return }
 
         if let id = node.attributes["id"] {
