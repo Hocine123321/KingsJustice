@@ -35,6 +35,8 @@ extension GameEngine {
         self.lowHealthBarked = false
         self.on = true
         self.over = false
+        self.resultReady = false
+        self.endClock = 0.0
         self.paused = false
         self.started = false
 

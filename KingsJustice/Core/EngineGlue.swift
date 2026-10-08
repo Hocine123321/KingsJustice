@@ -58,6 +58,12 @@ extension GameEngine: RenderSource {
     var rsFlash: Double { return flashOpacity }
     var rsFocusActive: Bool { return focusUntil > t }
     var rsPerfectGlow: Double { return 0.0 }
+    var rsKillCam: Double {
+        guard over && won else { return 0.0 }
+        let rampIn = min(1.0, endClock / 0.3)
+        let rampOut = endClock < 1.6 ? 1.0 : max(0.0, 1.0 - (endClock - 1.6) / 0.4)
+        return rampIn * rampOut
+    }
 
     var rsEvents: [RenderNote] {
         var out: [RenderNote] = []

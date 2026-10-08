@@ -182,3 +182,31 @@ final class EngineTests: XCTestCase {
         XCTAssertEqual(engine.stamina, 50.0)
     }
 }
+
+@MainActor
+final class KillCamTests: XCTestCase {
+    func testResultScreenWaitsForFinisher() {
+        let e = GameEngine()
+        e.on = true
+        e.started = true
+        e.over = true
+        e.won = true
+        e.tick(dt: 0.1)
+        XCTAssertFalse(e.resultReady)
+        XCTAssertGreaterThan(e.rsKillCam, 0.0)
+        for _ in 0..<25 { e.tick(dt: 0.1) }
+        XCTAssertTrue(e.resultReady)
+        XCTAssertEqual(e.rsKillCam, 0.0, accuracy: 1e-9)
+    }
+
+    func testLossRevealsResultSooner() {
+        let e = GameEngine()
+        e.on = true
+        e.started = true
+        e.over = true
+        e.won = false
+        for _ in 0..<11 { e.tick(dt: 0.1) }
+        XCTAssertTrue(e.resultReady)
+        XCTAssertEqual(e.rsKillCam, 0.0, accuracy: 1e-9)
+    }
+}

@@ -49,10 +49,13 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                     let totalSr = shakeR + driftR
 
                     // Brief zoom punch on hits
-                    let zoomPunch = 1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))
+                    let killCam = source.rsKillCam
+                    let zoomPunch = (1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))) * (1.0 + 0.22 * killCam)
+                    let pivotX = 800.0 + 60.0 * killCam
+                    let pivotY = 450.0 + 20.0 * killCam
                     let effScale = scale * zoomPunch
-                    let txEff = tx + totalSx - 800.0 * scale * (zoomPunch - 1.0)
-                    let tyEff = ty + totalSy - 450.0 * scale * (zoomPunch - 1.0)
+                    let txEff = tx + totalSx - pivotX * scale * (zoomPunch - 1.0)
+                    let tyEff = ty + totalSy - pivotY * scale * (zoomPunch - 1.0)
 
                     let renderTime = model.effectiveTime > 0 ? model.effectiveTime : time
 
@@ -113,6 +116,9 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                             )
                         }
 
+                        // Drifting mist in front of the fighters' feet
+                        Atmosphere.drawFog(in: sceneCtx, arenaKey: source.rsArenaKey, time: renderTime, strength: 1.0 - 0.5 * killCam)
+
                         // 5. Foreground (fg 1.5)
                         model.drawFgLayer(in: sceneCtx, size: worldSize)
 
@@ -130,16 +136,20 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         // 7. Torch light overlays
                         if let light = arena?.light {
                             let keyColor = SVGColorParser.parseColor(light.key) ?? Color.orange
-                            let lightGrad = Gradient(stops: [
-                                Gradient.Stop(color: keyColor.opacity(light.keyOp), location: 0.0),
+                            let leftGrad = Gradient(stops: [
+                                Gradient.Stop(color: keyColor.opacity(min(1.0, light.keyOp * Atmosphere.flicker(time: renderTime, phase: 0.0))), location: 0.0),
+                                Gradient.Stop(color: keyColor.opacity(0.0), location: 1.0)
+                            ])
+                            let rightGrad = Gradient(stops: [
+                                Gradient.Stop(color: keyColor.opacity(min(1.0, light.keyOp * Atmosphere.flicker(time: renderTime, phase: 2.1))), location: 0.0),
                                 Gradient.Stop(color: keyColor.opacity(0.0), location: 1.0)
                             ])
 
                             let rL = Path(ellipseIn: CGRect(x: light.keyLX - 450, y: light.keyLY - 450, width: 900, height: 900))
-                            sceneCtx.fill(rL, with: .radialGradient(lightGrad, center: CGPoint(x: light.keyLX, y: light.keyLY), startRadius: 0, endRadius: 450))
+                            sceneCtx.fill(rL, with: .radialGradient(leftGrad, center: CGPoint(x: light.keyLX, y: light.keyLY), startRadius: 0, endRadius: 450))
 
                             let rR = Path(ellipseIn: CGRect(x: light.keyRX - 450, y: light.keyRY - 450, width: 900, height: 900))
-                            sceneCtx.fill(rR, with: .radialGradient(lightGrad, center: CGPoint(x: light.keyRX, y: light.keyRY), startRadius: 0, endRadius: 450))
+                            sceneCtx.fill(rR, with: .radialGradient(rightGrad, center: CGPoint(x: light.keyRX, y: light.keyRY), startRadius: 0, endRadius: 450))
                         }
 
                         // Vignette
@@ -148,6 +158,11 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                             Gradient.Stop(color: Color.black.opacity(0.65), location: 1.0)
                         ])
                         sceneCtx.fill(Path(CGRect(x: 0, y: 0, width: 1600, height: 900)), with: .radialGradient(vignetteGrad, center: CGPoint(x: 800, y: 450), startRadius: 400, endRadius: 900))
+
+                        if source.rsFocusActive {
+                            Atmosphere.drawFocus(in: sceneCtx, time: renderTime)
+                        }
+                        Atmosphere.drawKillCam(in: sceneCtx, amount: killCam)
 
                         // Hit Impact Radial Flash
                         if shake > 0.25 || hitStop {

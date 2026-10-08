@@ -134,7 +134,7 @@ struct RootView: View {
                     screen = .settings
                 })
             }
-            if engine.over {
+            if engine.over && engine.resultReady {
                 EndScreenView(
                     engine: engine,
                     onNext: { nextFight() },

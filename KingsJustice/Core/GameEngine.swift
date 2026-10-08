@@ -21,6 +21,9 @@ final class GameEngine: ObservableObject {
     @Published var roundType: RoundType = .defend
     @Published var paused: Bool = false
     @Published var over: Bool = false
+    /// True once the finishing-blow slow-mo has played and the result screen may appear.
+    @Published var resultReady: Bool = false
+    var endClock: Double = 0.0
     @Published var won: Bool = false
     @Published var phaseBanner: String? = nil
     @Published var tutorialTip: String? = nil
@@ -150,6 +153,17 @@ final class GameEngine: ObservableObject {
         if hitStop > 0 {
             hitStop -= dt
             dtFrame = dt * 0.08
+        }
+
+        // Finishing blow: slow-mo kill-cam on a win, a short beat on a loss, then reveal the result.
+        if over {
+            endClock += dt
+            if won {
+                dtFrame = dt * (endClock < 1.5 ? 0.25 : 0.6)
+            }
+            if !resultReady && endClock > (won ? 1.9 : 1.0) {
+                resultReady = true
+            }
         }
 
         t += dtFrame
