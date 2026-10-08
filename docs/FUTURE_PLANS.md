@@ -28,10 +28,10 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 
 ## Next up (in order)
 ### 1. First impressions
-- [ ] Animated title screen: embers, parallax castle, slow camera drift, logo reveal
-- [ ] Polished menu cards with press animation, subtle glow, mode art
-- [ ] Smooth screen transitions (fade/wipe) instead of hard cuts
-- [ ] Short first-launch intro / story hook
+- [x] Animated title screen: blood moon, parallax ridges, flickering castle, embers, staged logo reveal
+- [ ] Polished menu cards with press animation, subtle glow, mode art (staggered entrance + skyline backdrop done; card art still open)
+- [x] Smooth screen transitions (fade) instead of hard cuts
+- [ ] Short first-launch intro / story hook (the old "Watch Cinematic" button was a dead end and was removed; bring it back only with a real cinematic)
 
 ### 2. Fight presentation
 - [ ] Boss entrance: champion name and title card, a signature pose, and a short sting before round one

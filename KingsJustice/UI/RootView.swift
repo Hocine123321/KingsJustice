@@ -55,7 +55,10 @@ struct RootView: View {
         ZStack {
             UITheme.bgNearBlack.ignoresSafeArea()
             content
+                .transition(.opacity)
+                .id(screen)
         }
+        .animation(.easeInOut(duration: 0.3), value: screen)
         .preferredColorScheme(.dark)
         .statusBarHidden(true)
         .onAppear { setupEngine() }

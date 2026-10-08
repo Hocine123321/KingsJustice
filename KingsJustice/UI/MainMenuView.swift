@@ -69,6 +69,7 @@ struct MainMenuView<Engine: UIEngine>: View {
     let onSelectShop: () -> Void
     let onSelectSettings: () -> Void
     let onWatchCinematic: () -> Void
+    @State private var appeared: Bool = false
     
     init(
         engine: Engine,
@@ -105,11 +106,15 @@ struct MainMenuView<Engine: UIEngine>: View {
     var body: some View {
         ZStack {
             BackgroundGradientView()
+            TitleBackdropView(fadeStart: 0.30, fadeEnd: 0.62)
             
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 16) {
                     HeaderKickView(kick: "A Medieval Duel", title: "The King's Justice")
                         .padding(.top, 16)
+                        .opacity(appeared ? 1.0 : 0.0)
+                        .scaleEffect(appeared ? 1.0 : 1.05)
+                        .animation(.easeOut(duration: 0.7), value: appeared)
                     
                     VStack(spacing: 10) {
                         ForEach(MenuModeCatalog.main, id: \.id) { mode in
@@ -122,6 +127,9 @@ struct MainMenuView<Engine: UIEngine>: View {
                         }
                     }
                     .padding(.horizontal, 16)
+                    .opacity(appeared ? 1.0 : 0.0)
+                    .offset(y: appeared ? 0.0 : 22.0)
+                    .animation(.easeOut(duration: 0.55).delay(0.2), value: appeared)
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text("EXTRAS")
@@ -139,6 +147,9 @@ struct MainMenuView<Engine: UIEngine>: View {
                         }
                     }
                     .padding(.horizontal, 16)
+                    .opacity(appeared ? 1.0 : 0.0)
+                    .offset(y: appeared ? 0.0 : 22.0)
+                    .animation(.easeOut(duration: 0.55).delay(0.35), value: appeared)
 
                     VStack(spacing: 10) {
                         HStack(spacing: 8) {
@@ -146,12 +157,11 @@ struct MainMenuView<Engine: UIEngine>: View {
                             PillButton(title: "Tonics", action: onSelectShop)
                         }
                         
-                        HStack(spacing: 8) {
-                            PillButton(title: "Settings", action: onSelectSettings)
-                            PillButton(title: "Watch Cinematic", action: onWatchCinematic)
-                        }
+                        PillButton(title: "Settings", action: onSelectSettings)
                     }
                     .padding(.top, 8)
+                    .opacity(appeared ? 1.0 : 0.0)
+                    .animation(.easeOut(duration: 0.55).delay(0.5), value: appeared)
                     
                     HStack(spacing: 20) {
                         Text("GOLD: \(engine.save.gold)")
@@ -166,5 +176,6 @@ struct MainMenuView<Engine: UIEngine>: View {
                 .padding(.bottom, 24)
             }
         }
+        .onAppear { appeared = true }
     }
 }
