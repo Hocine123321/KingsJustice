@@ -1,0 +1,107 @@
+# Kings Justice — Future Plans
+
+Living roadmap. Goal: turn the prototype into a high-quality, polished game people actually want to keep playing.
+Update the status boxes as work lands. Never delete an idea; move it to "Done" or "Parked" with a reason.
+
+## Fixed rules (from the owner — do not drift from these)
+- Two main modes: **Trial by Combat** and **Survival**. Extras: Boss Rush, Daily Challenge, Training Yard.
+- Target 60 fps. A standard fight lasts about 60 seconds.
+- **Focus** empowers the player. It must never make enemy AI easier.
+- Mobile layout stays compact so fighters and arena are always visible.
+- Every change is pushed to GitHub. CI must build the IPA and pass the tests before a download link is shared.
+- Quality bar: every side of the game, not just one area.
+
+## Working constraints
+- Swift cannot be compiled locally; CI is the compiler. Ship in small batches so one error never blocks everything.
+- No third-party dependencies; art is vector, audio is synthesized in code.
+- Rhythm notes are synced to the music clock. Never slow game time during live fighting (slow-mo only at the finisher).
+- Validated balance in `PORTING.md`: any gameplay-balance change needs owner sign-off.
+
+## Done so far
+- [x] Menu: Trial by Combat + Survival as main cards, extras as compact rows
+- [x] Display link pinned to 60 fps
+- [x] Spring-based fighter animation, weapon trails, dust (pre-existing updates)
+- [x] Layered music, dialogue/barks, app icon (pre-existing updates)
+- [x] Floating damage numbers and combo pop-ups
+- [x] Kill-cam finisher: slow-mo, pivot zoom, delayed result screen
+- [x] Torch flicker, drifting fog, Focus aura
+
+## Next up (in order)
+### 1. First impressions
+- [ ] Animated title screen: embers, parallax castle, slow camera drift, logo reveal
+- [ ] Polished menu cards with press animation, subtle glow, mode art
+- [ ] Smooth screen transitions (fade/wipe) instead of hard cuts
+- [ ] Short first-launch intro / story hook
+
+### 2. Fight presentation
+- [ ] Boss entrance: champion name and title card, a signature pose, and a short sting before round one
+- [ ] Round-start "FIGHT" beat with a clean countdown
+- [ ] Phase-change moments (enemy shifts stance, music layer swaps, banner)
+- [ ] Parry shockwave ring and screen-edge flash on Perfect
+- [ ] Camera framing that pushes in as an enemy gets low on health
+
+### 3. Result and reward feel
+- [ ] Rewards sequence: gold count-up, star/rank rating (S/A/B/C), personal-best callouts
+- [ ] "New unlock" celebration moment
+- [ ] Better defeat screen: tips tied to what actually killed the player
+
+### 4. Arena depth (arenas currently read flat)
+- [ ] 3+ parallax layers per arena (far / mid / near) with independent drift
+- [ ] God rays / light shafts where the art implies windows or moon
+- [ ] Per-arena ambient life: crows, bats, fireflies, falling leaves, torch sparks
+- [ ] Arena-specific events mid-fight: lightning flash, wind gust, crowd reaction
+- [ ] Reactive environment: banners sway, puddles ripple on impact, debris on heavy hits
+- [ ] Per-arena colour grading
+
+### 5. Character animation and design
+- [ ] Anticipation / follow-through pass on every attack and block
+- [ ] Idle variety (breathing, weight shifts, taunts) so fighters never look frozen
+- [ ] Distinct silhouette and attack language for each of the seven champions
+- [ ] Better hit reactions, stagger, and death animations per champion
+- [ ] Cloth/cape/hair secondary motion
+- [ ] Armour and weapon cosmetics per fighting style
+
+### 6. Audio
+- [ ] Unique looping battle theme per arena, tied to champion identity
+- [ ] Adaptive intensity: layers escalate with combo and low health, resolve after the kill
+- [ ] Title and menu themes, victory / defeat / unlock stingers
+- [ ] Richer impact sounds (material-aware: steel, shield, flesh), ambient beds (wind, crowd, swamp)
+- [ ] Haptic patterns matched to hit type
+
+### 7. Gameplay depth
+- [ ] Clearer, more varied enemy tells; per-champion signature mechanic
+- [ ] Survival: modifiers between waves, risk/reward picks, boss waves, leaderboard-style best runs
+- [ ] Daily Challenge: seeded modifier of the day, streak counter
+- [ ] Boss Rush: score multiplier for no-damage clears
+- [ ] Training Yard: guided drills, a move list, a metronome to practise timing
+- [ ] Interactive tutorial for the rhythm mechanic (first fight)
+- [ ] Difficulty assist options that never touch Focus-vs-AI rules
+
+### 8. Progression and retention
+- [ ] Meaningful unlocks: styles, cosmetics, titles
+- [ ] Achievements and a "chronicle" of defeated champions
+- [ ] Gold sinks that matter in the shop
+- [ ] Optional Game Center leaderboards and achievements
+
+### 9. UI/UX and accessibility
+- [ ] Consistent HUD style, safe-area handling on all iPhones, compact layout check on small screens
+- [ ] Colour-blind friendly note colours, reduced-motion and reduced-flash options (settings already exist for some)
+- [ ] Left-handed layout option
+- [ ] Pause menu polish, clearer settings
+
+### 10. Technical quality
+- [ ] Performance profile on the heaviest scene; keep every effect cheap (gradients over blur filters)
+- [ ] More unit tests around engine edge cases and fight length (~60 s)
+- [ ] Crash/edge-case pass: interruptions, backgrounding, audio route changes
+- [ ] CI: add a lint step and a simple fight-length simulation test
+- [ ] Localization-ready strings
+
+## Stretch ideas (parked until the core is polished)
+- Photo mode / replay of the final blow
+- Ghost data for Daily Challenge
+- Story cinematics between champions
+- Seasonal arenas and limited events
+- Local pass-and-play duel
+
+## Process for every batch
+1. Pick the next unchecked item above. 2. Implement small. 3. Add or update tests. 4. Push. 5. Confirm CI (tests + IPA) is green. 6. Share the download link and what to look at. 7. Tick the box here.
