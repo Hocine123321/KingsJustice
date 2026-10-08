@@ -41,9 +41,9 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] Camera framing that pushes in as an enemy gets low on health
 
 ### 3. Result and reward feel
-- [ ] Rewards sequence: gold count-up, star/rank rating (S/A/B/C), personal-best callouts
+- [x] Rewards sequence: gold/score count-up, S/A/B/C/D rank stamp, personal-best callouts (real stats; the old screen showed a fake +50 gold and the current combo as "best")
 - [ ] "New unlock" celebration moment
-- [ ] Better defeat screen: tips tied to what actually killed the player
+- [x] Better defeat screen: tip tied to the fight stats (misses vs perfects vs Focus)
 
 ### 4. Arena depth (arenas currently read flat)
 - [ ] 3+ parallax layers per arena (far / mid / near) with independent drift

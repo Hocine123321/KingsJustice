@@ -36,6 +36,7 @@ extension GameEngine {
         self.on = true
         self.over = false
         self.resultReady = false
+        self.fightResult = FightResult()
         self.endClock = 0.0
         self.paused = false
         self.started = false
@@ -230,6 +231,9 @@ extension GameEngine {
             }
         }
 
+        let prevBestWave = save.bestSurvival
+        let prevDaily = save.bestDaily[todayDateString()] ?? 0
+
         if win && mode == "survival" {
             wave += 1
             hp = min(maxhp, hp + 22.0)
@@ -245,6 +249,29 @@ extension GameEngine {
                 save.bestDaily[today] = score
             }
         }
+
+        // Capture the result screen data once, from real fight stats
+        let hpFrac = maxhp > 0 ? max(0.0, min(1.0, hp / maxhp)) : 0.0
+        var res = FightResult()
+        res.won = win
+        res.score = score
+        res.maxCombo = maxCombo
+        res.perfects = nP
+        res.goods = nG
+        res.misses = nM
+        res.gold = goldReward
+        res.hpFraction = hpFrac
+        res.duration = max(0.0, t)
+        res.rankLetter = FightRank.grade(perfects: nP, goods: nG, misses: nM, hpFraction: hpFrac, won: win).rawValue
+        if win && mode == "survival" && wave > prevBestWave {
+            res.newBest = true
+            res.bestLabel = "New best: wave \(wave)"
+        } else if mode == "daily" && score > prevDaily {
+            res.newBest = true
+            res.bestLabel = "New daily best"
+        }
+        if !win { res.tip = FightResult.defeatTip(perfects: nP, goods: nG, misses: nM) }
+        fightResult = res
 
         // Unlock styles if gold thresholds met
         if save.gold >= 200 { save.unlockedDuelist = true }

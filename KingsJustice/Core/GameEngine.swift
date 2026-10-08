@@ -24,6 +24,7 @@ final class GameEngine: ObservableObject {
     /// True once the finishing-blow slow-mo has played and the result screen may appear.
     @Published var resultReady: Bool = false
     var endClock: Double = 0.0
+    @Published var fightResult: FightResult = FightResult()
     @Published var won: Bool = false
     @Published var phaseBanner: String? = nil
     @Published var tutorialTip: String? = nil
