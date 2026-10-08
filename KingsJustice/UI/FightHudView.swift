@@ -32,6 +32,8 @@ struct FightHudView<Engine: UIEngine>: View {
                     .padding(.bottom, isLandscape ? 6 : 12)
             }
 
+            FightIntroView(engine: engine)
+
             // Center Judge Popup
             if !engine.judgeText.isEmpty {
                 judgePopupView

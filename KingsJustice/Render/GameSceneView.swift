@@ -50,7 +50,9 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
 
                     // Brief zoom punch on hits
                     let killCam = source.rsKillCam
-                    let zoomPunch = (1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))) * (1.0 + 0.22 * killCam)
+                    // Slow camera push as the champion nears defeat (wound runs 0...0.8)
+                    let lowHpPush = max(0.0, min(1.0, (source.rsWound - 0.4) / 0.4))
+                    let zoomPunch = (1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))) * (1.0 + 0.22 * killCam) * (1.0 + 0.045 * lowHpPush)
                     let pivotX = 800.0 + 60.0 * killCam
                     let pivotY = 450.0 + 20.0 * killCam
                     let effScale = scale * zoomPunch
@@ -130,6 +132,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
 
                         // Sparks and Blood
                         model.particleSystem.drawBlood(in: sceneCtx)
+                        model.particleSystem.drawShockwaves(in: sceneCtx)
                         model.particleSystem.drawSparks(in: sceneCtx)
                         model.particleSystem.drawFloatTexts(in: sceneCtx)
 

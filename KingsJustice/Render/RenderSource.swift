@@ -55,6 +55,7 @@ enum RenderFX: Sendable {
     case stain(x: Double, y: Double, r: Double)
     case flashHurt
     case floatText(text: String, x: Double, y: Double, color: String, big: Bool)
+    case shockwave(x: Double, y: Double, color: String)
 }
 
 protocol RenderSource: AnyObject {

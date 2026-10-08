@@ -104,4 +104,14 @@ final class RenderTests: XCTestCase {
         ps.update(dt: 1.0, time: 1.5, weatherType: "embers", wind: 0)
         XCTAssertTrue(ps.floatTexts.isEmpty)
     }
+
+    func testShockwaveSpawnsAndExpires() {
+        let ps = ParticleSystem()
+        ps.spawnShockwave(x: 700, y: 430, color: Color.white)
+        XCTAssertEqual(ps.shockwaves.count, 1)
+        ps.update(dt: 0.2, time: 0.2, weatherType: "embers", wind: 0)
+        XCTAssertEqual(ps.shockwaves.count, 1)
+        ps.update(dt: 0.5, time: 0.7, weatherType: "embers", wind: 0)
+        XCTAssertTrue(ps.shockwaves.isEmpty)
+    }
 }

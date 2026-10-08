@@ -135,6 +135,7 @@ extension GameEngine {
 
             if events[index].input == "parry" {
                 onSpawnFX?(.spark(x: 650, y: 430, count: perfect ? 36 : 22))
+                if perfect { onSpawnFX?(.shockwave(x: 650, y: 430, color: "#e8f2ff")) }
                 onSfx?(.clang, perfect ? 1.2 : 0.9)
                 shake2(perfect ? 0.8 : 0.5)
                 playerPoseState.setAction(EnginePoses.kParry, speed: 26.0, hold: 0.32)
@@ -358,6 +359,7 @@ extension GameEngine {
                 onSpawnFX?(.floatText(text: "\(shown)", x: 760.0, y: 350.0, color: col, big: perfect))
             }
         }
+        if perfect { onSpawnFX?(.shockwave(x: 720.0, y: 430.0, color: col)) }
         if combo > 0 && combo % 8 == 0 {
             onSpawnFX?(.floatText(text: "\(combo) COMBO", x: 640.0, y: 300.0, color: "#ffe08a", big: true))
         }

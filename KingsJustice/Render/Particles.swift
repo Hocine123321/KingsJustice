@@ -64,8 +64,17 @@ struct FloatText: Sendable {
     var life: Double
 }
 
+struct Shockwave: Sendable {
+    var x: Double
+    var y: Double
+    var color: Color
+    var age: Double
+    var life: Double
+}
+
 final class ParticleSystem: @unchecked Sendable {
     var floatTexts: [FloatText] = []
+    var shockwaves: [Shockwave] = []
     var weatherParticles: [WeatherParticle] = []
     var sparkParticles: [SparkParticle] = []
     var bloodParticles: [BloodParticle] = []
@@ -138,6 +147,24 @@ final class ParticleSystem: @unchecked Sendable {
         }
     }
 
+    func spawnShockwave(x: Double, y: Double, color: Color) {
+        if shockwaves.count > 6 { shockwaves.removeFirst() }
+        shockwaves.append(Shockwave(x: x, y: y, color: color, age: 0.0, life: 0.45))
+    }
+
+    func drawShockwaves(in context: GraphicsContext) {
+        for s in shockwaves {
+            let t = s.age / s.life
+            let eased = 1.0 - (1.0 - t) * (1.0 - t)
+            let r = 24.0 + 230.0 * eased
+            let alpha = max(0.0, 1.0 - t)
+            let rect = CGRect(x: s.x - r, y: s.y - r * 0.55, width: r * 2.0, height: r * 1.1)
+            context.stroke(Path(ellipseIn: rect), with: .color(s.color.opacity(0.85 * alpha)), lineWidth: 6.0 * (1.0 - t) + 1.0)
+            let inner = rect.insetBy(dx: r * 0.22, dy: r * 0.12)
+            context.stroke(Path(ellipseIn: inner), with: .color(Color.white.opacity(0.5 * alpha)), lineWidth: 2.0)
+        }
+    }
+
     func spawnFloatText(text: String, x: Double, y: Double, color: Color, big: Bool) {
         if floatTexts.count > 24 { floatTexts.removeFirst() }
         floatTexts.append(FloatText(text: text, x: x + Double.random(in: -26...26), y: y, vy: big ? -150.0 : -110.0, color: color, big: big, age: 0.0, life: big ? 1.1 : 0.85))
@@ -160,6 +187,13 @@ final class ParticleSystem: @unchecked Sendable {
     }
 
     func update(dt: Double, time: Double, weatherType: String, wind: Double) {
+        // Parry / perfect shockwave rings
+        var j = shockwaves.count - 1
+        while j >= 0 {
+            shockwaves[j].age += dt
+            if shockwaves[j].age >= shockwaves[j].life { shockwaves.remove(at: j) }
+            j -= 1
+        }
         // Floating combat text
         var i = floatTexts.count - 1
         while i >= 0 {

@@ -106,6 +106,8 @@ final class SceneModel: ObservableObject {
                     particleSystem.addStain(x: x, y: y, r: r)
                 case .flashHurt:
                     break
+                case .shockwave(let x, let y, let color):
+                    particleSystem.spawnShockwave(x: x, y: y, color: SVGColorParser.parseColor(color) ?? Color.white)
                 case .floatText(let text, let x, let y, let color, let big):
                     particleSystem.spawnFloatText(text: text, x: x, y: y, color: SVGColorParser.parseColor(color) ?? Color.white, big: big)
                 }

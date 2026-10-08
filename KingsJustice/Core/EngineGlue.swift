@@ -109,6 +109,8 @@ extension GameEngine: RenderSource {
                 break
             case .floatText(let text, let x, let y, let color, let big):
                 out.append(RenderFX.floatText(text: text, x: x, y: y, color: color, big: big))
+            case .shockwave(let x, let y, let color):
+                out.append(RenderFX.shockwave(x: x, y: y, color: color))
             }
         }
         fxQueue.removeAll()

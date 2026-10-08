@@ -34,11 +34,11 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [ ] Short first-launch intro / story hook (the old "Watch Cinematic" button was a dead end and was removed; bring it back only with a real cinematic)
 
 ### 2. Fight presentation
-- [ ] Boss entrance: champion name and title card, a signature pose, and a short sting before round one
-- [ ] Round-start "FIGHT" beat with a clean countdown
+- [x] Boss entrance: champion name and title card before round one (signature pose and sting still open)
+- [x] Round-start "FIGHT!" beat
 - [ ] Phase-change moments (enemy shifts stance, music layer swaps, banner)
-- [ ] Parry shockwave ring and screen-edge flash on Perfect
-- [ ] Camera framing that pushes in as an enemy gets low on health
+- [x] Parry / Perfect shockwave ring (screen-edge flash still open)
+- [x] Camera framing that pushes in as an enemy gets low on health
 
 ### 3. Result and reward feel
 - [ ] Rewards sequence: gold count-up, star/rank rating (S/A/B/C), personal-best callouts
