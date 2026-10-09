@@ -47,7 +47,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 
 ### 4. Arena depth (arenas currently read flat)
 - [ ] 3+ parallax layers per arena (far / mid / near) with independent drift
-- [ ] God rays / light shafts where the art implies windows or moon
+- [ ] God rays / light shafts where the art implies windows or moon (castle done; cathedral, pass, swamp still open)
 - [ ] Per-arena ambient life: crows, bats, fireflies, falling leaves, torch sparks
 - [ ] Arena-specific events mid-fight: lightning flash, wind gust, crowd reaction
 - [ ] Reactive environment: banners sway, puddles ripple on impact, debris on heavy hits
@@ -112,7 +112,7 @@ Still open:
 - [ ] Re-measure fps from a new recording; if still under 60, profile fighter rig layer count and SVG per-frame fallback
 - [x] Weapons look oversized: all weapons scaled to 86% (grip anchored, trail tip matched). Revisit after a new recording
 - [x] Fighters are small on screen: landscape camera 5% tighter, centred lower on the fighters
-- [ ] Castle arena stone texture is muddy; redo with cleaner shapes
+- [x] Castle arena: real block masonry (highlights, shadows, chips, damp streaks), moonlit windows and light shafts. Other arenas still to get the same treatment
 - [ ] Touch zones: consider a first-run hint then auto-fade, and a left-handed check
 - [x] Top HUD: removed the confusing wallet gold from the enemy side; player bar turns red when low
 

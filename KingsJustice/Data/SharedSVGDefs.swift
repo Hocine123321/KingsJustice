@@ -17,6 +17,7 @@ enum SharedSVGDefs {
   <linearGradient id="gold" x2="0" y2="1"><stop offset="0" stop-color="#f6da86"/><stop offset=".5" stop-color="#97742c"/><stop offset="1" stop-color="#3a2a0e"/></linearGradient>
   <linearGradient id="cloak" x2="0" y2="1"><stop offset="0" stop-color="#4a0b10"/><stop offset="1" stop-color="#0a0304"/></linearGradient>
   <linearGradient id="cloakK" x2="0" y2="1"><stop offset="0" stop-color="#2a323c"/><stop offset="1" stop-color="#07090c"/></linearGradient>
+  <linearGradient id="shaftG" x2="0" y2="1"><stop offset="0" stop-color="#b8c8ea" stop-opacity=".2"/><stop offset=".7" stop-color="#b8c8ea" stop-opacity=".05"/><stop offset="1" stop-color="#b8c8ea" stop-opacity="0"/></linearGradient>
   <linearGradient id="mudG" x2="0" y2="1"><stop offset="0" stop-color="#3d3023"/><stop offset=".35" stop-color="#261c14"/><stop offset="1" stop-color="#0c0806"/></linearGradient>
   <linearGradient id="flame" x2="0" y2="1"><stop offset="0" stop-color="#fff4b8"/><stop offset=".45" stop-color="#ff9a1f"/><stop offset="1" stop-color="#c22a00" stop-opacity=".15"/></linearGradient>
   <linearGradient id="mist" x2="0" y2="1"><stop offset="0" stop-color="#a39884" stop-opacity="0"/><stop offset=".5" stop-color="#a39884" stop-opacity=".17"/><stop offset="1" stop-color="#a39884" stop-opacity="0"/></linearGradient>
