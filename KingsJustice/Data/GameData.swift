@@ -670,9 +670,16 @@ enum GameData {
           <stop offset="75%" stop-color="#1a2842"/>
           <stop offset="100%" stop-color="#0b101c"/>
         </linearGradient>
+        <radialGradient id="cd_halo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#7aa8ff" stop-opacity="0.34"/>
+          <stop offset="60%" stop-color="#4a6fd0" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="#4a6fd0" stop-opacity="0"/>
+        </radialGradient>
       </defs>
       <rect x="-1200" y="0" width="4000" height="900" fill="url(#cd_sky)"/>
+            <g><circle cx="1335" cy="79" r="2.0" fill="#dce9ff" opacity="0.9"/><circle cx="1395" cy="149" r="1.2" fill="#dce9ff" opacity="0.7"/><circle cx="570" cy="27" r="1.6" fill="#dce9ff" opacity="0.5"/><circle cx="1173" cy="40" r="1.6" fill="#dce9ff" opacity="0.5"/><circle cx="632" cy="60" r="2.6" fill="#dce9ff" opacity="0.5"/><circle cx="207" cy="49" r="2.6" fill="#dce9ff" opacity="0.5"/><circle cx="330" cy="14" r="1.2" fill="#dce9ff" opacity="0.5"/><circle cx="501" cy="56" r="1.6" fill="#dce9ff" opacity="0.7"/><circle cx="1164" cy="66" r="1.6" fill="#dce9ff" opacity="0.9"/><circle cx="463" cy="112" r="2.0" fill="#dce9ff" opacity="0.5"/><circle cx="399" cy="51" r="2.0" fill="#dce9ff" opacity="0.5"/><circle cx="1295" cy="164" r="1.2" fill="#dce9ff" opacity="0.9"/><circle cx="1448" cy="100" r="1.2" fill="#dce9ff" opacity="0.7"/><circle cx="438" cy="137" r="2.6" fill="#dce9ff" opacity="0.9"/><circle cx="420" cy="28" r="2.0" fill="#dce9ff" opacity="0.5"/><circle cx="97" cy="154" r="2.6" fill="#dce9ff" opacity="0.7"/><circle cx="78" cy="129" r="1.2" fill="#dce9ff" opacity="0.9"/><circle cx="430" cy="64" r="1.2" fill="#dce9ff" opacity="0.5"/><circle cx="1134" cy="78" r="2.6" fill="#dce9ff" opacity="0.5"/><circle cx="1267" cy="108" r="2.0" fill="#dce9ff" opacity="0.5"/><circle cx="946" cy="37" r="1.6" fill="#dce9ff" opacity="0.7"/></g>
       <path d="M-800,0 Q-800,300 -600,300 Q-400,300 -400,0 M-400,0 Q-400,300 -200,300 Q0,300 0,0 M0,0 Q0,300 200,300 Q400,300 400,0 M400,0 Q400,300 600,300 Q800,300 800,0 M800,0 Q800,300 1000,300 Q1200,300 1200,0 M1200,0 Q1200,300 1400,300 Q1600,300 1600,0 M1600,0 Q1600,300 1800,300 Q2000,300 2000,0 M2000,0 Q2000,300 2200,300 Q2400,300 2400,0" stroke="#162338" stroke-width="14" fill="none"/>
+      <circle cx="800" cy="200" r="270" fill="url(#cd_halo)"/>
       <circle cx="800" cy="200" r="120" fill="#192b45" stroke="#334b6e" stroke-width="10"/>
       <path d="M800,200 L800,80 M800,200 L800,320 M800,200 L680,200 M800,200 L920,200 M800,200 L715,115 M800,200 L885,285 M800,200 L715,285 M800,200 L885,115" stroke="#334b6e" stroke-width="5"/>
       <circle cx="800" cy="200" r="85" fill="none" stroke="#334b6e" stroke-width="5"/>
@@ -680,6 +687,10 @@ enum GameData {
       <path d="M800,200 L885,115 A120,120 0 0,1 920,200 Z" fill="#8e44ad" opacity="0.75"/>
       <path d="M800,200 L920,200 A120,120 0 0,1 885,285 Z" fill="#1b9aaa" opacity="0.75"/>
       <path d="M800,200 L715,115 A120,120 0 0,1 800,80 Z" fill="#4a00e0" opacity="0.75"/>
+      <path d="M800,200 L885,285 A120,120 0 0,1 800,320 Z" fill="#d98a2b" opacity="0.7"/>
+      <path d="M800,200 L800,320 A120,120 0 0,1 715,285 Z" fill="#b8323a" opacity="0.7"/>
+      <path d="M800,200 L715,285 A120,120 0 0,1 680,200 Z" fill="#2f9e6a" opacity="0.7"/>
+      <path d="M800,200 L680,200 A120,120 0 0,1 715,115 Z" fill="#c0508a" opacity="0.7"/>
       <path d="M520,380 L520,200 Q570,140 620,200 L620,380 Z" fill="#243859" stroke="#3d5c87" stroke-width="7"/>
       <path d="M980,380 L980,200 Q1030,140 1080,200 L1080,380 Z" fill="#243859" stroke="#3d5c87" stroke-width="7"/>
       <path d="M520,270 Q570,200 620,270 M980,270 Q1030,200 1080,270" stroke="#3d5c87" stroke-width="5" fill="none"/>
@@ -706,6 +717,14 @@ enum GameData {
       <polygon points="530,200 630,180 1000,700 740,700" fill="url(#cd_god)"/>
       <polygon points="760,100 840,100 1300,700 1060,700" fill="url(#cd_god)"/>
       <polygon points="970,200 1070,180 1540,700 1300,700" fill="url(#cd_god)"/>
+      <g fill="#0c1422" stroke="#1b2a40" stroke-width="3">
+        <rect x="150" y="652" width="190" height="38"/>
+        <rect x="150" y="620" width="12" height="34"/>
+        <rect x="328" y="620" width="12" height="34"/>
+        <path d="M1260,690 L1260,656 L1440,640 L1450,690 Z"/>
+        <rect x="1262" y="622" width="12" height="34"/>
+        <path d="M1090,690 L1100,668 L1180,676 L1176,690 Z"/>
+      </g>
       <rect x="720" y="605" width="160" height="85" fill="#182436" stroke="#334863" stroke-width="5"/>
       <rect x="700" y="592" width="200" height="16" fill="#21314a" stroke="#3f5980" stroke-width="3"/>
       <rect x="740" y="565" width="7" height="27" fill="#ebdcc8"/>
@@ -755,6 +774,9 @@ enum GameData {
       <ellipse cx="860" cy="720" rx="160" ry="28" fill="#b8ddff" opacity="0.32" filter="url(#b4)"/>
       <ellipse cx="1180" cy="720" rx="180" ry="30" fill="#b8ddff" opacity="0.32" filter="url(#b4)"/>
       <ellipse cx="520" cy="720" rx="140" ry="24" fill="#b8ddff" opacity="0.25" filter="url(#b4)"/>
+      <ellipse cx="760" cy="738" rx="120" ry="20" fill="#7a5be0" opacity="0.26" filter="url(#b4)"/>
+      <ellipse cx="1010" cy="744" rx="130" ry="20" fill="#1fb7c4" opacity="0.22" filter="url(#b4)"/>
+      <ellipse cx="560" cy="742" rx="110" ry="18" fill="#e0a13a" opacity="0.2" filter="url(#b4)"/>
       <ellipse cx="650" cy="750" rx="130" ry="22" fill="url(#blood)"/>
       <ellipse cx="1050" cy="760" rx="160" ry="26" fill="url(#pool)"/>
       <ellipse cx="1050" cy="760" rx="100" ry="14" fill="url(#poolShine)"/>
