@@ -719,11 +719,25 @@ enum GameData {
       <circle cx="780" cy="360" r="130" fill="#ff3333"/>
       <path d="M480,310 Q780,270 1080,320 Q800,340 480,310 Z" fill="#2b070d" opacity="0.85"/>
       <path d="M520,380 Q780,340 1040,390 Q760,410 520,380 Z" fill="#2b070d" opacity="0.75"/>
+      <path d="M662,340 Q669,332 676,344 Q683,332 690,340 Q682,339 676,347 Q670,339 662,340 Z M606,294 Q615,284 624,299 Q633,284 642,294 Q632,293 624,303 Q616,293 606,294 Z M571,268 Q576,261 582,271 Q588,261 593,268 Q587,267 582,273 Q577,267 571,268 Z M675,376 Q680,369 686,379 Q692,369 697,376 Q691,375 686,381 Q681,375 675,376 Z M754,411 Q759,404 765,414 Q771,404 776,411 Q770,410 765,416 Q760,410 754,411 Z M781,370 Q788,362 795,374 Q802,362 809,370 Q801,369 795,377 Q789,369 781,370 Z M742,371 Q750,361 759,376 Q768,361 776,371 Q766,370 759,380 Q752,370 742,371 Z M647,350 Q652,343 658,353 Q664,343 669,350 Q663,349 658,355 Q653,349 647,350 Z" fill="#0a0203"/>
       <path d="M-1200,690 L-1200,510 L-600,540 L0,490 L500,530 L1000,480 L1600,520 L2200,480 L2800,530 L2800,690 Z" fill="#1c070c"/>
       <rect x="-1200" y="550" width="4000" height="140" fill="url(#cl_sea)"/>
+            <path d="M-300,560 L-270,470 L-250,500 L-225,440 L-190,560 Z M380,566 L410,500 L440,530 L470,486 L500,566 Z M1500,560 L1530,490 L1560,520 L1590,460 L1630,560 Z" fill="#12050a"/>
+      <path d="M893,601 q12,-5 25,0 M1335,606 q28,-5 57,0 M734,632 q24,-5 48,0 M1386,586 q33,-5 66,0 M429,584 q14,-5 28,0 M691,651 q24,-5 48,0 M120,656 q13,-5 27,0 M593,602 q34,-5 68,0 M76,635 q32,-5 65,0 M958,598 q30,-5 61,0 M1555,590 q31,-5 62,0 M31,641 q13,-5 26,0 M900,661 q18,-5 36,0 M203,646 q26,-5 53,0 M1392,646 q26,-5 52,0 M485,643 q23,-5 46,0" stroke="#ffb0a8" stroke-opacity=".38" stroke-width="2.5" fill="none" stroke-linecap="round"/>
       <path d="M-1000,580 Q-800,565 -600,585 T-200,580 T200,585 T600,580 T1000,585 T1400,580 T1800,585 T2200,580 T2600,585" stroke="#ff6666" stroke-width="2.5" fill="none" opacity="0.75"/>
       <path d="M-900,610 Q-700,595 -500,615 T-100,610 T300,615 T700,610 T1100,615 T1500,610 T1900,615 T2300,610" stroke="#e62e2e" stroke-width="3" fill="none" opacity="0.65"/>
-      <path d="M1280,480 L1280,410 L1315,410 M1280,430 L1300,410 M1310,410 L1310,440" stroke="#0a0203" stroke-width="5" fill="none"/>
+      <g>
+        <rect x="1030" y="636" width="290" height="54" fill="#1a0a0d"/>
+        <path d="M1030,636 H1320 M1030,654 H1320 M1030,672 H1320" stroke="#0a0203" stroke-width="3"/>
+        <path d="M1030,636 H1320" stroke="#ff5a4a" stroke-opacity=".35" stroke-width="3"/>
+        <rect x="1052" y="690" width="12" height="20" fill="#0f0507"/><rect x="1290" y="690" width="12" height="20" fill="#0f0507"/>
+        <path d="M1262,636 V404 M1262,404 H1140 M1262,452 L1214,404" stroke="#0a0203" stroke-width="12" stroke-linecap="square" fill="none"/>
+        <path d="M1262,404 H1140" stroke="#ff5a4a" stroke-opacity=".28" stroke-width="3"/>
+        <path d="M1168,404 V470" stroke="#2b1a14" stroke-width="4"/>
+        <ellipse cx="1168" cy="482" rx="11" ry="15" fill="none" stroke="#2b1a14" stroke-width="4"/>
+        <path d="M1090,636 L1086,596 L1136,596 L1132,636 Z" fill="#26120f" stroke="#0a0203" stroke-width="3"/>
+        <path d="M1112,596 L1146,540 M1146,540 q22,-12 30,12 L1150,562 Z" stroke="#0a0203" stroke-width="5" fill="#3a3238"/>
+      </g>
     </g>
 """##,
             cl: ##"""
@@ -739,7 +753,7 @@ enum GameData {
       <path d="M240,490 L280,490 M240,530 L280,530 M240,570 L280,570" stroke="#330e18" stroke-width="6"/>
       <path d="M180,690 Q150,560 100,500 Q140,520 80,460" fill="none" stroke="#0f0305" stroke-width="14" stroke-linecap="round"/>
       <path d="M1380,690 Q1410,550 1460,490 Q1420,510 1490,450" fill="none" stroke="#0f0305" stroke-width="14" stroke-linecap="round"/>
-      <path d="M-600,690 L-400,500 L-200,690 M450,690 L550,540 L650,690 M1050,690 L1180,510 L1280,690" fill="#120508"/>
+      <path d="M-600,690 L-400,500 L-200,690 M450,690 L550,540 L650,690" fill="#120508"/>
       <rect x="-1200" y="530" width="4000" height="160" fill="url(#cl_mist)"/>
     </g>
 """##,
@@ -763,6 +777,8 @@ enum GameData {
       <path d="M300,720 L380,740 L450,730 M550,710 L620,750 L710,735 M820,715 L900,745 L1020,725 L1100,750 M1200,710 L1280,740" fill="none" stroke="#ff6666" stroke-width="3" opacity="0.85" filter="url(#glow)"/>
       <path d="M380,740 L410,770 M900,745 L930,780 M1020,725 L1050,760" fill="none" stroke="#e62e2e" stroke-width="2.2" opacity="0.7"/>
       <path d="M200,710 L205,680 L212,710 M215,710 L220,675 L226,710 M650,705 L654,678 L660,705 M1050,708 L1055,680 L1061,708 M1350,712 L1355,682 L1362,712" stroke="#662931" stroke-width="2.5" fill="none"/>
+      <polygon points="992,757 1001,762 996,766 985,765" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="1351,748 1366,757 1357,764 1339,762" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="762,827 774,834 767,840 752,838" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="1438,844 1452,852 1444,859 1427,856" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="1151,818 1161,824 1155,829 1143,827" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="752,757 764,764 757,770 742,768" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="1202,772 1217,781 1208,788 1190,786" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="1465,743 1484,754 1473,764 1450,760" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="1159,825 1174,834 1165,842 1147,838" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="570,783 580,789 574,794 562,792" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="144,775 156,782 149,788 134,786" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="570,775 577,779 573,782 564,781" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="987,769 1000,777 992,784 977,781" fill="#241821" stroke="#0a0508" stroke-width="2"/><polygon points="731,840 749,851 738,860 717,856" fill="#241821" stroke="#0a0508" stroke-width="2"/>
+      <path d="M470,800 l34,-8 M474,794 l-6,-6 M474,802 l-6,6 M504,792 l6,-6 M504,792 l6,6 M1180,830 l30,10 M1184,834 l-6,6 M1210,840 l6,-4" stroke="#b9a99a" stroke-opacity=".55" stroke-width="3" stroke-linecap="round" fill="none"/>
       <ellipse cx="660" cy="735" rx="90" ry="14" fill="#6e121a" opacity="0.85"/>
       <ellipse cx="660" cy="735" rx="60" ry="8" fill="#ff4d4d" opacity="0.45"/>
       <ellipse cx="1120" cy="740" rx="120" ry="17" fill="#6e121a" opacity="0.9"/>
