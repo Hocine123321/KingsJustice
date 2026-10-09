@@ -27,7 +27,8 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         tx = size.width / 2.0 - 660.0 * scale
                         ty = size.height * 0.35 - 480.0 * scale
                     } else {
-                        scale = min(size.width / 1600.0, size.height / 900.0)
+                        // Fill the whole screen (no side bars on wide phones); the top/bottom edge is trimmed instead
+                        scale = max(size.width / 1600.0, size.height / 900.0)
                         tx = (size.width - 1600.0 * scale) / 2.0
                         ty = (size.height - 900.0 * scale) / 2.0
                     }
@@ -162,19 +163,10 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         ])
                         sceneCtx.fill(Path(CGRect(x: 0, y: 0, width: 1600, height: 900)), with: .radialGradient(vignetteGrad, center: CGPoint(x: 800, y: 450), startRadius: 400, endRadius: 900))
 
-                        if source.rsFocusActive {
-                            Atmosphere.drawFocus(in: sceneCtx, time: renderTime)
-                        }
-                        Atmosphere.drawKillCam(in: sceneCtx, amount: killCam)
-
                         // Hit Impact Radial Flash
                         if shake > 0.25 || hitStop {
                             let flashOp = min(0.35, max(0.1, shake * 0.35 + (hitStop ? 0.15 : 0.0)))
-                            sceneCtx.drawLayer { flashCtx in
-                                flashCtx.addFilter(.blur(radius: 12.0))
-                                let impactRect = CGRect(x: 500, y: 300, width: 600, height: 400)
-                                flashCtx.fill(Path(ellipseIn: impactRect), with: .color(Color.white.opacity(flashOp)))
-                            }
+                            Atmosphere.softGlow(in: sceneCtx, center: CGPoint(x: 800, y: 500), rx: 360, ry: 240, color: Color.white, opacity: flashOp * 1.3)
                         }
 
                         // Hurt Flash Overlay
@@ -190,6 +182,12 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         // 8. Rhythm Overlay
                         drawRhythmOverlay(in: sceneCtx, time: time)
                     }
+
+                    // Screen-space polish (reaches the true screen edges on any aspect ratio)
+                    if source.rsFocusActive {
+                        Atmosphere.drawFocus(in: context, size: size, time: renderTime)
+                    }
+                    Atmosphere.drawKillCam(in: context, size: size, amount: killCam)
                 }
             }
         }
@@ -238,10 +236,9 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                     let ringPath = Path(ellipseIn: CGRect(x: cx - r, y: cy - r, width: r * 2.0, height: r * 2.0))
                     let ringCol = isPerfectNow ? Color.white : col
 
-                    ringCtx.drawLayer { glowCtx in
-                        glowCtx.addFilter(.blur(radius: 8.0))
-                        glowCtx.stroke(ringPath, with: .color(ringCol), style: style)
-                    }
+                    var glowStyle = style
+                    glowStyle.lineWidth = style.lineWidth + 9.0
+                    ringCtx.stroke(ringPath, with: .color(ringCol.opacity(0.28)), style: glowStyle)
                     ringCtx.stroke(ringPath, with: .color(ringCol), style: style)
 
                     if event.input == "grab" {
@@ -316,10 +313,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
             diamond.addLine(to: CGPoint(x: -r, y: 0))
             diamond.closeSubpath()
 
-            ctx.drawLayer { glowCtx in
-                glowCtx.addFilter(.blur(radius: 6.0))
-                glowCtx.fill(diamond, with: .color(fillCol))
-            }
+            Atmosphere.softGlow(in: ctx, center: .zero, rx: r * 2.4, ry: r * 2.6, color: fillCol, opacity: 0.55)
             ctx.fill(diamond, with: .color(fillCol))
 
             var innerDiamond = Path()

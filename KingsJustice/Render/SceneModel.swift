@@ -200,10 +200,8 @@ final class SceneModel: ObservableObject {
                 path.addQuadCurve(to: points[i].point, control: CGPoint(x: midX, y: midY))
             }
 
-            context.drawLayer { glowCtx in
-                glowCtx.addFilter(.blur(radius: 5.0))
-                glowCtx.stroke(path, with: .color(primaryColor.opacity(0.35)), style: StrokeStyle(lineWidth: 13.0, lineCap: .round, lineJoin: .round))
-            }
+            context.stroke(path, with: .color(primaryColor.opacity(0.14)), style: StrokeStyle(lineWidth: 20.0, lineCap: .round, lineJoin: .round))
+            context.stroke(path, with: .color(primaryColor.opacity(0.26)), style: StrokeStyle(lineWidth: 12.0, lineCap: .round, lineJoin: .round))
             context.stroke(path, with: .color(primaryColor.opacity(0.65)), style: StrokeStyle(lineWidth: 6.5, lineCap: .round, lineJoin: .round))
             context.stroke(path, with: .color(Color.white.opacity(0.9)), style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
         }
@@ -216,7 +214,7 @@ final class SceneModel: ObservableObject {
         .frame(width: 1600, height: 900)
 
         let renderer = ImageRenderer(content: layerView)
-        renderer.scale = 1.0
+        renderer.scale = 1.6
         if let uiImage = renderer.uiImage {
             return Image(uiImage: uiImage)
         }

@@ -162,12 +162,15 @@ struct FightHudView<Engine: UIEngine>: View {
                 .font(.system(size: 30, weight: .bold, design: .serif).italic())
                 .tracking(3.0)
                 .foregroundColor(Color(hex: engine.judgeColorHex))
-                .shadow(color: Color(hex: engine.judgeColorHex).opacity(0.8), radius: 12)
+                .shadow(color: Color.black.opacity(0.95), radius: 2, x: 0, y: 2)
+                .shadow(color: Color.black.opacity(0.8), radius: 6)
+                .shadow(color: Color(hex: engine.judgeColorHex).opacity(0.6), radius: 12)
                 .id(engine.judgeStamp)
                 .transition(.scale.combined(with: .opacity))
                 .animation(.easeOut(duration: 0.25), value: engine.judgeStamp)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.top, 52)
         .allowsHitTesting(false)
     }
     

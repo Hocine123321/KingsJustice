@@ -354,14 +354,14 @@ extension GameEngine {
 
         damageEnemy(dmg)
         if dmg > 0 && !training {
-            let shown = Int((dmg / max(kmax, 1.0) * 1000.0).rounded())
+            let shown = Int((dmg / max(kmax, 1.0) * 10000.0).rounded())
             if shown > 0 {
-                onSpawnFX?(.floatText(text: "\(shown)", x: 760.0, y: 350.0, color: col, big: perfect))
+                onSpawnFX?(.floatText(text: "\(shown)", x: 930.0, y: 300.0, color: perfect ? "#ffd36b" : "#f4ead8", big: perfect))
             }
         }
         if perfect { onSpawnFX?(.shockwave(x: 720.0, y: 430.0, color: col)) }
         if combo > 0 && combo % 8 == 0 {
-            onSpawnFX?(.floatText(text: "\(combo) COMBO", x: 640.0, y: 300.0, color: "#ffe08a", big: true))
+            onSpawnFX?(.floatText(text: "\(combo) COMBO", x: 560.0, y: 250.0, color: "#ffe08a", big: true))
         }
 
         let lanePose = (events[index].lane == 0) ? EnginePoses.kSlash : ((events[index].lane == 1) ? EnginePoses.kThrust : EnginePoses.kOver)

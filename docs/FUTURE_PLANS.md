@@ -96,6 +96,24 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [ ] CI: add a lint step and a simple fight-length simulation test
 - [ ] Localization-ready strings
 
+## Findings from the owner's gameplay recording (Oct 2026)
+Fixed in the "recording fixes" batch:
+- [x] Focus aura / kill-cam vignette showed a hard 16:9 edge on wide phones (my bug) - now drawn in screen space
+- [x] Arena left dark side bars on wide phones - landscape now fills the screen (top/bottom edge trimmed instead)
+- [x] Arenas looked blurry - layers were baked at 1.0x, now 1.6x
+- [x] Touch-zone boxes covered most of the arena - borders and labels are now much quieter until pressed
+- [x] "Struck" / "Scraped" judge text was low-contrast and sat on top of the fighters - now outlined and raised
+- [x] Damage numbers were small, grey and always "37" - now bigger, outlined, over the champion's head, 10x scale
+- [x] Landscape menu: skyline fought with the list rows - dimmed in landscape
+- [x] Frame rate: the recording suggests roughly 45-48 fps in the red arena and 30-36 fps in the castle. Per-frame blur layers (note glow, fighter shadow/aura, weapon trail, sparks, dust, ring glow, impact flash) were replaced with cheap gradients/strokes
+Still open:
+- [ ] Re-measure fps from a new recording; if still under 60, profile fighter rig layer count and SVG per-frame fallback
+- [ ] Weapons look oversized (enemy blade longer than its body, clipped at the top of the screen)
+- [ ] Fighters are small on screen; consider a slightly tighter camera
+- [ ] Castle arena stone texture is muddy; redo with cleaner shapes
+- [ ] Touch zones: consider a first-run hint then auto-fade, and a left-handed check
+- [ ] Top HUD: enemy bar is unlabelled and the gold number between the bars is confusing
+
 ## Stretch ideas (parked until the core is polished)
 - Photo mode / replay of the final blow
 - Ghost data for Daily Challenge

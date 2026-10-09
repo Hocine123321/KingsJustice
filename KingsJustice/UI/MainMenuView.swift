@@ -70,6 +70,7 @@ struct MainMenuView<Engine: UIEngine>: View {
     let onSelectSettings: () -> Void
     let onWatchCinematic: () -> Void
     @State private var appeared: Bool = false
+    @Environment(\.verticalSizeClass) private var vSize
     
     init(
         engine: Engine,
@@ -107,6 +108,7 @@ struct MainMenuView<Engine: UIEngine>: View {
         ZStack {
             BackgroundGradientView()
             TitleBackdropView(fadeStart: 0.30, fadeEnd: 0.62)
+                .opacity(vSize == .compact ? 0.28 : 1.0)
             
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 16) {

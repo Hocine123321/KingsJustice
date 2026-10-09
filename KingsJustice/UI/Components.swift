@@ -157,10 +157,10 @@ struct TouchPadButton: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 14)
-                .fill(isPressed ? Color(hex: colorHex).opacity(0.6) : Color(hex: "#0e0a08").opacity(0.18))
+                .fill(isPressed ? Color(hex: colorHex).opacity(0.6) : Color(hex: "#0e0a08").opacity(0.06))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color(hex: colorHex).opacity(0.75), lineWidth: 1.5)
+                        .stroke(Color(hex: colorHex).opacity(isPressed ? 0.9 : 0.30), lineWidth: 1.5)
                 )
                 .scaleEffect(isPressed ? 0.95 : 1.0)
                 .animation(.easeOut(duration: 0.06), value: isPressed)
@@ -168,7 +168,7 @@ struct TouchPadButton: View {
             Text(title.uppercased())
                 .font(.system(size: 11, weight: .bold))
                 .tracking(1.5)
-                .foregroundColor(Color(hex: colorHex).opacity(0.9))
+                .foregroundColor(Color(hex: colorHex).opacity(isPressed ? 1.0 : 0.5))
         }
         .frame(minHeight: minHeight)
         .contentShape(Rectangle())

@@ -43,26 +43,47 @@ enum Atmosphere {
         return 1.0 + 0.10 * sin(time * 7.3 + phase) + 0.05 * sin(time * 13.1 + phase * 2.0) + 0.03 * sin(time * 29.0 + phase * 3.0)
     }
 
-    /// Cool pulsing aura around the screen edge while Focus is active.
-    static func drawFocus(in context: GraphicsContext, time: Double) {
+    /// Soft elliptical glow without a blur filter (blur layers are expensive every frame).
+    static func softGlow(in context: GraphicsContext, center: CGPoint, rx: Double, ry: Double, color: Color, opacity: Double) {
+        guard rx > 0.5 && ry > 0.5 && opacity > 0.0 else { return }
+        let grad = Gradient(stops: [
+            Gradient.Stop(color: color.opacity(opacity), location: 0.0),
+            Gradient.Stop(color: color.opacity(opacity * 0.45), location: 0.55),
+            Gradient.Stop(color: color.opacity(0.0), location: 1.0)
+        ])
+        context.drawLayer { ctx in
+            ctx.translateBy(x: center.x, y: center.y)
+            ctx.scaleBy(x: 1.0, y: ry / rx)
+            ctx.fill(Path(ellipseIn: CGRect(x: -rx, y: -rx, width: rx * 2.0, height: rx * 2.0)),
+                     with: .radialGradient(grad, center: .zero, startRadius: 0, endRadius: rx))
+        }
+    }
+
+    /// Cool pulsing aura around the screen edge while Focus is active. Drawn in SCREEN space so it
+    /// always reaches the real screen edges (no visible 16:9 frame on wide phones).
+    static func drawFocus(in context: GraphicsContext, size: CGSize, time: Double) {
+        let w = Double(size.width)
+        let h = Double(size.height)
         let pulse = 0.5 + 0.5 * sin(time * 4.0)
         let edge = Color(red: 0.45, green: 0.72, blue: 1.0)
         let grad = Gradient(stops: [
             Gradient.Stop(color: edge.opacity(0.0), location: 0.55),
-            Gradient.Stop(color: edge.opacity(0.22 + 0.10 * pulse), location: 1.0)
+            Gradient.Stop(color: edge.opacity(0.20 + 0.10 * pulse), location: 1.0)
         ])
-        context.fill(Path(CGRect(x: 0, y: 0, width: 1600, height: 900)),
-                     with: .radialGradient(grad, center: CGPoint(x: 800, y: 450), startRadius: 300, endRadius: 950))
+        context.fill(Path(CGRect(x: 0, y: 0, width: w, height: h)),
+                     with: .radialGradient(grad, center: CGPoint(x: w / 2.0, y: h / 2.0), startRadius: 0, endRadius: max(w, h) * 0.62))
     }
 
-    /// Darkens and tightens the frame during the finishing blow.
-    static func drawKillCam(in context: GraphicsContext, amount: Double) {
+    /// Darkens and tightens the frame during the finishing blow (screen space).
+    static func drawKillCam(in context: GraphicsContext, size: CGSize, amount: Double) {
         guard amount > 0.0 else { return }
+        let w = Double(size.width)
+        let h = Double(size.height)
         let grad = Gradient(stops: [
             Gradient.Stop(color: Color.black.opacity(0.0), location: 0.25),
             Gradient.Stop(color: Color.black.opacity(0.75 * amount), location: 1.0)
         ])
-        context.fill(Path(CGRect(x: 0, y: 0, width: 1600, height: 900)),
-                     with: .radialGradient(grad, center: CGPoint(x: 860, y: 470), startRadius: 120, endRadius: 800))
+        context.fill(Path(CGRect(x: 0, y: 0, width: w, height: h)),
+                     with: .radialGradient(grad, center: CGPoint(x: w * 0.54, y: h * 0.52), startRadius: 0, endRadius: max(w, h) * 0.6))
     }
 }

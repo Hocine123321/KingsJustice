@@ -150,10 +150,8 @@ struct FighterRig {
         let shadowRect = CGRect(x: shadowCx - shadowRx, y: 714.0 - shadowRy, width: shadowRx * 2.0, height: shadowRy * 2.0)
         let shadowPath = Path(ellipseIn: shadowRect)
 
-        context.drawLayer { ctx in
-            ctx.addFilter(.blur(radius: max(1.0, 4.0 * shadowScale)))
-            ctx.fill(shadowPath, with: .color(Color.black.opacity(shadowOpacity)))
-        }
+        _ = shadowPath
+        Atmosphere.softGlow(in: context, center: CGPoint(x: shadowCx, y: 714.0), rx: shadowRx * 1.15, ry: shadowRy * 1.25, color: Color.black, opacity: shadowOpacity)
 
         // Main Fighter Layer
         context.drawLayer { ctx in
@@ -166,12 +164,7 @@ struct FighterRig {
 
             // Glow Aura
             if let glowCol = config.glow {
-                let auraRect = CGRect(x: -140.0, y: -450.0, width: 280.0, height: 440.0)
-                let auraPath = Path(ellipseIn: auraRect)
-                ctx.drawLayer { auraCtx in
-                    auraCtx.addFilter(.blur(radius: 9.0))
-                    auraCtx.fill(auraPath, with: .color(glowCol.opacity(0.12)))
-                }
+                Atmosphere.softGlow(in: ctx, center: CGPoint(x: 0, y: -230), rx: 150.0, ry: 235.0, color: glowCol, opacity: 0.16)
             }
 
             // Cape (secondary motion with lag)

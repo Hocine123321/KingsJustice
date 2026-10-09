@@ -174,12 +174,14 @@ final class ParticleSystem: @unchecked Sendable {
         for f in floatTexts {
             let t = f.age / f.life
             let pop = 1.0 + 0.45 * max(0.0, 1.0 - f.age / 0.14)
-            let size = (f.big ? 46.0 : 32.0) * pop
+            let size = (f.big ? 62.0 : 44.0) * pop
             let alpha = t < 0.65 ? 1.0 : max(0.0, 1.0 - (t - 0.65) / 0.35)
             context.drawLayer { ctx in
                 ctx.opacity = alpha
-                let shadow = Text(f.text).font(.system(size: size, weight: .heavy, design: .serif)).foregroundColor(Color.black.opacity(0.85))
-                ctx.draw(shadow, at: CGPoint(x: f.x + 2.0, y: f.y + 3.0))
+                let shadow = Text(f.text).font(.system(size: size, weight: .heavy, design: .serif)).foregroundColor(Color.black.opacity(0.9))
+                for off in [(-3.0, 0.0), (3.0, 0.0), (0.0, -3.0), (0.0, 3.0), (2.0, 4.0)] {
+                    ctx.draw(shadow, at: CGPoint(x: f.x + off.0, y: f.y + off.1))
+                }
                 let label = Text(f.text).font(.system(size: size, weight: .heavy, design: .serif)).foregroundColor(f.color)
                 ctx.draw(label, at: CGPoint(x: f.x, y: f.y))
             }
@@ -373,10 +375,7 @@ final class ParticleSystem: @unchecked Sendable {
 
             case "fireflies":
                 let col = Color(red: 0.95, green: 0.9, blue: 0.3, opacity: p.opacity)
-                context.drawLayer { ctx in
-                    ctx.addFilter(.blur(radius: 2.0))
-                    ctx.fill(Path(ellipseIn: rect), with: .color(col))
-                }
+                context.fill(Path(ellipseIn: rect.insetBy(dx: -3.0, dy: -3.0)), with: .color(col.opacity(0.35)))
                 context.fill(Path(ellipseIn: rect), with: .color(Color.white.opacity(p.opacity)))
 
             default: // snow, ash, dust
@@ -399,10 +398,8 @@ final class ParticleSystem: @unchecked Sendable {
             let colGlow = Color(red: 1.0, green: 0.75, blue: 0.25, opacity: p.opacity)
             let colCore = Color.white.opacity(p.opacity)
 
-            context.drawLayer { ctx in
-                ctx.addFilter(.blur(radius: 2.0))
-                ctx.stroke(path, with: .color(colGlow), style: StrokeStyle(lineWidth: p.size + 1.5, lineCap: .round))
-            }
+            context.stroke(path, with: .color(Color(red: 1.0, green: 0.75, blue: 0.25, opacity: p.opacity * 0.4)), style: StrokeStyle(lineWidth: p.size + 4.5, lineCap: .round))
+            _ = colGlow
             context.stroke(path, with: .color(colCore), style: StrokeStyle(lineWidth: p.size * 0.6, lineCap: .round))
         }
     }
@@ -430,10 +427,8 @@ final class ParticleSystem: @unchecked Sendable {
         let dustCol = Color(red: 0.55, green: 0.48, blue: 0.42)
         for p in dustParticles {
             let rect = CGRect(x: p.x - p.size / 2.0, y: p.y - p.size * 0.4, width: p.size, height: p.size * 0.8)
-            context.drawLayer { ctx in
-                ctx.addFilter(.blur(radius: 3.0))
-                ctx.fill(Path(ellipseIn: rect), with: .color(dustCol.opacity(p.opacity)))
-            }
+            context.fill(Path(ellipseIn: rect.insetBy(dx: -p.size * 0.25, dy: -p.size * 0.2)), with: .color(dustCol.opacity(p.opacity * 0.35)))
+            context.fill(Path(ellipseIn: rect), with: .color(dustCol.opacity(p.opacity * 0.6)))
         }
     }
 
