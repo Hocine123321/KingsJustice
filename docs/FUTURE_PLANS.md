@@ -112,7 +112,7 @@ Still open:
 - [ ] Re-measure fps from a new recording; if still under 60, profile fighter rig layer count and SVG per-frame fallback
 - [x] Weapons look oversized: all weapons scaled to 86% (grip anchored, trail tip matched). Revisit after a new recording
 - [x] Fighters are small on screen: landscape camera 5% tighter, centred lower on the fighters
-- [x] Castle arena: real block masonry (highlights, shadows, chips, damp streaks), moonlit windows and light shafts. Cathedral also reworked (complete rose window + halo, stars, coloured light pools, broken pews). Swamp also reworked (two-layer cypress forest with hanging moss, glowing eyes, mud/puddle detail, rotting log). Village, pass and cliff still to get the same treatment
+- [x] Castle arena: real block masonry (highlights, shadows, chips, damp streaks), moonlit windows and light shafts. Cathedral also reworked (complete rose window + halo, stars, coloured light pools, broken pews). Swamp also reworked (two-layer cypress forest with hanging moss, glowing eyes, mud/puddle detail, rotting log). Village also reworked (it only had mountains before; now a burning village skyline with houses, rooftop fires and a church tower). Pass and cliff still to get the same treatment
 - [ ] Touch zones: consider a first-run hint then auto-fade, and a left-handed check
 - [x] Top HUD: removed the confusing wallet gold from the enemy side; player bar turns red when low
 

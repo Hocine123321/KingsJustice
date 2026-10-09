@@ -340,6 +340,74 @@ enum GameData {
   <path d="M-1200,680 L-1100,420 L-950,500 L-800,380 L-650,480 L-450,340 L-300,460 L-100,360 L50,490 L250,320 L400,450 L600,300 L750,470 L950,310 L1100,460 L1300,330 L1450,480 L1650,340 L1800,470 L2000,350 L2800,680 Z" fill="#0a0604"/>
   <path d="M-1100,420 L-1025,460 L-950,500 M-800,380 L-725,430 L-650,480 M-450,340 L-375,400 M250,320 L325,385 M600,300 L675,385 M950,310 L1025,385 M1300,330 L1375,405" stroke="#ff5500" stroke-width="8" fill="none"/>
   <path d="M-450,340 L-380,420 L-480,450 Z M250,320 L310,400 L230,420 Z M600,300 L670,390 L580,410 Z M1300,330 L1360,420 L1280,430 Z" fill="url(#flame)"/>
+  <!-- burning village -->
+  <g>
+  <rect x="520" y="648" width="70" height="42" fill="#120a07"/>
+  <polygon points="511,648 555.0,614 599,648" fill="#0a0605"/>
+  <path d="M511,648 L555.0,614 L599,648" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="532" y="661" width="9" height="12" fill="#ffa21f"/>
+  <rect x="563" y="661" width="9" height="12" fill="#ff7a12"/>
+  <path d="M539.6,632.7 Q546.6,601.0 555.0,588 Q562.0,602.3 571.8,632.7 Z" fill="url(#flame)"/>
+  <path d="M548.0,634.4 Q551.5,608.8 556.4,599.7 Q560.6,610.1 563.4,634.4 Z" fill="#ffd24a" opacity=".85"/>
+  <rect x="640" y="654" width="56" height="36" fill="#120a07"/>
+  <polygon points="631,654 668.0,626 705,654" fill="#0a0605"/>
+  <path d="M631,654 L668.0,626 L705,654" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="650" y="665" width="8" height="11" fill="#ffa21f"/>
+  <rect x="674" y="665" width="8" height="11" fill="#ff7a12"/>
+  <rect x="760" y="644" width="78" height="46" fill="#120a07"/>
+  <polygon points="751,644 799.0,608 847,644" fill="#0a0605"/>
+  <path d="M751,644 L799.0,608 L847,644" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="774" y="658" width="10" height="14" fill="#ffa21f"/>
+  <rect x="808" y="658" width="10" height="14" fill="#ff7a12"/>
+  <path d="M781.84,627.8 Q789.64,594.5 799.0,581 Q806.8,595.85 817.72,627.8 Z" fill="url(#flame)"/>
+  <path d="M791.2,629.6 Q795.1,602.6 800.56,593.15 Q805.24,603.95 808.36,629.6 Z" fill="#ffd24a" opacity=".85"/>
+  <rect x="900" y="652" width="60" height="38" fill="#120a07"/>
+  <polygon points="891,652 930.0,622 969,652" fill="#0a0605"/>
+  <path d="M891,652 L930.0,622 L969,652" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="910" y="664" width="8" height="11" fill="#ffa21f"/>
+  <rect x="937" y="664" width="8" height="11" fill="#ff7a12"/>
+  <path d="M916.8,638.5 Q922.8,605.5 930.0,589 Q936.0,607.15 944.4,638.5 Z" fill="url(#flame)"/>
+  <path d="M924.0,640.0 Q927.0,615.4 931.2,603.85 Q934.8,617.05 937.2,640.0 Z" fill="#ffd24a" opacity=".85"/>
+  <rect x="1010" y="646" width="72" height="44" fill="#120a07"/>
+  <polygon points="1001,646 1046.0,612 1091,646" fill="#0a0605"/>
+  <path d="M1001,646 L1046.0,612 L1091,646" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="1022" y="660" width="10" height="14" fill="#ffa21f"/>
+  <rect x="1054" y="660" width="10" height="14" fill="#ff7a12"/>
+  <path d="M1030.16,630.7 Q1037.36,596.0 1046.0,580 Q1053.2,597.6 1063.28,630.7 Z" fill="url(#flame)"/>
+  <path d="M1038.8,632.4 Q1042.4,605.6 1047.44,594.4 Q1051.76,607.2 1054.64,632.4 Z" fill="#ffd24a" opacity=".85"/>
+  <rect x="20" y="594" width="130" height="96" fill="#120a07"/>
+  <polygon points="11,594 85.0,524 159,594" fill="#0a0605"/>
+  <path d="M11,594 L85.0,524 L159,594" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="43" y="623" width="18" height="25" fill="#ffa21f"/>
+  <rect x="100" y="623" width="18" height="25" fill="#ff7a12"/>
+  <path d="M56.4,562.5 Q69.4,498.0 85.0,472 Q98.0,500.6 116.2,562.5 Z" fill="url(#flame)"/>
+  <path d="M72.0,566.0 Q78.5,513.6 87.6,495.4 Q95.4,516.2 100.6,566.0 Z" fill="#ffd24a" opacity=".85"/>
+  <rect x="170" y="610" width="110" height="80" fill="#120a07"/>
+  <polygon points="161,610 225.0,550 289,610" fill="#0a0605"/>
+  <path d="M161,610 L225.0,550 L289,610" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="189" y="634" width="15" height="21" fill="#ffa21f"/>
+  <rect x="238" y="634" width="15" height="21" fill="#ff7a12"/>
+  <path d="M200.8,583.0 Q211.8,522.0 225.0,494 Q236.0,524.8 251.4,583.0 Z" fill="url(#flame)"/>
+  <path d="M214.0,586.0 Q219.5,538.8 227.2,519.2 Q233.8,541.6 238.2,586.0 Z" fill="#ffd24a" opacity=".85"/>
+  <rect x="1330" y="600" width="120" height="90" fill="#120a07"/>
+  <polygon points="1321,600 1390.0,536 1459,600" fill="#0a0605"/>
+  <path d="M1321,600 L1390.0,536 L1459,600" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="1351" y="628" width="16" height="22" fill="#ffa21f"/>
+  <rect x="1404" y="628" width="16" height="22" fill="#ff7a12"/>
+  <path d="M1363.6,571.2 Q1375.6,497.5 1390.0,459 Q1402.0,501.35 1418.8,571.2 Z" fill="url(#flame)"/>
+  <path d="M1378.0,574.4 Q1384.0,520.6 1392.4,493.65 Q1399.6,524.45 1404.4,574.4 Z" fill="#ffd24a" opacity=".85"/>
+  <rect x="1470" y="590" width="130" height="100" fill="#120a07"/>
+  <polygon points="1461,590 1535.0,518 1609,590" fill="#0a0605"/>
+  <path d="M1461,590 L1535.0,518 L1609,590" stroke="#ff5a10" stroke-opacity=".55" stroke-width="3" fill="none"/>
+  <rect x="1493" y="620" width="18" height="25" fill="#ffa21f"/>
+  <rect x="1550" y="620" width="18" height="25" fill="#ff7a12"/>
+  <rect x="1190" y="440" width="64" height="250" fill="#100907"/>
+  <polygon points="1180,440 1222,330 1264,440" fill="#090504"/>
+  <path d="M1180,440 L1222,330 L1264,440" stroke="#ff5a10" stroke-opacity=".5" stroke-width="3" fill="none"/>
+  <rect x="1210" y="470" width="24" height="46" fill="#ff8a1a"/>
+  <path d="M1200,360 Q1206,300 1222,262 Q1236,304 1244,360 Z" fill="url(#flame)"/>
+  <path d="M1212,356 Q1218,320 1224,296 Q1232,326 1234,356 Z" fill="#ffd24a" opacity=".85"/>
+  </g>
   <path d="M-300,680 Q-250,350 -400,-100 Q-150,200 -100,680 Z M350,680 Q450,300 250,-200 Q500,150 550,680 Z M900,680 Q1050,250 850,-150 Q1100,200 1150,680 Z M1500,680 Q1600,300 1400,-200 Q1650,150 1700,680 Z" fill="#0c0807" opacity="0.75" filter="url(#b6)"/>
 </g>
 """##,
