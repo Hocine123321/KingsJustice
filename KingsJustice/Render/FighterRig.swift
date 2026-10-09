@@ -1,5 +1,9 @@
 import SwiftUI
+
 import CoreGraphics
+
+/// Weapons were drawn oversized next to the fighters; this trims them while keeping the grip anchored.
+fileprivate let weaponScale: Double = 0.86
 
 struct FighterRigConfig: Sendable {
     let id: String
@@ -484,6 +488,7 @@ struct FighterRig {
                         swCtx.concatenate(CGAffineTransform(translationX: Hh.x, y: Hh.y))
                         let weaponAngle = -(a3 + w) * .pi / 180.0
                         swCtx.concatenate(CGAffineTransform(rotationAngle: weaponAngle))
+                        swCtx.concatenate(CGAffineTransform(scaleX: weaponScale, y: weaponScale))
 
                         drawWeapon(in: swCtx, weapon: config.weapon)
                     }
@@ -504,6 +509,7 @@ struct FighterRig {
                             sw2Ctx.concatenate(CGAffineTransform(translationX: H2.x, y: H2.y))
                             let weaponAngle2 = -(a3 * 0.8 + 20.0 + w) * .pi / 180.0
                             sw2Ctx.concatenate(CGAffineTransform(rotationAngle: weaponAngle2))
+                            sw2Ctx.concatenate(CGAffineTransform(scaleX: weaponScale, y: weaponScale))
 
                             drawWeapon(in: sw2Ctx, weapon: "twinblades")
                         }
@@ -553,8 +559,8 @@ struct FighterRig {
         let Hh = P(Ee, a2, 66.0)
 
         let weaponRad = -(a3 + w) * .pi / 180.0
-        let wTipX = Hh.x + tipLocalX * cos(weaponRad) - tipLocalY * sin(weaponRad)
-        let wTipY = Hh.y + tipLocalX * sin(weaponRad) + tipLocalY * cos(weaponRad)
+        let wTipX = Hh.x + weaponScale * (tipLocalX * cos(weaponRad) - tipLocalY * sin(weaponRad))
+        let wTipY = Hh.y + weaponScale * (tipLocalX * sin(weaponRad) + tipLocalY * cos(weaponRad))
 
         let leanRad = lean * .pi / 180.0
         let relY = wTipY + 165.0

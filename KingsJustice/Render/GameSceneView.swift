@@ -53,9 +53,11 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                     let killCam = source.rsKillCam
                     // Slow camera push as the champion nears defeat (wound runs 0...0.8)
                     let lowHpPush = max(0.0, min(1.0, (source.rsWound - 0.4) / 0.4))
-                    let zoomPunch = (1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))) * (1.0 + 0.22 * killCam) * (1.0 + 0.045 * lowHpPush)
+                    // Slightly tighter framing in landscape so the fighters read larger
+                    let camZoom = isPortrait ? 1.0 : 1.05
+                    let zoomPunch = (1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))) * (1.0 + 0.22 * killCam) * (1.0 + 0.045 * lowHpPush) * camZoom
                     let pivotX = 800.0 + 60.0 * killCam
-                    let pivotY = 450.0 + 20.0 * killCam
+                    let pivotY = (isPortrait ? 450.0 : 500.0) + 20.0 * killCam
                     let effScale = scale * zoomPunch
                     let txEff = tx + totalSx - pivotX * scale * (zoomPunch - 1.0)
                     let tyEff = ty + totalSy - pivotY * scale * (zoomPunch - 1.0)

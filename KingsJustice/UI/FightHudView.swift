@@ -78,7 +78,7 @@ struct FightHudView<Engine: UIEngine>: View {
                 .tracking(1.5)
                 .foregroundColor(UITheme.textCream)
 
-                hpBar(current: engine.hp, max: engine.maxhp, color: Color(hex: "#4a8a5a"))
+                hpBar(current: engine.hp, max: engine.maxhp, color: (engine.maxhp > 0 && engine.hp / engine.maxhp < 0.3) ? Color(hex: "#c0392b") : Color(hex: "#4a8a5a"))
             }
             .frame(maxWidth: .infinity)
 
@@ -100,8 +100,6 @@ struct FightHudView<Engine: UIEngine>: View {
             // Enemy HP
             VStack(alignment: .trailing, spacing: 2) {
                 HStack {
-                    Text("\(engine.gold)g")
-                        .foregroundColor(UITheme.textGold)
                     Spacer(minLength: 4)
                     Text(engine.enemyName.uppercased())
                         .lineLimit(1)

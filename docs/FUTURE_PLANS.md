@@ -108,11 +108,11 @@ Fixed in the "recording fixes" batch:
 - [x] Frame rate: the recording suggests roughly 45-48 fps in the red arena and 30-36 fps in the castle. Per-frame blur layers (note glow, fighter shadow/aura, weapon trail, sparks, dust, ring glow, impact flash) were replaced with cheap gradients/strokes
 Still open:
 - [ ] Re-measure fps from a new recording; if still under 60, profile fighter rig layer count and SVG per-frame fallback
-- [ ] Weapons look oversized (enemy blade longer than its body, clipped at the top of the screen)
-- [ ] Fighters are small on screen; consider a slightly tighter camera
+- [x] Weapons look oversized: all weapons scaled to 86% (grip anchored, trail tip matched). Revisit after a new recording
+- [x] Fighters are small on screen: landscape camera 5% tighter, centred lower on the fighters
 - [ ] Castle arena stone texture is muddy; redo with cleaner shapes
 - [ ] Touch zones: consider a first-run hint then auto-fade, and a left-handed check
-- [ ] Top HUD: enemy bar is unlabelled and the gold number between the bars is confusing
+- [x] Top HUD: removed the confusing wallet gold from the enemy side; player bar turns red when low
 
 ## Stretch ideas (parked until the core is polished)
 - Photo mode / replay of the final blow
