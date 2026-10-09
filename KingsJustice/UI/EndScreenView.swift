@@ -69,89 +69,154 @@ struct EndScreenView<Engine: UIEngine>: View {
         ZStack {
             BackgroundGradientView()
 
-            VStack(spacing: 14) {
-                HeaderKickView(kick: subtitleText, title: titleText)
-
-                // Rank stamp
-                Text(r.rankLetter)
-                    .font(.system(size: 76, weight: .heavy, design: .serif))
-                    .foregroundColor(rankColor)
-                    .shadow(color: rankColor.opacity(0.7), radius: 18)
-                    .scaleEffect(shown ? 1.0 : 2.4)
-                    .rotationEffect(.degrees(shown ? -6.0 : 0.0))
-                    .opacity(shown ? 1.0 : 0.0)
-                    .animation(.spring(response: 0.45, dampingFraction: 0.55).delay(0.35), value: shown)
-
-                if r.newBest {
-                    Text(r.bestLabel.uppercased())
-                        .font(.system(size: 11, weight: .bold))
-                        .tracking(2.5)
-                        .foregroundColor(UITheme.textGold)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 5)
-                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(UITheme.textGold, lineWidth: 1))
-                        .opacity(shown ? 1.0 : 0.0)
-                        .animation(.easeOut(duration: 0.4).delay(1.0), value: shown)
-                }
-
-                // Stats card
-                VStack(spacing: 12) {
-                    HStack(spacing: 12) {
-                        statBox(label: "SCORE") {
-                            CountUpText(value: shown ? Double(r.score) : 0.0)
-                                .animation(.easeOut(duration: 1.1).delay(0.5), value: shown)
-                        }
-                        statBox(label: "GOLD") {
-                            CountUpText(value: shown ? Double(r.gold) : 0.0, prefix: "+")
-                                .animation(.easeOut(duration: 1.1).delay(0.7), value: shown)
-                        }
-                    }
-                    HStack(spacing: 12) {
-                        statBox(label: "BEST COMBO") { Text("\(r.maxCombo)") }
-                        statBox(label: "TIME") { Text(timeString(r.duration)) }
-                    }
-                    HStack(spacing: 12) {
-                        statBox(label: "PERFECT") { Text("\(r.perfects)") }
-                        statBox(label: "GOOD") { Text("\(r.goods)") }
-                        statBox(label: "MISSED") { Text("\(r.misses)") }
+            GeometryReader { geo in
+                if geo.size.width > geo.size.height {
+                    landscapeLayout(r)
+                } else {
+                    ScrollView {
+                        portraitLayout(r)
                     }
                 }
-                .padding(14)
-                .background(RoundedRectangle(cornerRadius: 12).fill(UITheme.bgCard))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(UITheme.borderCream, lineWidth: 1))
-                .opacity(shown ? 1.0 : 0.0)
-                .animation(.easeOut(duration: 0.5).delay(0.15), value: shown)
-
-                if !engine.won && !r.tip.isEmpty {
-                    Text(r.tip)
-                        .font(.system(size: 12, weight: .regular, design: .serif).italic())
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(UITheme.textCream)
-                        .padding(.horizontal, 8)
-                }
-
-                // Action buttons
-                VStack(spacing: 10) {
-                    if engine.won {
-                        PillButton(title: "Next Champion", isPrimary: true, action: onNext)
-                    } else {
-                        PillButton(title: "Fight Again", isPrimary: true, action: onRetry)
-                    }
-
-                    HStack(spacing: 12) {
-                        PillButton(title: "Tonics", action: onShop)
-                        PillButton(title: "Main Menu", action: onMainMenu)
-                    }
-                }
-                .opacity(shown ? 1.0 : 0.0)
-                .animation(.easeOut(duration: 0.5).delay(1.2), value: shown)
             }
-            .padding(20)
         }
         .onAppear { shown = true }
     }
 
-    private func statBox<V: View>(label: String, @ViewBuilder value: () -> V) -> some View {
+    // MARK: - Pieces
+
+    private func rankStamp(_ r: FightResult, size: CGFloat) -> some View {
+        Text(r.rankLetter)
+            .font(.system(size: size, weight: .heavy, design: .serif))
+            .foregroundColor(rankColor)
+            .shadow(color: rankColor.opacity(0.7), radius: 18)
+            .scaleEffect(shown ? 1.0 : 2.4)
+            .rotationEffect(.degrees(shown ? -6.0 : 0.0))
+            .opacity(shown ? 1.0 : 0.0)
+            .animation(.spring(response: 0.45, dampingFraction: 0.55).delay(0.35), value: shown)
+    }
+
+    private func bestBadge(_ r: FightResult) -> some View {
+        Group {
+            if r.newBest {
+                Text(r.bestLabel.uppercased())
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(2.5)
+                    .foregroundColor(UITheme.textGold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(UITheme.textGold, lineWidth: 1))
+                    .opacity(shown ? 1.0 : 0.0)
+                    .animation(.easeOut(duration: 0.4).delay(1.0), value: shown)
+            }
+        }
+    }
+
+    private func tipLine(_ r: FightResult) -> some View {
+        Group {
+            if !engine.won && !r.tip.isEmpty {
+                Text(r.tip)
+                    .font(.system(size: 12, weight: .regular, design: .serif).italic())
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(UITheme.textCream)
+                    .padding(.horizontal, 8)
+            }
+        }
+    }
+
+    private func statsCard(_ r: FightResult, compact: Bool) -> some View {
+        VStack(spacing: compact ? 8 : 12) {
+            HStack(spacing: 12) {
+                statBox(label: "SCORE", compact: compact) {
+                    CountUpText(value: shown ? Double(r.score) : 0.0)
+                        .animation(.easeOut(duration: 1.1).delay(0.5), value: shown)
+                }
+                statBox(label: "GOLD", compact: compact) {
+                    CountUpText(value: shown ? Double(r.gold) : 0.0, prefix: "+")
+                        .animation(.easeOut(duration: 1.1).delay(0.7), value: shown)
+                }
+                if compact {
+                    statBox(label: "BEST COMBO", compact: compact) { Text("\(r.maxCombo)") }
+                }
+            }
+            if !compact {
+                HStack(spacing: 12) {
+                    statBox(label: "BEST COMBO", compact: compact) { Text("\(r.maxCombo)") }
+                    statBox(label: "TIME", compact: compact) { Text(timeString(r.duration)) }
+                }
+            }
+            HStack(spacing: 12) {
+                statBox(label: "PERFECT", compact: compact) { Text("\(r.perfects)") }
+                statBox(label: "GOOD", compact: compact) { Text("\(r.goods)") }
+                statBox(label: "MISSED", compact: compact) { Text("\(r.misses)") }
+                if compact {
+                    statBox(label: "TIME", compact: compact) { Text(timeString(r.duration)) }
+                }
+            }
+        }
+        .padding(compact ? 10 : 14)
+        .background(RoundedRectangle(cornerRadius: 12).fill(UITheme.bgCard))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(UITheme.borderCream, lineWidth: 1))
+        .opacity(shown ? 1.0 : 0.0)
+        .animation(.easeOut(duration: 0.5).delay(0.15), value: shown)
+    }
+
+    private var actionButtons: some View {
+        VStack(spacing: 10) {
+            if engine.won {
+                PillButton(title: "Next Champion", isPrimary: true, action: onNext)
+            } else {
+                PillButton(title: "Fight Again", isPrimary: true, action: onRetry)
+            }
+
+            HStack(spacing: 12) {
+                PillButton(title: "Tonics", action: onShop)
+                PillButton(title: "Main Menu", action: onMainMenu)
+            }
+        }
+        .opacity(shown ? 1.0 : 0.0)
+        .animation(.easeOut(duration: 0.5).delay(1.2), value: shown)
+    }
+
+    // MARK: - Layouts
+
+    private func portraitLayout(_ r: FightResult) -> some View {
+        VStack(spacing: 14) {
+            HeaderKickView(kick: subtitleText, title: titleText)
+            rankStamp(r, size: 76)
+            bestBadge(r)
+            statsCard(r, compact: false)
+            tipLine(r)
+            actionButtons
+        }
+        .padding(20)
+    }
+
+    /// Phone landscape is short, so the result splits into two columns instead of stacking.
+    private func landscapeLayout(_ r: FightResult) -> some View {
+        HStack(spacing: 24) {
+            VStack(spacing: 8) {
+                Spacer(minLength: 0)
+                HeaderKickView(kick: subtitleText, title: titleText)
+                rankStamp(r, size: 64)
+                bestBadge(r)
+                tipLine(r)
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity)
+
+            VStack(spacing: 12) {
+                Spacer(minLength: 0)
+                statsCard(r, compact: true)
+                actionButtons
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 28)
+        .padding(.vertical, 12)
+    }
+
+    private func statBox<V: View>(label: String, compact: Bool = false, @ViewBuilder value: () -> V) -> some View {
         VStack(spacing: 4) {
             Text(label)
                 .font(.system(size: 9, weight: .bold))
@@ -159,7 +224,7 @@ struct EndScreenView<Engine: UIEngine>: View {
                 .foregroundColor(UITheme.textMuted)
 
             value()
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: compact ? 16 : 20, weight: .bold))
                 .foregroundColor(UITheme.textCreamBright)
         }
         .frame(maxWidth: .infinity)

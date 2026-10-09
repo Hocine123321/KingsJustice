@@ -106,7 +106,9 @@ Fixed in the "recording fixes" batch:
 - [x] Damage numbers were small, grey and always "37" - now bigger, outlined, over the champion's head, 10x scale
 - [x] Landscape menu: skyline fought with the list rows - dimmed in landscape
 - [x] Frame rate: the recording suggests roughly 45-48 fps in the red arena and 30-36 fps in the castle. Per-frame blur layers (note glow, fighter shadow/aura, weapon trail, sparks, dust, ring glow, impact flash) were replaced with cheap gradients/strokes
+- [x] Result screen overflowed in landscape (title and buttons cut off; owner screenshot) - now a two-column landscape layout, scrollable in portrait
 Still open:
+- [ ] Check EVERY screen in phone landscape for overflow (shop, style picker, settings, pause, end screen) with a layout test or screenshot pass
 - [ ] Re-measure fps from a new recording; if still under 60, profile fighter rig layer count and SVG per-frame fallback
 - [x] Weapons look oversized: all weapons scaled to 86% (grip anchored, trail tip matched). Revisit after a new recording
 - [x] Fighters are small on screen: landscape camera 5% tighter, centred lower on the fighters
