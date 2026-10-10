@@ -303,14 +303,14 @@ struct TipInfo {
 
 enum EngineTips {
     static let tips: [String: TipInfo] = [
-        "slash": TipInfo(title: "Parry", description: "Press PARRY (Space / tap) just as the ring closes on the red circle."),
-        "low": TipInfo(title: "Low sweep", description: "Duck it: press S or tap DUCK as the ring closes."),
-        "high": TipInfo(title: "Overhead", description: "Jump over it: press W or tap JUMP."),
-        "unblockable": TipInfo(title: "Unblockable", description: "Red dashed ring: you cannot parry this. DODGE it (A or tap DODGE). A clean dodge stuns him."),
+        "slash": TipInfo(title: "Parry", description: "Tap PARRY just as the ring closes on the red circle."),
+        "low": TipInfo(title: "Low sweep", description: "Duck it: tap DUCK as the ring closes."),
+        "high": TipInfo(title: "Overhead", description: "Jump over it: tap JUMP as the ring closes."),
+        "unblockable": TipInfo(title: "Unblockable", description: "Red dashed ring: you cannot parry this. DODGE it: tap DODGE. A clean dodge stuns him."),
         "feint": TipInfo(title: "Feint", description: "The ring flickers: he is faking. Wait for it to settle, then parry."),
         "double": TipInfo(title: "Double strike", description: "Two hits half a beat apart. Parry twice."),
         "triple": TipInfo(title: "Triple strike", description: "Three quick hits. Tap parry three times in rhythm."),
-        "grab": TipInfo(title: "Grab", description: "Press PARRY and DODGE together to break his grip."),
+        "grab": TipInfo(title: "Grab", description: "Tap PARRY and DODGE together to break his grip."),
         "ranged": TipInfo(title: "Thrown weapon", description: "Parry it as it arrives. Small damage, long warning."),
         "sweep_combo": TipInfo(title: "Sweep combo", description: "Duck, then jump."),
         "note:P": TipInfo(title: "He parries", description: "Blue-ringed notes will be blocked. Hit them PERFECT to break his guard and open him up."),

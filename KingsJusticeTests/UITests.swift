@@ -22,6 +22,20 @@ final class UITests: XCTestCase {
         XCTAssertEqual(MenuModeCatalog.extras.map { $0.id }, ["rush", "daily", "training"])
     }
 
+    func testHowToPlayBuildsAndFirstRunIsPending() {
+        _ = HowToPlayView(onDone: {})
+        XCTAssertNotEqual(GameEngine().save.seen["howto"], true)
+    }
+
+    func testTipsUseTouchWording() {
+        for (key, tip) in EngineTips.tips {
+            XCTAssertFalse(tip.description.contains("Space"), key)
+            XCTAssertFalse(tip.description.contains("press W"), key)
+            XCTAssertFalse(tip.description.contains("press S"), key)
+            XCTAssertFalse(tip.description.contains("(A or"), key)
+        }
+    }
+
     func testRootViewBuilds() {
         _ = RootView()
     }

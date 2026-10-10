@@ -9,7 +9,13 @@ enum AppScreen: Equatable {
     case style
     case shop
     case settings
+    case howTo
     case fight
+}
+
+struct PendingFight {
+    let mode: String
+    let index: Int
 }
 
 /// Drives `engine.tick(dt:)` once per display frame.
@@ -48,6 +54,7 @@ struct RootView: View {
     @State private var screen: AppScreen = .title
     @State private var settingsFromPause: Bool = false
     @State private var pendingMode: String = "duel"
+    @State private var pendingFight: PendingFight? = nil
 
     init() {}
 
@@ -105,7 +112,10 @@ struct RootView: View {
                     settingsFromPause = false
                     screen = .settings
                 },
-                onWatchCinematic: { }
+                onWatchCinematic: {
+                    pendingFight = nil
+                    screen = .howTo
+                }
             )
         case .campaign:
             CampaignSelectView(
@@ -120,6 +130,17 @@ struct RootView: View {
         case .settings:
             SettingsView(engine: engine, onBack: {
                 screen = settingsFromPause ? .fight : .menu
+            })
+        case .howTo:
+            HowToPlayView(onDone: {
+                engine.save.seen["howto"] = true
+                engine.saveAll()
+                if let p = pendingFight {
+                    pendingFight = nil
+                    beginFightNow(mode: p.mode, index: p.index)
+                } else {
+                    screen = .menu
+                }
             })
         case .fight:
             fightLayer
@@ -167,6 +188,16 @@ struct RootView: View {
     }
 
     private func startFight(mode: String, index: Int) {
+        // First fight ever: show the short how-to first.
+        if engine.save.seen["howto"] != true {
+            pendingFight = PendingFight(mode: mode, index: index)
+            screen = .howTo
+            return
+        }
+        beginFightNow(mode: mode, index: index)
+    }
+
+    private func beginFightNow(mode: String, index: Int) {
         UIApplication.shared.isIdleTimerDisabled = true
         engine.startRun(mode: mode, enemyIndex: index)
         screen = .fight

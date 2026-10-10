@@ -74,7 +74,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [ ] Daily Challenge: seeded modifier of the day, streak counter
 - [ ] Boss Rush: score multiplier for no-damage clears
 - [ ] Training Yard: guided drills, a move list, a metronome to practise timing
-- [ ] Interactive tutorial for the rhythm mechanic (first fight)
+- [x] How to Play: 3 animated pages (Strike / Defend / Focus and Heal), shown once before the first fight and from the menu. Contextual tips now use touch wording (they said Space / W / S / A). Still open: a guided, interactive practice round
 - [ ] Difficulty assist options that never touch Focus-vs-AI rules
 
 ### 8. Progression and retention

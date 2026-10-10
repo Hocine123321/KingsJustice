@@ -159,7 +159,10 @@ struct MainMenuView<Engine: UIEngine>: View {
                             PillButton(title: "Tonics", action: onSelectShop)
                         }
                         
-                        PillButton(title: "Settings", action: onSelectSettings)
+                        HStack(spacing: 8) {
+                            PillButton(title: "How to Play", action: onWatchCinematic)
+                            PillButton(title: "Settings", action: onSelectSettings)
+                        }
                     }
                     .padding(.top, 8)
                     .opacity(appeared ? 1.0 : 0.0)
