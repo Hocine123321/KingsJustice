@@ -412,6 +412,7 @@ extension GameEngine {
 
     func chip(_ n: Double) {
         if invulnUntil > t { return }
+        if n > 0 { tookDamage = true }
         let D = difficultyParams(settings.difficulty)
         let toughMul = tough ? 0.8 : 1.0
         hp -= n * D.take * styleDef.takeMul * earlyEase() * toughMul * BoonCatalog.damageTakenMul(boons) * (dailyMod.id == "brittle" ? 1.3 : 1.0)

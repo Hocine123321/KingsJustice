@@ -244,3 +244,26 @@ final class SaveCompatibilityTests: XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(SaveData.self, from: data), s)
     }
 }
+
+@MainActor
+final class FlawlessAndPhaseTests: XCTestCase {
+    func testChipMarksDamageTaken() {
+        let e = GameEngine()
+        e.invulnUntil = 0
+        XCTAssertFalse(e.tookDamage)
+        e.chip(5.0)
+        XCTAssertTrue(e.tookDamage)
+    }
+
+    func testBannerClearsAfterItsTime() {
+        let e = GameEngine()
+        e.on = true
+        e.started = true
+        e.phaseBanner = "Phase II"
+        e.phaseBannerUntil = e.t + 0.2
+        e.tick(dt: 0.1)
+        XCTAssertEqual(e.phaseBanner, "Phase II")
+        for _ in 0..<5 { e.tick(dt: 0.1) }
+        XCTAssertEqual(e.phaseBanner, "")
+    }
+}

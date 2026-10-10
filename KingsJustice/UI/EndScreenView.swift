@@ -111,6 +111,22 @@ struct EndScreenView<Engine: UIEngine>: View {
         }
     }
 
+    private func flawlessBadge(_ r: FightResult) -> some View {
+        Group {
+            if r.flawless {
+                Text("FLAWLESS · +20% GOLD")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(2.5)
+                    .foregroundColor(Color(red: 0.55, green: 0.85, blue: 0.95))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(red: 0.55, green: 0.85, blue: 0.95), lineWidth: 1))
+                    .opacity(shown ? 1.0 : 0.0)
+                    .animation(.easeOut(duration: 0.4).delay(1.1), value: shown)
+            }
+        }
+    }
+
     private func tipLine(_ r: FightResult) -> some View {
         Group {
             if !engine.won && !r.tip.isEmpty {
@@ -184,6 +200,7 @@ struct EndScreenView<Engine: UIEngine>: View {
             HeaderKickView(kick: subtitleText, title: titleText)
             rankStamp(r, size: 76)
             bestBadge(r)
+            flawlessBadge(r)
             statsCard(r, compact: false)
             tipLine(r)
             actionButtons
@@ -199,6 +216,7 @@ struct EndScreenView<Engine: UIEngine>: View {
                 HeaderKickView(kick: subtitleText, title: titleText)
                 rankStamp(r, size: 64)
                 bestBadge(r)
+                flawlessBadge(r)
                 tipLine(r)
                 Spacer(minLength: 0)
             }

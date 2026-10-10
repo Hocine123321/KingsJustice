@@ -50,6 +50,34 @@ struct FightIntroView<Engine: UIEngine>: View {
                 .onAppear { cardIn = true }
             }
 
+            if !engine.phaseBanner.isEmpty {
+                VStack(spacing: 4) {
+                    Text(engine.phaseBanner.uppercased())
+                        .font(.system(size: 34, weight: .heavy, design: .serif))
+                        .tracking(8.0)
+                        .foregroundColor(UITheme.textCreamBright)
+                        .shadow(color: UITheme.bloodRed, radius: 16)
+                    Text(engine.enemyName.uppercased() + " GROWS DESPERATE")
+                        .font(.system(size: 11, weight: .bold))
+                        .tracking(3.0)
+                        .foregroundColor(UITheme.textGold)
+                }
+                .padding(.vertical, 14)
+                .frame(maxWidth: .infinity)
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            Gradient.Stop(color: Color.black.opacity(0.0), location: 0.0),
+                            Gradient.Stop(color: UITheme.bloodRed.opacity(0.55), location: 0.5),
+                            Gradient.Stop(color: Color.black.opacity(0.0), location: 1.0)
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .transition(.opacity)
+            }
+
             if fightVisible {
                 Text("FIGHT!")
                     .font(.system(size: 56, weight: .heavy, design: .serif).italic())
@@ -61,6 +89,7 @@ struct FightIntroView<Engine: UIEngine>: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: engine.started)
+        .animation(.easeOut(duration: 0.35), value: engine.phaseBanner)
         .allowsHitTesting(false)
         .onChange(of: engine.started) { s in
             if s {

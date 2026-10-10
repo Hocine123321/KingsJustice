@@ -91,6 +91,7 @@ struct MainMenuView<Engine: UIEngine>: View {
     private var todayString: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         return formatter.string(from: Date())
     }
     

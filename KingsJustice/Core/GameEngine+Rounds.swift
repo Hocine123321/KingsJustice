@@ -195,6 +195,9 @@ extension GameEngine {
                 shake2(1.2)
                 onSfx?(.heartbeat, 1.0)
                 flashScreen(color: "#a00", opacity: 0.35)
+                let numerals = ["I", "II", "III", "IV", "V"]
+                phaseBanner = "Phase \(numerals[min(i + 1, numerals.count - 1)])"
+                phaseBannerUntil = t + 2.0
             }
         }
     }

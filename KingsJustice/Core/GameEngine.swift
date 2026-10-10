@@ -29,6 +29,11 @@ final class GameEngine: ObservableObject {
     @Published var boons: [String] = []
     /// Daily Challenge twist in force (steady outside the Daily).
     var dailyMod: DailyModifier = DailyModifiers.steady
+    /// True once the player has lost any health this fight (flawless tracking).
+    var tookDamage: Bool = false
+    /// Big centre-screen callout when the champion changes phase.
+    @Published var phaseBanner: String = ""
+    var phaseBannerUntil: Double = 0.0
     @Published var boonOffer: [Boon] = []
     @Published var won: Bool = false
     @Published var phaseBanner: String? = nil
@@ -161,6 +166,10 @@ final class GameEngine: ObservableObject {
         if hitStop > 0 {
             hitStop -= dt
             dtFrame = dt * 0.08
+        }
+
+        if !phaseBanner.isEmpty && t > phaseBannerUntil {
+            phaseBanner = ""
         }
 
         // Finishing blow: slow-mo kill-cam on a win, a short beat on a loss, then reveal the result.

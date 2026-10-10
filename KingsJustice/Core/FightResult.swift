@@ -34,6 +34,7 @@ struct FightResult: Equatable, Sendable {
     var duration: Double = 0.0
     var rankLetter: String = "C"
     var newBest: Bool = false
+    var flawless: Bool = false
     var bestLabel: String = ""
     var tip: String = ""
 

@@ -41,6 +41,8 @@ extension GameEngine {
         self.over = false
         self.resultReady = false
         self.fightResult = FightResult()
+        self.tookDamage = false
+        self.phaseBanner = ""
         self.endClock = 0.0
         self.paused = false
         self.started = false
@@ -246,10 +248,13 @@ extension GameEngine {
 
         // Rewards logic
         let boonGold = (mode == "survival") ? BoonCatalog.goldMul(boons) : 1.0
-        let goldReward = win ? Int(floor(Double(E.reward) * (1.0 + Double(maxCombo) / 60.0) * boonGold)) : 0
+        let flawlessWin = win && !tookDamage && !training
+        let flawlessGold = flawlessWin ? 1.2 : 1.0
+        let goldReward = win ? Int(floor(Double(E.reward) * (1.0 + Double(maxCombo) / 60.0) * boonGold * flawlessGold)) : 0
         if win {
             save.gold += goldReward
             save.kills += 1
+            if flawlessWin { save.flawless += 1 }
             if mode == "duel" && !save.beat.contains(E.id) {
                 save.beat.append(E.id)
             }
@@ -292,6 +297,7 @@ extension GameEngine {
         res.goods = nG
         res.misses = nM
         res.gold = goldReward
+        res.flawless = flawlessWin
         res.hpFraction = hpFrac
         res.duration = max(0.0, t)
         res.rankLetter = FightRank.grade(perfects: nP, goods: nG, misses: nM, hpFraction: hpFrac, won: win).rawValue

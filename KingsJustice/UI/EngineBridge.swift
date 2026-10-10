@@ -42,6 +42,7 @@ protocol UIEngine: ObservableObject {
     var enemyName: String { get }
     var enemyTitle: String { get }
     var fightResult: FightResult { get }
+    var phaseBanner: String { get }
     
     var settings: GameSettings { get set }
     var save: SaveData { get set }
@@ -86,6 +87,7 @@ final class MockGameEngine: UIEngine, ObservableObject {
     @Published var enemyName: String = "Hollow Conscript"
     @Published var enemyTitle: String = "Broken Foot-Soldier"
     @Published var fightResult: FightResult = FightResult()
+    @Published var phaseBanner: String = ""
     
     var settings: GameSettings = GameSettings()
     var save: SaveData = SaveData()
