@@ -261,6 +261,7 @@ extension GameEngine {
         if guardBreak > t { m *= 1.25 }
         if edge { m *= 1.2 }
         dmg *= min(m, 2.0)
+        dmg *= BoonCatalog.damageDealtMul(boons)
 
         if riposte {
             dmg *= 2.0
@@ -413,7 +414,7 @@ extension GameEngine {
         if invulnUntil > t { return }
         let D = difficultyParams(settings.difficulty)
         let toughMul = tough ? 0.8 : 1.0
-        hp -= n * D.take * styleDef.takeMul * earlyEase() * toughMul
+        hp -= n * D.take * styleDef.takeMul * earlyEase() * toughMul * BoonCatalog.damageTakenMul(boons)
 
         if hp <= 0 {
             if !windUsed {

@@ -25,6 +25,9 @@ final class GameEngine: ObservableObject {
     @Published var resultReady: Bool = false
     var endClock: Double = 0.0
     @Published var fightResult: FightResult = FightResult()
+    /// Survival boons taken this run, and the three on offer after a won wave.
+    @Published var boons: [String] = []
+    @Published var boonOffer: [Boon] = []
     @Published var won: Bool = false
     @Published var phaseBanner: String? = nil
     @Published var tutorialTip: String? = nil

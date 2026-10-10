@@ -55,6 +55,7 @@ struct RootView: View {
     @State private var settingsFromPause: Bool = false
     @State private var pendingMode: String = "duel"
     @State private var pendingFight: PendingFight? = nil
+    @State private var showBoons: Bool = false
 
     init() {}
 
@@ -170,6 +171,19 @@ struct RootView: View {
                     onMainMenu: { leaveFight() }
                 )
             }
+            if showBoons {
+                BoonPickView(
+                    wave: engine.wave,
+                    offer: engine.boonOffer,
+                    taken: engine.boons,
+                    onPick: { (id: String) in
+                        engine.chooseBoon(id)
+                        showBoons = false
+                        engine.beginFight(index: engine.enemyIdx + 1, keepHp: true)
+                    }
+                )
+                .transition(.opacity)
+            }
         }
     }
 
@@ -207,8 +221,15 @@ struct RootView: View {
         let count = GameData.roster.count
         if engine.won && engine.mode == "duel" && engine.enemyIdx + 1 < count {
             startFight(mode: "duel", index: engine.enemyIdx + 1)
-        } else if engine.won && (engine.mode == "survival" || engine.mode == "rush") {
-            engine.beginFight(index: engine.enemyIdx + 1)
+        } else if engine.won && engine.mode == "survival" {
+            // Survival keeps your health and score between waves; a boon is chosen first.
+            if engine.boonOffer.isEmpty {
+                engine.beginFight(index: engine.enemyIdx + 1, keepHp: true)
+            } else {
+                showBoons = true
+            }
+        } else if engine.won && engine.mode == "rush" {
+            engine.beginFight(index: engine.enemyIdx + 1, keepHp: true)
         } else {
             leaveFight()
         }

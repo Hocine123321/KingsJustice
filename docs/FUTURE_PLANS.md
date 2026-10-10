@@ -70,7 +70,8 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 
 ### 7. Gameplay depth
 - [ ] Clearer, more varied enemy tells; per-champion signature mechanic
-- [ ] Survival: modifiers between waves, risk/reward picks, boss waves, leaderboard-style best runs
+- [x] Survival: pick one of three boons after each wave (Keen Edge, Iron Ward, Vigor, Mending Draught, Glass Cannon risk/reward, Spoils of War). None touch enemy AI. Still open: boss waves, a leaderboard-style best-run list, showing active boons on the HUD
+- [x] BUG FIXED: Survival and Boss Rush reset your health to full and your score to zero after every win (the "one health bar" rule was not enforced); they now carry health and score between fights
 - [ ] Daily Challenge: seeded modifier of the day, streak counter
 - [ ] Boss Rush: score multiplier for no-damage clears
 - [ ] Training Yard: guided drills, a move list, a metronome to practise timing

@@ -6,12 +6,16 @@ extension GameEngine {
     func startRun(mode: String, enemyIndex: Int) {
         self.mode = mode
         self.training = (mode == "training")
+        self.boons = []
+        self.boonOffer = []
 
         if mode == "training" {
             self.enemyIdx = 0
             beginFight(index: 0)
         } else if mode == "survival" {
             self.wave = 0
+            self.boons = []
+            self.boonOffer = []
             beginFight(index: 0)
         } else if mode == "rush" {
             self.rushList = Array(0..<GameData.roster.count)
@@ -43,7 +47,7 @@ extension GameEngine {
 
         let selectedStyle = GameData.styles.first(where: { $0.id == settings.style }) ?? GameData.styles[0]
         self.styleDef = selectedStyle
-        self.maxhp = 100.0
+        self.maxhp = 100.0 + BoonCatalog.maxHealthBonus(boons)
         if !keepHp || hp <= 0 {
             self.hp = maxhp
         }
@@ -104,6 +108,20 @@ extension GameEngine {
         self.startTimer = 1.7
 
         updateHud()
+    }
+
+    /// Takes one of the offered boons and applies its instant effect.
+    func chooseBoon(_ id: String) {
+        guard BoonCatalog.boon(id) != nil else { return }
+        boons.append(id)
+        boonOffer = []
+        maxhp = 100.0 + BoonCatalog.maxHealthBonus(boons)
+        if id == "vigor" {
+            hp = min(maxhp, hp + 12.0)
+        } else if id == "mend" {
+            hp = min(maxhp, hp + maxhp * 0.35)
+        }
+        hp = min(hp, maxhp)
     }
 
     func enemyFor(mode: String, idx: Int) -> EnemyDef {
@@ -224,7 +242,8 @@ extension GameEngine {
         }
 
         // Rewards logic
-        let goldReward = win ? Int(floor(Double(E.reward) * (1.0 + Double(maxCombo) / 60.0))) : 0
+        let boonGold = (mode == "survival") ? BoonCatalog.goldMul(boons) : 1.0
+        let goldReward = win ? Int(floor(Double(E.reward) * (1.0 + Double(maxCombo) / 60.0) * boonGold)) : 0
         if win {
             save.gold += goldReward
             save.kills += 1
@@ -239,6 +258,7 @@ extension GameEngine {
         if win && mode == "survival" {
             wave += 1
             hp = min(maxhp, hp + 22.0)
+            boonOffer = BoonCatalog.offer(taken: boons, seed: UInt32(truncatingIfNeeded: wave &* 7919 &+ boons.count &* 31 &+ score))
             if wave > save.bestSurvival {
                 save.bestSurvival = wave
             }

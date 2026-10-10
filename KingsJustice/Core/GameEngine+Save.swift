@@ -29,7 +29,7 @@ extension GameEngine {
 
     var tonics: [ShopTonic] {
         return [
-            ShopTonic(id: "heal", name: "Healing Draught", desc: "Press H (or tap flask) mid-fight: restore 35% health. Once per fight.", price: 60, owned: save.invHeal),
+            ShopTonic(id: "heal", name: "Healing Draught", desc: "Tap the flask mid-fight: restore 35% health. Once per fight.", price: 60, owned: save.invHeal),
             ShopTonic(id: "focus", name: "Battle Focus", desc: "Start the next fight with your Focus meter half full.", price: 50, owned: save.invFocus),
             ShopTonic(id: "edge", name: "Whetstone", desc: "+25% damage dealt for the next fight.", price: 70, owned: save.invEdge),
             ShopTonic(id: "tough", name: "Iron Gambeson", desc: "20% less damage taken for the next fight.", price: 80, owned: save.invTough)
