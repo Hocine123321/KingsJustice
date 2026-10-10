@@ -273,14 +273,14 @@ struct FightHudView<Engine: UIEngine>: View {
 
     private func evadeCluster(h: CGFloat) -> some View {
         VStack(spacing: 6) {
-            TouchPadButton(title: "Jump", colorHex: "#8fc4a0", minHeight: h) {
+            TouchPadButton(title: "Jump", colorHex: InputPalette.jump, minHeight: h) {
                 engine.input(kind: "jump", lane: 0)
             }
             HStack(spacing: 6) {
-                TouchPadButton(title: "Dodge", colorHex: "#ff9a8a", minHeight: h) {
+                TouchPadButton(title: "Dodge", colorHex: InputPalette.dodge, minHeight: h) {
                     engine.input(kind: "dodge", lane: 0)
                 }
-                TouchPadButton(title: "Duck", colorHex: "#f1d98e", minHeight: h) {
+                TouchPadButton(title: "Duck", colorHex: InputPalette.duck, minHeight: h) {
                     engine.input(kind: "duck", lane: 0)
                 }
             }
@@ -289,7 +289,7 @@ struct FightHudView<Engine: UIEngine>: View {
     }
 
     private func parryCluster(h: CGFloat) -> some View {
-        TouchPadButton(title: "Parry", colorHex: "#c8d4e0", minHeight: h) {
+        TouchPadButton(title: "Parry", colorHex: InputPalette.parry, minHeight: h) {
             engine.input(kind: "parry", lane: 0)
         }
         .frame(maxWidth: isLandscape ? 220 : .infinity)

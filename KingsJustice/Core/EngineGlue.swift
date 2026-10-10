@@ -70,7 +70,7 @@ extension GameEngine: RenderSource {
         for e in events {
             if e.state != "live" { continue }
             let move: MoveDef? = GameData.moves[e.kind]
-            let color: String = move?.color ?? "#d9b45a"
+            let color: String = (move != nil) ? InputPalette.hex(for: e.input) : "#d9b45a"
             let ring: String = move?.ringStyle ?? "solid"
             let note = RenderNote(
                 id: String(e.id),

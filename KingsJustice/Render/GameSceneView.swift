@@ -243,7 +243,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                     ringCtx.stroke(ringPath, with: .color(ringCol.opacity(0.28)), style: glowStyle)
                     ringCtx.stroke(ringPath, with: .color(ringCol), style: style)
 
-                    if event.input == "grab" {
+                    if event.input == "grab" || event.ringStyle == "double" {
                         let innerR = r * 0.82
                         let innerPath = Path(ellipseIn: CGRect(x: cx - innerR, y: cy - innerR, width: innerR * 2.0, height: innerR * 2.0))
                         ringCtx.stroke(innerPath, with: .color(ringCol), style: style)
@@ -251,7 +251,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
 
                     // Target Hit Ring
                     let targetPath = Path(ellipseIn: CGRect(x: cx - rEnd, y: cy - rEnd, width: rEnd * 2.0, height: rEnd * 2.0))
-                    ringCtx.stroke(targetPath, with: .color(Color(red: 0.76, green: 0.23, blue: 0.16)), style: StrokeStyle(lineWidth: 2.0))
+                    ringCtx.stroke(targetPath, with: .color(col.opacity(0.9)), style: StrokeStyle(lineWidth: 2.5))
                 }
             }
         } else {
@@ -354,11 +354,11 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
 
     private var INPUT_COL: [String: String] {
         [
-            "parry": "#e8f2ff",
-            "duck": "#f1d98e",
-            "jump": "#bfe8cc",
-            "dodge": "#ff5a3a",
-            "grab": "#ff9a3a"
+            "parry": InputPalette.parry,
+            "duck": InputPalette.duck,
+            "jump": InputPalette.jump,
+            "dodge": InputPalette.dodge,
+            "grab": InputPalette.grab
         ]
     }
 }

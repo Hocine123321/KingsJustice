@@ -116,6 +116,9 @@ Still open:
 - [ ] Touch zones: consider a first-run hint then auto-fade, and a left-handed check
 - [x] Top HUD: removed the confusing wallet gold from the enemy side; player bar turns red when low
 
+## Controls (owner feedback)
+- [x] Button colours did not match the circles (the Jump button was green but its circle was yellow; circles were coloured by attack type, not by the button to press). One shared palette now drives both: Parry blue, Duck yellow, Jump green, Dodge red-orange, Grab violet. The target circle takes the same colour; double strikes show a second ring.
+
 ## Stretch ideas (parked until the core is polished)
 - Photo mode / replay of the final blow
 - Ghost data for Daily Challenge

@@ -303,7 +303,7 @@ struct TipInfo {
 
 enum EngineTips {
     static let tips: [String: TipInfo] = [
-        "slash": TipInfo(title: "Parry", description: "Tap PARRY just as the ring closes on the red circle."),
+        "slash": TipInfo(title: "Parry", description: "Tap PARRY just as the ring closes on its circle. Every circle matches the colour of its button."),
         "low": TipInfo(title: "Low sweep", description: "Duck it: tap DUCK as the ring closes."),
         "high": TipInfo(title: "Overhead", description: "Jump over it: tap JUMP as the ring closes."),
         "unblockable": TipInfo(title: "Unblockable", description: "Red dashed ring: you cannot parry this. DODGE it: tap DODGE. A clean dodge stuns him."),

@@ -24,7 +24,7 @@ struct HowToPlayView: View {
         Page(
             kick: "His turn",
             title: "Defend",
-            body: "A ring closes on you when the champion attacks. Parry slashes, Duck low sweeps, Jump overheads. Red dashed rings cannot be parried: Dodge them.",
+            body: "A ring closes on you when the champion attacks. Its colour matches the button to press: blue Parry, yellow Duck, green Jump. Red dashed rings cannot be parried: Dodge them.",
             accent: Color(red: 0.95, green: 0.35, blue: 0.3),
             defend: true
         ),
@@ -141,8 +141,12 @@ struct HowToPlayView: View {
                     let target = 22.0
                     let ringR = target + (1.0 - phase) * min(w, h) * 0.38
                     let hitWindow = phase > 0.88
+                    // On the Defend page the ring cycles through the four actions, in their button colours.
+                    let cycleIndex = Int(t / 1.5) % 4
+                    let cycleInput = InputPalette.defendInputs[cycleIndex]
+                    let ringAccent: Color = defend ? (SVGColorParser.parseColor(InputPalette.hex(for: cycleInput)) ?? accent) : accent
                     ctx.stroke(Path(ellipseIn: CGRect(x: c.x - target, y: c.y - target, width: target * 2.0, height: target * 2.0)),
-                               with: .color(accent.opacity(0.85)), lineWidth: 3.0)
+                               with: .color(ringAccent.opacity(0.85)), lineWidth: 3.0)
                     if showFocus {
                         // Focus: the window around the target is wider.
                         let wr = target + 16.0 + 3.0 * sin(t * 4.0)
@@ -150,19 +154,20 @@ struct HowToPlayView: View {
                                    with: .color(accent.opacity(0.4)), style: StrokeStyle(lineWidth: 2.0, dash: [5, 5]))
                     }
                     var style = StrokeStyle(lineWidth: 4.0, lineCap: .round)
-                    if defend && page == 1 && (Int(t / 3.0) % 2 == 1) {
+                    if defend && cycleInput == "dodge" {
                         style.dash = [8, 6]
                     }
                     ctx.stroke(Path(ellipseIn: CGRect(x: c.x - ringR, y: c.y - ringR, width: ringR * 2.0, height: ringR * 2.0)),
-                               with: .color((hitWindow ? Color.white : accent).opacity(0.95)), style: style)
+                               with: .color((hitWindow ? Color.white : ringAccent).opacity(0.95)), style: style)
 
                     if defend {
-                        let labels = ["PARRY", "DODGE", "DUCK", "JUMP"]
                         let r = min(w, h) * 0.46
-                        for (i, label) in labels.enumerated() {
+                        for (i, input) in InputPalette.defendInputs.enumerated() {
                             let a = Double(i) * .pi / 2.0 - .pi / 2.0
                             let p = CGPoint(x: c.x + cos(a) * r * 1.35, y: c.y + sin(a) * r * 0.95)
-                            ctx.draw(Text(label).font(.system(size: 11, weight: .bold)).foregroundColor(UITheme.textCream.opacity(0.75)), at: p)
+                            let labelCol = SVGColorParser.parseColor(InputPalette.hex(for: input)) ?? Color.white
+                            let active = (i == cycleIndex)
+                            ctx.draw(Text(input.uppercased()).font(.system(size: active ? 13 : 11, weight: .bold)).foregroundColor(labelCol.opacity(active ? 1.0 : 0.6)), at: p)
                         }
                     }
                 }
