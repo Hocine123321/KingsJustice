@@ -10,6 +10,7 @@ enum AppScreen: Equatable {
     case shop
     case settings
     case howTo
+    case chronicle
     case fight
 }
 
@@ -113,6 +114,7 @@ struct RootView: View {
                     settingsFromPause = false
                     screen = .settings
                 },
+                onSelectChronicle: { screen = .chronicle },
                 onWatchCinematic: {
                     pendingFight = nil
                     screen = .howTo
@@ -132,6 +134,8 @@ struct RootView: View {
             SettingsView(engine: engine, onBack: {
                 screen = settingsFromPause ? .fight : .menu
             })
+        case .chronicle:
+            ChronicleView(save: engine.save, onBack: { screen = .menu })
         case .howTo:
             HowToPlayView(onDone: {
                 engine.save.seen["howto"] = true

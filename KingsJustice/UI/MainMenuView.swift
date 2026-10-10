@@ -68,6 +68,7 @@ struct MainMenuView<Engine: UIEngine>: View {
     let onSelectStyle: () -> Void
     let onSelectShop: () -> Void
     let onSelectSettings: () -> Void
+    let onSelectChronicle: () -> Void
     let onWatchCinematic: () -> Void
     @State private var appeared: Bool = false
     @Environment(\.verticalSizeClass) private var vSize
@@ -78,6 +79,7 @@ struct MainMenuView<Engine: UIEngine>: View {
         onSelectStyle: @escaping () -> Void,
         onSelectShop: @escaping () -> Void,
         onSelectSettings: @escaping () -> Void,
+        onSelectChronicle: @escaping () -> Void,
         onWatchCinematic: @escaping () -> Void
     ) {
         self.engine = engine
@@ -85,6 +87,7 @@ struct MainMenuView<Engine: UIEngine>: View {
         self.onSelectStyle = onSelectStyle
         self.onSelectShop = onSelectShop
         self.onSelectSettings = onSelectSettings
+        self.onSelectChronicle = onSelectChronicle
         self.onWatchCinematic = onWatchCinematic
     }
     
@@ -169,6 +172,7 @@ struct MainMenuView<Engine: UIEngine>: View {
                             PillButton(title: "Tonics", action: onSelectShop)
                         }
                         
+                        PillButton(title: "Chronicle", action: onSelectChronicle)
                         HStack(spacing: 8) {
                             PillButton(title: "How to Play", action: onWatchCinematic)
                             PillButton(title: "Settings", action: onSelectSettings)
