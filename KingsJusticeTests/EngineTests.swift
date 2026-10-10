@@ -210,3 +210,37 @@ final class KillCamTests: XCTestCase {
         XCTAssertEqual(e.rsKillCam, 0.0, accuracy: 1e-9)
     }
 }
+
+final class SaveCompatibilityTests: XCTestCase {
+    func testOldSaveWithoutNewFieldsStillLoads() throws {
+        // A save written before flawless/streak fields and colorSafe existed.
+        let oldSave = #"{"gold":420,"beat":["a","b"],"bestSurvival":7,"kills":12,"invHeal":1}"#
+        let loaded = try JSONDecoder().decode(SaveData.self, from: Data(oldSave.utf8))
+        XCTAssertEqual(loaded.gold, 420)
+        XCTAssertEqual(loaded.beat, ["a", "b"])
+        XCTAssertEqual(loaded.bestSurvival, 7)
+        XCTAssertEqual(loaded.kills, 12)
+        XCTAssertEqual(loaded.flawless, 0)
+        XCTAssertEqual(loaded.dailyStreak, 0)
+        XCTAssertEqual(loaded.lastDailyWin, "")
+    }
+
+    func testOldSettingsWithoutColorSafeStillLoad() throws {
+        let oldSettings = #"{"music":0.5,"difficulty":"hard","leftHand":true}"#
+        let loaded = try JSONDecoder().decode(GameSettings.self, from: Data(oldSettings.utf8))
+        XCTAssertEqual(loaded.music, 0.5, accuracy: 1e-9)
+        XCTAssertEqual(loaded.difficulty, "hard")
+        XCTAssertTrue(loaded.leftHand)
+        XCTAssertFalse(loaded.colorSafe)
+        XCTAssertEqual(loaded.sfx, 0.9, accuracy: 1e-9)
+    }
+
+    func testRoundTrip() throws {
+        var s = SaveData()
+        s.gold = 99
+        s.flawless = 3
+        s.dailyStreak = 4
+        let data = try JSONEncoder().encode(s)
+        XCTAssertEqual(try JSONDecoder().decode(SaveData.self, from: data), s)
+    }
+}
