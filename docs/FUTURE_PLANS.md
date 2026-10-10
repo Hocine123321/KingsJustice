@@ -62,11 +62,11 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [ ] Armour and weapon cosmetics per fighting style
 
 ### 6. Audio
-- [ ] Unique looping battle theme per arena, tied to champion identity
+- [x] Unique battle theme per arena: own chord progression, melody and drum feel for castle, village, pass, swamp, cliff, cathedral (before, all six used one pattern and differed only by key and speed)
 - [ ] Adaptive intensity: layers escalate with combo and low health, resolve after the kill
 - [ ] Title and menu themes, victory / defeat / unlock stingers
-- [ ] Richer impact sounds (material-aware: steel, shield, flesh), ambient beds (wind, crowd, swamp)
-- [ ] Haptic patterns matched to hit type
+- [ ] Richer impact sounds: parry/perfect/hurt/block/heavy/thud sounds are now layered onto hits (they existed but were never used). Material-aware variants and ambient beds (wind, crowd, swamp) still open
+- [x] Haptic patterns matched to hit type (menu taps and enemy hits were silently doing nothing before; added tap, parry, impact, perfect, kill patterns)
 
 ### 7. Gameplay depth
 - [ ] Clearer, more varied enemy tells; per-champion signature mechanic

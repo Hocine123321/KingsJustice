@@ -25,9 +25,9 @@ enum UIAudio {
     // MARK: - Music & Ambience Helpers
 
     /// Starts arena background music with specified root MIDI pitch, scale name, and tempo BPM.
-    static func startArenaMusic(root: Int, scale: String, bpm: Double) {
+    static func startArenaMusic(root: Int, scale: String, bpm: Double, theme: String = "default") {
         onFirstUserTap()
-        AudioEngine.shared.startMusic(root: root, scale: scale, bpm: bpm)
+        AudioEngine.shared.startMusic(root: root, scale: scale, bpm: bpm, style: theme, isMenu: false)
     }
 
     /// Starts serene, drum-less menu and idle ambience music.

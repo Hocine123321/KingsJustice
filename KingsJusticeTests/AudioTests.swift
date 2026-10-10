@@ -172,3 +172,42 @@ final class AudioTests: XCTestCase {
         AudioEngine.shared.stopMusic(fadeDuration: 0.0)
     }
 }
+
+final class MusicThemeTests: XCTestCase {
+    func testEveryArenaHasAWellFormedTheme() {
+        for key in GameData.arenas.keys {
+            guard let theme = MusicThemes.theme(for: key) else {
+                XCTFail("Missing music theme for \(key)")
+                continue
+            }
+            XCTAssertEqual(theme.chordDegrees.count, 4, key)
+            XCTAssertEqual(theme.melody.count, 4, key)
+            for bar in theme.melody { XCTAssertEqual(bar.count, 16, key) }
+            for d in theme.chordDegrees { XCTAssertTrue(d >= 0 && d < 7, key) }
+            for s in theme.kickSteps.union(theme.snareSteps) { XCTAssertTrue(s >= 0 && s < 16, key) }
+            XCTAssertTrue(theme.melody.flatMap { $0 }.contains { $0 >= 0 }, "\(key) melody is silent")
+        }
+    }
+
+    func testThemesAreDistinct() {
+        let progressions = GameData.arenas.keys.compactMap { MusicThemes.theme(for: $0)?.chordDegrees }
+        XCTAssertEqual(Set(progressions.map { $0.map(String.init).joined(separator: ",") }).count, progressions.count)
+    }
+
+    func testThemedNoteSetsCoverEveryChord() {
+        for (key, arena) in GameData.arenas {
+            guard let theme = MusicThemes.theme(for: key) else { continue }
+            let offsets = Synth.scaleOffsets(for: arena.music.scale)
+            let sets = AudioEngine.musicNoteSets(root: arena.music.root, scale: arena.music.scale, style: key)
+            for d in theme.chordDegrees {
+                let chordRoot = arena.music.root + offsets[min(d, offsets.count - 1)]
+                XCTAssertTrue(sets.bass.contains(max(24, min(55, chordRoot - 12))), "\(key) bass missing")
+                XCTAssertTrue(sets.pad.contains(max(36, min(60, chordRoot - 12))), "\(key) pad missing")
+            }
+        }
+    }
+
+    func testUnknownStyleKeepsGenericPattern() {
+        XCTAssertNil(MusicThemes.theme(for: "default"))
+    }
+}

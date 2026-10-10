@@ -137,6 +137,9 @@ extension GameEngine {
                 onSpawnFX?(.spark(x: 650, y: 430, count: perfect ? 36 : 22))
                 if perfect { onSpawnFX?(.shockwave(x: 650, y: 430, color: "#e8f2ff")) }
                 onSfx?(.clang, perfect ? 1.2 : 0.9)
+                onSfx?(.parry, perfect ? 1.0 : 0.7)
+                if perfect { onSfx?(.perfect, 0.8) }
+                onHaptic?(perfect ? "parry" : "tap")
                 shake2(perfect ? 0.8 : 0.5)
                 playerPoseState.setAction(EnginePoses.kParry, speed: 26.0, hold: 0.32)
                 enemyPoseState.setAction(EnginePoses.gParried, speed: 26.0, hold: 0.55)
@@ -200,6 +203,7 @@ extension GameEngine {
             special = 0
             say("Bastion holds", col: "#ffe08a")
             onSfx?(.clang, 1.2)
+            onSfx?(.block, 1.1)
             onSpawnFX?(.spark(x: 600, y: 500, count: 30))
             shake2(0.6)
             updateHud()
@@ -227,6 +231,8 @@ extension GameEngine {
         }
 
         onSfx?(.slash, 0.9)
+        onSfx?(.hurt, 1.0)
+        onSfx?(.thud, 0.8)
         shake2(1.4)
         hitStop = 0.08
         onHaptic?("impact")
@@ -278,6 +284,7 @@ extension GameEngine {
                 say("Guard broken! Strike!", col: "#ff9a5a")
                 enemyPoseState.setTarget(EnginePoses.gStun, speed: 20.0)
                 onSfx?(.clang, 1.2)
+                onSfx?(.heavy, 0.9)
                 onSpawnFX?(.spark(x: 710, y: 430, count: 40))
             } else {
                 msg = "Parried"
@@ -295,6 +302,7 @@ extension GameEngine {
             combo = 0
             enemyPoseState.setAction(EnginePoses.gBlockH, speed: 26.0, hold: 0.35)
             onSfx?(.clang, 0.7)
+            onSfx?(.block, 0.8)
         } else if events[index].flag == "BL" && events[index].lane == 0 {
             dmg *= 0.2
             msg = "Blocked low"
@@ -377,11 +385,17 @@ extension GameEngine {
                 onSpawnFX?(.stain(x: 800.0 + Double.random(in: 0...80), y: 722.0, radius: 34.0 + Double.random(in: 0...30)))
             }
             onSfx?(.slash, perfect ? 0.8 : 0.5)
+            if perfect {
+                onSfx?(.perfect, 0.8)
+                onSfx?(.heavy, 0.7)
+            } else {
+                onSfx?(.thud, 0.5)
+            }
         }
 
         shake2(perfect ? 1.1 : 0.6)
         hitStop = perfect ? 0.07 : 0.04
-        onHaptic?(perfect ? "heavy" : "light")
+        onHaptic?(perfect ? "perfect" : "light")
         updateHud()
     }
 

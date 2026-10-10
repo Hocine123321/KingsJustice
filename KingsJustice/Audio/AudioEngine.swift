@@ -196,7 +196,7 @@ final class AudioEngine {
         let isDark = (scale.lowercased() == "phrygian" || scale.lowercased() == "locrian" || scale.lowercased() == "swamp")
         synthQueue.async { [weak self] in
             guard let self = self else { return }
-            self.renderMusicBuffers(root: root, scale: scale, isChoir: isChoir, isDark: isDark)
+            self.renderMusicBuffers(root: root, scale: scale, isChoir: isChoir, isDark: isDark, style: style)
             DispatchQueue.main.async { [weak self] in
                 guard let self = self, self.musicGeneration == generation else { return }
                 self.beginMusicScheduler()
@@ -220,13 +220,13 @@ final class AudioEngine {
     }
 
     /// The distinct pad, bass and lead notes a track can reach. Small by design, so starting music never renders a whole library.
-    static func musicNoteSets(root: Int, scale: String) -> (pad: Set<Int>, bass: Set<Int>, lead: Set<Int>) {
+    static func musicNoteSets(root: Int, scale: String, style: String = "default") -> (pad: Set<Int>, bass: Set<Int>, lead: Set<Int>) {
         let offsets = Synth.scaleOffsets(for: scale)
         guard !offsets.isEmpty else { return ([], [], []) }
 
         var padNotes = Set<Int>()
         var bassNotes = Set<Int>()
-        for degree in [0, 5, 2, 6] {
+        for degree in (MusicThemes.theme(for: style)?.chordDegrees ?? [0, 5, 2, 6]) {
             let d = min(degree, offsets.count - 1)
             let chordRoot = root + offsets[d]
             padNotes.insert(max(36, min(60, chordRoot - 12)))
@@ -240,9 +240,9 @@ final class AudioEngine {
     }
 
     /// Synthesizes just the pad, bass and lead notes a track can reach. Runs on the synth queue.
-    private func renderMusicBuffers(root: Int, scale: String, isChoir: Bool, isDark: Bool) {
+    private func renderMusicBuffers(root: Int, scale: String, isChoir: Bool, isDark: Bool, style: String = "default") {
         let sr = 44100.0
-        let sets = AudioEngine.musicNoteSets(root: root, scale: scale)
+        let sets = AudioEngine.musicNoteSets(root: root, scale: scale, style: style)
         let padNotes = sets.pad
         let bassNotes = sets.bass
         let leadNotes = sets.lead
@@ -627,13 +627,18 @@ final class AudioEngine {
         let stepInBar = step % 16
 
         // 4-bar harmonic chord progression: bar 0 -> Root (deg 0), bar 1 -> deg 5/3, bar 2 -> deg 2/4, bar 3 -> deg 6/4
+        let theme: MusicTheme? = isMenuMusicMode ? nil : MusicThemes.theme(for: musicStyle)
         let chordDegreeIndex: Int
-        switch bar {
-        case 0: chordDegreeIndex = 0
-        case 1: chordDegreeIndex = min(5, scaleOffsets.count - 1)
-        case 2: chordDegreeIndex = min(2, scaleOffsets.count - 1)
-        case 3: chordDegreeIndex = min(6, scaleOffsets.count - 1)
-        default: chordDegreeIndex = 0
+        if let th = theme {
+            chordDegreeIndex = min(th.chordDegrees[bar], scaleOffsets.count - 1)
+        } else {
+            switch bar {
+            case 0: chordDegreeIndex = 0
+            case 1: chordDegreeIndex = min(5, scaleOffsets.count - 1)
+            case 2: chordDegreeIndex = min(2, scaleOffsets.count - 1)
+            case 3: chordDegreeIndex = min(6, scaleOffsets.count - 1)
+            default: chordDegreeIndex = 0
+            }
         }
         let chordRootNote = root + scaleOffsets[chordDegreeIndex]
 
@@ -669,8 +674,12 @@ final class AudioEngine {
 
         // 3. LEAD / MELODY LAYER
         let playLeadNote: Bool
+        var themedDegree = -1
         if isMenuMusicMode {
             playLeadNote = (stepInBar == 2 || stepInBar == 8 || stepInBar == 12)
+        } else if let th = theme {
+            themedDegree = th.melody[bar][stepInBar]
+            playLeadNote = themedDegree >= 0
         } else {
             switch bar {
             case 0: playLeadNote = (stepInBar == 2 || stepInBar == 6 || stepInBar == 10)
@@ -682,7 +691,7 @@ final class AudioEngine {
         }
 
         if playLeadNote && (intensity > 0.2 || isMenuMusicMode) {
-            let melodyDegreeIndex = (stepInBar / 2) % scaleOffsets.count
+            let melodyDegreeIndex = themedDegree >= 0 ? (themedDegree % scaleOffsets.count) : ((stepInBar / 2) % scaleOffsets.count)
             let leadNote = max(48, min(72, root + scaleOffsets[melodyDegreeIndex]))
             let leadStyleName = isChoirStyle ? "choir" : "plucked"
             let key = "\(leadNote)_\(leadStyleName)"
@@ -696,7 +705,20 @@ final class AudioEngine {
         }
 
         // 4. DRUMS LAYER (Muted in Menu mode)
-        if !isMenuMusicMode {
+        if !isMenuMusicMode, let th = theme {
+            if th.kickSteps.contains(stepInBar) {
+                playDrumPlayer(musicKickPlayer, kind: "kick", volume: 0.85)
+            }
+            if th.snareSteps.contains(stepInBar) {
+                playDrumPlayer(musicSnarePlayer, kind: "snare", volume: 0.8)
+            }
+            if th.hatStride > 0 && stepInBar % th.hatStride == 0 {
+                playDrumPlayer(musicHatPlayer, kind: "hat", volume: Float(0.28 + intensity * 0.25))
+            }
+            if th.tomFill && bar == 3 && stepInBar >= 12 {
+                playDrumPlayer(musicTomPlayer, kind: "tom", volume: Float(0.5 + intensity * 0.3))
+            }
+        } else if !isMenuMusicMode {
             // Kick
             if stepInBar == 0 || stepInBar == 8 {
                 playDrumPlayer(musicKickPlayer, kind: "kick", volume: 0.85)
