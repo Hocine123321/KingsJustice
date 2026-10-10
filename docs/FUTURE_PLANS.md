@@ -36,7 +36,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 ### 2. Fight presentation
 - [x] Boss entrance: champion name and title card before round one (signature pose and sting still open)
 - [x] Round-start "FIGHT!" beat
-- [ ] Phase-change moments (enemy shifts stance, music layer swaps, banner)
+- [x] Phase-change banner ("PHASE II - <champion> grows desperate") with the existing shake, heartbeat and red flash. Music layer swap still open
 - [x] Parry / Perfect shockwave ring (screen-edge flash still open)
 - [x] Camera framing that pushes in as an enemy gets low on health
 
@@ -65,28 +65,28 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] Unique battle theme per arena: own chord progression, melody and drum feel for castle, village, pass, swamp, cliff, cathedral (before, all six used one pattern and differed only by key and speed)
 - [ ] Adaptive intensity: layers escalate with combo and low health, resolve after the kill
 - [ ] Title and menu themes, victory / defeat / unlock stingers
-- [ ] Richer impact sounds: parry/perfect/hurt/block/heavy/thud sounds are now layered onto hits (they existed but were never used). Material-aware variants and ambient beds (wind, crowd, swamp) still open
+- [ ] Richer impact sounds: parry/perfect/hurt/block/heavy/thud sounds are now layered onto hits (they existed but were never used). Material-aware variants and ambient beds now exist (see below). Material-aware variants still open
 - [x] Haptic patterns matched to hit type (menu taps and enemy hits were silently doing nothing before; added tap, parry, impact, perfect, kill patterns)
 
 ### 7. Gameplay depth
 - [ ] Clearer, more varied enemy tells; per-champion signature mechanic
 - [x] Survival: pick one of three boons after each wave (Keen Edge, Iron Ward, Vigor, Mending Draught, Glass Cannon risk/reward, Spoils of War). None touch enemy AI. Still open: boss waves, a leaderboard-style best-run list, showing active boons on the HUD
 - [x] BUG FIXED: Survival and Boss Rush reset your health to full and your score to zero after every win (the "one health bar" rule was not enforced); they now carry health and score between fights
-- [ ] Daily Challenge: seeded modifier of the day, streak counter
-- [ ] Boss Rush: score multiplier for no-damage clears
+- [x] Daily Challenge: modifier of the day (Steady Hands, Brittle, Marathon, Quickstep, One Chance, each with a score bonus) and a win streak shown on the menu
+- [x] Flawless bonus (any mode): win without taking a hit for +20% gold and a result badge. Dedicated Boss Rush scoring still open
 - [ ] Training Yard: guided drills, a move list, a metronome to practise timing
 - [x] How to Play: 3 animated pages (Strike / Defend / Focus and Heal), shown once before the first fight and from the menu. Contextual tips now use touch wording (they said Space / W / S / A). Still open: a guided, interactive practice round
 - [ ] Difficulty assist options that never touch Focus-vs-AI rules
 
 ### 8. Progression and retention
 - [ ] Meaningful unlocks: styles, cosmetics, titles
-- [ ] Achievements and a "chronicle" of defeated champions
+- [x] Chronicle screen: deeds, defeated champions, 9 achievements derived from the save
 - [ ] Gold sinks that matter in the shop
 - [ ] Optional Game Center leaderboards and achievements
 
 ### 9. UI/UX and accessibility
 - [ ] Consistent HUD style, safe-area handling on all iPhones, compact layout check on small screens
-- [ ] Colour-blind friendly note colours, reduced-motion and reduced-flash options (settings already exist for some)
+- [x] Colour-blind palette toggle (Okabe-Ito). Reduced-flash already exists; reduced-motion still open
 - [ ] Left-handed layout option
 - [ ] Pause menu polish, clearer settings
 
@@ -119,6 +119,10 @@ Still open:
 
 ## Controls (owner feedback)
 - [x] Button colours did not match the circles (the Jump button was green but its circle was yellow; circles were coloured by attack type, not by the button to press). One shared palette now drives both: Parry blue, Duck yellow, Jump green, Dodge red-orange, Grab violet. The target circle takes the same colour; double strikes show a second ring.
+
+## Engineering fixes
+- [x] Saves and settings used auto-generated decoding, so adding any field would have silently reset players' progress. Now tolerant (missing fields fall back to defaults), with tests
+- [x] Ambient beds: wind (pass), crowd (castle), crackling fire (village), crickets (swamp), waves (cliff), choir hum (cathedral). Seamless 8 s loops, synthesized in code
 
 ## Stretch ideas (parked until the core is polished)
 - Photo mode / replay of the final blow

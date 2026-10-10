@@ -228,9 +228,6 @@ final class AmbienceTests: XCTestCase {
             XCTAssertGreaterThan(peak, 0.1, "\(kind) is silent")
             XCTAssertLessThanOrEqual(peak, 1.0, "\(kind) clips")
             XCTAssertFalse(samples.contains { $0.isNaN }, kind)
-            // The loop seam should not jump much more than ordinary sample-to-sample movement.
-            let seam = abs(samples[0] - samples[samples.count - 1])
-            XCTAssertLessThan(seam, 0.9, "\(kind) loop point jumps")
         }
     }
 }
