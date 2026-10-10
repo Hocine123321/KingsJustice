@@ -144,6 +144,11 @@ struct SettingsView<Engine: UIEngine>: View {
                             get: { engine.settings.leftHand },
                             set: { engine.settings.leftHand = $0; engine.saveAll() }
                         ))
+
+                        toggleRow(label: "COLOUR-BLIND COLOURS", isOn: Binding(
+                            get: { engine.settings.colorSafe },
+                            set: { engine.settings.colorSafe = $0; engine.saveAll() }
+                        ))
                     }
                     .padding(.horizontal, 16)
                     

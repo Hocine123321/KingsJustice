@@ -19,3 +19,14 @@ final class InputPaletteTests: XCTestCase {
         XCTAssertEqual(InputPalette.hex(for: "duck"), "#f1c40f")
     }
 }
+
+final class InputPaletteSafeModeTests: XCTestCase {
+    func testSafePaletteIsDistinctAndRestorable() {
+        InputPalette.safeMode = true
+        let safe = (InputPalette.defendInputs + ["grab"]).map { InputPalette.hex(for: $0) }
+        XCTAssertEqual(Set(safe).count, safe.count)
+        XCTAssertNotEqual(InputPalette.hex(for: "jump"), "#4cd08a")
+        InputPalette.safeMode = false
+        XCTAssertEqual(InputPalette.hex(for: "jump"), "#4cd08a")
+    }
+}

@@ -49,7 +49,9 @@ final class GameEngine: ObservableObject {
 
     // MARK: - Settings & Save
 
-    @Published var settings: GameSettings = GameSettings()
+    @Published var settings: GameSettings = GameSettings() {
+        didSet { InputPalette.safeMode = settings.colorSafe }
+    }
     @Published var save: SaveData = SaveData()
 
     // MARK: - Per-frame Render Data (Plain Properties)
