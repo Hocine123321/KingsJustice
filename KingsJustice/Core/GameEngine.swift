@@ -27,6 +27,8 @@ final class GameEngine: ObservableObject {
     @Published var fightResult: FightResult = FightResult()
     /// Survival boons taken this run, and the three on offer after a won wave.
     @Published var boons: [String] = []
+    /// Daily Challenge twist in force (steady outside the Daily).
+    var dailyMod: DailyModifier = DailyModifiers.steady
     @Published var boonOffer: [Boon] = []
     @Published var won: Bool = false
     @Published var phaseBanner: String? = nil

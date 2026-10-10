@@ -98,8 +98,17 @@ struct MainMenuView<Engine: UIEngine>: View {
         if id == "survival", engine.save.bestSurvival > 0 {
             return "BEST \(engine.save.bestSurvival) WAVES"
         }
-        if id == "daily", let bestDaily = engine.save.bestDaily[todayString], bestDaily > 0 {
-            return "BEST \(bestDaily)"
+        if id == "daily" {
+            var parts: [String] = []
+            if let bestDaily = engine.save.bestDaily[todayString], bestDaily > 0 {
+                parts.append("BEST \(bestDaily)")
+            }
+            // Only show a streak that is still alive (won today or yesterday).
+            let live = engine.save.lastDailyWin == todayString || engine.save.lastDailyWin == DailyModifiers.previousDay(of: todayString)
+            if live && engine.save.dailyStreak > 0 {
+                parts.append("STREAK \(engine.save.dailyStreak)")
+            }
+            return parts.isEmpty ? nil : parts.joined(separator: " · ")
         }
         return nil
     }
@@ -142,7 +151,7 @@ struct MainMenuView<Engine: UIEngine>: View {
                         ForEach(MenuModeCatalog.extras, id: \.id) { mode in
                             ExtraModeRow(
                                 title: mode.name,
-                                detail: mode.desc,
+                                detail: mode.id == "daily" ? "Today: \(DailyModifiers.forDate(todayString).name). \(DailyModifiers.forDate(todayString).desc)" : mode.desc,
                                 badge: badgeForMode(mode.id),
                                 action: { onSelectMode(mode.id) }
                             )

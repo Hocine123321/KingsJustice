@@ -93,6 +93,9 @@ extension GameEngine {
 
         prepareTonicsForFight()
 
+        self.dailyMod = (mode == "daily") ? DailyModifiers.forDate(todayDateString()) : DailyModifiers.steady
+        if dailyMod.id == "onechance" { self.windUsed = true }
+
         playerPoseState = PoseState(values: EnginePoses.kIdle)
         enemyPoseState = PoseState(values: EnginePoses.gIdle)
 
@@ -154,9 +157,9 @@ extension GameEngine {
                 id: base.id,
                 name: base.name,
                 title: base.title,
-                hp: floor(base.hp * (0.9 + r.next() * 0.4)),
+                hp: floor(base.hp * (0.9 + r.next() * 0.4) * ((DailyModifiers.forDate(todayDateString()).id == "marathon") ? 1.4 : 1.0)),
                 arena: arenaKey,
-                bpm: base.bpm + floor(r.next() * 10.0),
+                bpm: base.bpm + floor(r.next() * 10.0) + ((DailyModifiers.forDate(todayDateString()).id == "tempo") ? 10.0 : 0.0),
                 look: base.look,
                 intro: base.intro,
                 ai: base.ai,
@@ -265,6 +268,13 @@ extension GameEngine {
         }
 
         if mode == "daily" {
+            score = Int((Double(score) * dailyMod.scoreMul).rounded())
+            if win {
+                let todayWin = todayDateString()
+                save.dailyStreak = DailyModifiers.nextStreak(current: save.dailyStreak, lastWin: save.lastDailyWin, today: todayWin)
+                save.lastDailyWin = todayWin
+                save.bestDailyStreak = max(save.bestDailyStreak, save.dailyStreak)
+            }
             let today = todayDateString()
             let bestStr = save.bestDaily[today] ?? 0
             if score > bestStr {

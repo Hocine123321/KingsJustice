@@ -414,7 +414,7 @@ extension GameEngine {
         if invulnUntil > t { return }
         let D = difficultyParams(settings.difficulty)
         let toughMul = tough ? 0.8 : 1.0
-        hp -= n * D.take * styleDef.takeMul * earlyEase() * toughMul * BoonCatalog.damageTakenMul(boons)
+        hp -= n * D.take * styleDef.takeMul * earlyEase() * toughMul * BoonCatalog.damageTakenMul(boons) * (dailyMod.id == "brittle" ? 1.3 : 1.0)
 
         if hp <= 0 {
             if !windUsed {
