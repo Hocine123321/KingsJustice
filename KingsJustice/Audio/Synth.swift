@@ -295,6 +295,82 @@ enum Synth {
         return samples
     }
 
+    /// Which ambience bed an arena uses.
+    static func ambienceKind(forArena key: String) -> String {
+        switch key {
+        case "castle": return "crowd"
+        case "village": return "fire"
+        case "pass": return "wind"
+        case "swamp": return "swamp"
+        case "cliff": return "waves"
+        case "cathedral": return "hum"
+        default: return "wind"
+        }
+    }
+
+    /// A seamlessly looping background bed. Kinds: wind, crowd, fire, swamp, waves, hum.
+    static func ambienceBuffer(kind: String, duration: Double = 8.0, sampleRate: Double = 44100.0) -> [Float] {
+        let sr = max(8000.0, sampleRate)
+        let n = max(1, Int(sr * duration))
+        let fade = min(n / 4, Int(sr * 0.6))
+        let total = n + fade
+        var out = [Float](repeating: 0, count: total)
+        let twoPi = 2.0 * Double.pi
+
+        var lpA = 0.0
+        var lpB = 0.0
+        var pop = 0.0
+
+        for i in 0..<total {
+            let t = Double(i) / sr
+            let w = Double.random(in: -1.0...1.0)
+            var v = 0.0
+            switch kind {
+            case "wind":
+                lpA += 0.05 * (w - lpA)
+                lpB += 0.004 * (w - lpB)
+                let gust = 0.55 + 0.45 * sin(twoPi * t / duration * 2.0) * sin(twoPi * t / duration * 3.0 + 1.0)
+                v = (lpA - lpB) * 3.0 * max(0.15, gust)
+            case "crowd":
+                lpA += 0.12 * (w - lpA)
+                lpB += 0.015 * (w - lpB)
+                let swell = 0.6 + 0.4 * sin(twoPi * t / duration * 3.0)
+                v = (lpA - lpB) * 1.6 * swell
+            case "fire":
+                lpA += 0.006 * (w - lpA)
+                if Double.random(in: 0.0...1.0) < 0.0007 { pop = Double.random(in: 0.4...1.0) }
+                pop *= 0.994
+                v = lpA * 4.0 + pop * w * 0.7
+            case "swamp":
+                lpA += 0.01 * (w - lpA)
+                let chirpGate = sin(twoPi * 14.0 * t) > 0.35 ? 1.0 : 0.0
+                let group = 0.5 + 0.5 * sin(twoPi * t / duration * 2.0)
+                let cricket = sin(twoPi * 4300.0 * t) * chirpGate * group * 0.22
+                v = lpA * 2.2 + cricket
+            case "waves":
+                lpA += 0.004 * (w - lpA)
+                lpB += 0.08 * (w - lpB)
+                let swell = pow(0.5 + 0.5 * sin(twoPi * t / duration * 1.0 - Double.pi / 2.0), 2.0)
+                v = lpA * 7.0 * (0.25 + swell) + (lpB - lpA) * 0.5 * swell
+            default: // "hum": exact integer cycles in 8 s, so it loops perfectly
+                let shimmer = 0.5 + 0.5 * sin(twoPi * t / duration)
+                v = 0.5 * sin(twoPi * 55.0 * t) + 0.3 * sin(twoPi * 82.5 * t) + 0.22 * sin(twoPi * 110.0 * t) + 0.18 * shimmer * sin(twoPi * 165.0 * t)
+            }
+            out[i] = Float(v)
+        }
+
+        // Crossfade the tail into the head so the loop point cannot click.
+        var loop = Array(out[0..<n])
+        if fade > 0 {
+            for i in 0..<fade {
+                let wgt = Float(i) / Float(fade)
+                loop[i] = out[i] * wgt + out[n + i] * (1.0 - wgt)
+            }
+        }
+        normalize(&loop, targetPeak: 0.8)
+        return loop
+    }
+
     static func stingerBuffer(win: Bool, sampleRate: Double = 44100.0) -> [Float] {
         let sr = max(8000.0, sampleRate)
         let duration = 2.0

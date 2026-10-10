@@ -17,6 +17,8 @@ final class AudioEngine {
     private let poolSize = 12
 
     private let dronePlayer = AVAudioPlayerNode()
+    private let ambiencePlayer = AVAudioPlayerNode()
+    private var ambienceKind: String = ""
 
     // Drum players
     private let musicKickPlayer = AVAudioPlayerNode()
@@ -166,6 +168,32 @@ final class AudioEngine {
 
     func stopDrone() {
         dronePlayer.stop()
+        stopAmbience()
+    }
+
+    /// Starts a looping background bed (wind, crowd, fire, swamp, waves, hum). Restarting the same bed is a no-op.
+    func startAmbience(kind: String, volume: Float = 0.32) {
+        guard isStarted else { return }
+        if kind == ambienceKind && ambiencePlayer.isPlaying { return }
+        ambienceKind = kind
+
+        synthQueue.async { [weak self] in
+            let samples = Synth.ambienceBuffer(kind: kind, duration: 8.0, sampleRate: 44100.0)
+            guard let buf = Synth.pcmBuffer(from: samples, sampleRate: 44100.0) else { return }
+
+            DispatchQueue.main.async {
+                guard let self = self, self.isStarted, self.ambienceKind == kind else { return }
+                self.ambiencePlayer.stop()
+                self.ambiencePlayer.volume = volume
+                self.safeSchedule(self.ambiencePlayer, buf, loops: true)
+                self.ambiencePlayer.play()
+            }
+        }
+    }
+
+    func stopAmbience() {
+        ambienceKind = ""
+        ambiencePlayer.stop()
     }
 
     func startMusic(root: Int, scale: String, bpm: Double) {
@@ -490,6 +518,8 @@ final class AudioEngine {
 
         engine.attach(dronePlayer)
         engine.connect(dronePlayer, to: sfxMixer, format: monoFormat)
+        engine.attach(ambiencePlayer)
+        engine.connect(ambiencePlayer, to: sfxMixer, format: monoFormat)
 
         let drumPlayers = [musicKickPlayer, musicSnarePlayer, musicHatPlayer, musicTomPlayer, stingerPlayer]
         for p in drumPlayers {

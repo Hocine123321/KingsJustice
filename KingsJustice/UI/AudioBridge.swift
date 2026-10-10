@@ -30,6 +30,12 @@ enum UIAudio {
         AudioEngine.shared.startMusic(root: root, scale: scale, bpm: bpm, style: theme, isMenu: false)
     }
 
+    /// Starts the arena's looping ambience bed (wind, fire, crickets...).
+    static func startArenaAmbience(arena: String) {
+        onFirstUserTap()
+        AudioEngine.shared.startAmbience(kind: Synth.ambienceKind(forArena: arena))
+    }
+
     /// Starts serene, drum-less menu and idle ambience music.
     static func startMenuMusic() {
         onFirstUserTap()

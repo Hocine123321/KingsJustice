@@ -105,6 +105,7 @@ extension GameEngine {
         taunt(introLine)
         if let arena = GameData.arenas[E.arena] {
             UIAudio.startArenaMusic(root: arena.music.root, scale: arena.music.scale, bpm: arena.music.tempo, theme: arena.key)
+            UIAudio.startArenaAmbience(arena: arena.key)
         }
         promptText = E.name
 

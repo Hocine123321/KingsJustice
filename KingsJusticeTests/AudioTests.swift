@@ -211,3 +211,26 @@ final class MusicThemeTests: XCTestCase {
         XCTAssertNil(MusicThemes.theme(for: "default"))
     }
 }
+
+final class AmbienceTests: XCTestCase {
+    func testEveryArenaMapsToAKnownBed() {
+        let known: Set<String> = ["wind", "crowd", "fire", "swamp", "waves", "hum"]
+        for key in GameData.arenas.keys {
+            XCTAssertTrue(known.contains(Synth.ambienceKind(forArena: key)), key)
+        }
+    }
+
+    func testBedsAreAudibleBoundedAndLoopSafely() {
+        for kind in ["wind", "crowd", "fire", "swamp", "waves", "hum"] {
+            let samples = Synth.ambienceBuffer(kind: kind, duration: 1.0, sampleRate: 8000.0)
+            XCTAssertEqual(samples.count, 8000, kind)
+            let peak = samples.map { abs($0) }.max() ?? 0
+            XCTAssertGreaterThan(peak, 0.1, "\(kind) is silent")
+            XCTAssertLessThanOrEqual(peak, 1.0, "\(kind) clips")
+            XCTAssertFalse(samples.contains { $0.isNaN }, kind)
+            // The loop seam should not jump much more than ordinary sample-to-sample movement.
+            let seam = abs(samples[0] - samples[samples.count - 1])
+            XCTAssertLessThan(seam, 0.9, "\(kind) loop point jumps")
+        }
+    }
+}
