@@ -53,6 +53,7 @@ struct RootView: View {
     @StateObject private var engine: GameEngine = GameEngine()
     @StateObject private var clock: FrameClock = FrameClock()
     @State private var screen: AppScreen = .title
+    @Environment(\.scenePhase) private var scenePhase
     @State private var settingsFromPause: Bool = false
     @State private var pendingMode: String = "duel"
     @State private var pendingFight: PendingFight? = nil
@@ -68,6 +69,12 @@ struct RootView: View {
                 .id(screen)
         }
         .animation(.easeInOut(duration: 0.3), value: screen)
+        .onChange(of: scenePhase) { newPhase in
+            // Never lose a fight to a notification, call or app switch: pause as soon as we leave the foreground.
+            if newPhase != .active && screen == .fight {
+                engine.pause()
+            }
+        }
         .preferredColorScheme(.dark)
         .statusBarHidden(true)
         .onAppear { setupEngine() }
