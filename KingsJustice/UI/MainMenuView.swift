@@ -102,6 +102,9 @@ struct MainMenuView<Engine: UIEngine>: View {
         if id == "survival", engine.save.bestSurvival > 0 {
             return "BEST \(engine.save.bestSurvival) WAVES"
         }
+        if id == "rush", engine.save.bestRush > 0 {
+            return "BEST \(engine.save.bestRush)/\(GameData.roster.count)"
+        }
         if id == "daily" {
             var parts: [String] = []
             if let bestDaily = engine.save.bestDaily[todayString], bestDaily > 0 {

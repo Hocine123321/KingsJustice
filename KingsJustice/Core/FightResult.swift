@@ -35,6 +35,8 @@ struct FightResult: Equatable, Sendable {
     var rankLetter: String = "C"
     var newBest: Bool = false
     var flawless: Bool = false
+    /// The last champion fell: there is no "next champion" to offer.
+    var finalVictory: Bool = false
     var bestLabel: String = ""
     var tip: String = ""
     var shareText: String = ""

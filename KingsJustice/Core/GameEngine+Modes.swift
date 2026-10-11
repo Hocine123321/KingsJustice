@@ -272,6 +272,19 @@ extension GameEngine {
 
         let prevBestWave = save.bestSurvival
         let prevDaily = save.bestDaily[todayDateString()] ?? 0
+        let prevBestRush = save.bestRush
+        let rosterCount = GameData.roster.count
+        // Beating the last champion ends a Trial by Combat or a Boss Rush.
+        let finalVictory = win && (mode == "duel" || mode == "rush") && (enemyIdx + 1 >= rosterCount)
+        var gauntletBonus = 0
+        if mode == "rush" {
+            let cleared = win ? enemyIdx + 1 : enemyIdx
+            if cleared > save.bestRush { save.bestRush = cleared }
+            if finalVictory {
+                gauntletBonus = 150
+                save.gold += gauntletBonus
+            }
+        }
 
         if win && mode == "survival" {
             wave += 1
@@ -308,7 +321,8 @@ extension GameEngine {
         res.perfects = nP
         res.goods = nG
         res.misses = nM
-        res.gold = goldReward
+        res.gold = goldReward + gauntletBonus
+        res.finalVictory = finalVictory
         res.flawless = flawlessWin
         res.hpFraction = hpFrac
         res.duration = max(0.0, t)
@@ -316,6 +330,9 @@ extension GameEngine {
         if win && mode == "survival" && wave > prevBestWave {
             res.newBest = true
             res.bestLabel = "New best: wave \(wave)"
+        } else if mode == "rush" && save.bestRush > prevBestRush {
+            res.newBest = true
+            res.bestLabel = finalVictory ? "Gauntlet cleared +\(gauntletBonus) gold" : "New best rush: \(save.bestRush)/\(rosterCount)"
         } else if mode == "daily" && score > prevDaily {
             res.newBest = true
             res.bestLabel = "New daily best"

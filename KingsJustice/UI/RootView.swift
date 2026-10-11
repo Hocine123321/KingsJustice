@@ -239,7 +239,7 @@ struct RootView: View {
             } else {
                 showBoons = true
             }
-        } else if engine.won && engine.mode == "rush" {
+        } else if engine.won && engine.mode == "rush" && engine.enemyIdx + 1 < count {
             engine.beginFight(index: engine.enemyIdx + 1, keepHp: true)
         } else {
             leaveFight()

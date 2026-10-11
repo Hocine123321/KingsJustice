@@ -35,3 +35,17 @@ final class ShareLineTests: XCTestCase {
         XCTAssertTrue(loss.contains("The King") && loss.contains("Rematch"))
     }
 }
+
+final class RushCompletionTests: XCTestCase {
+    func testGauntletNeedsEveryChampion() {
+        var s = SaveData()
+        s.bestRush = 2
+        XCTAssertFalse(Achievements.unlocked(save: s, rosterIds: ["a", "b", "c"]).contains("gauntlet"))
+        s.bestRush = 3
+        XCTAssertTrue(Achievements.unlocked(save: s, rosterIds: ["a", "b", "c"]).contains("gauntlet"))
+    }
+
+    func testFinalVictoryDefaultsOff() {
+        XCTAssertFalse(FightResult().finalVictory)
+    }
+}

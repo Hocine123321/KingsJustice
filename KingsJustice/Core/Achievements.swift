@@ -17,6 +17,7 @@ enum Achievements {
         Achievement(id: "survivor10", name: "Unbroken", desc: "Reach wave 10 in Survival."),
         Achievement(id: "devotee", name: "Devotee", desc: "Win the Daily Challenge 3 days in a row."),
         Achievement(id: "loyal", name: "Loyal Subject", desc: "Win the Daily Challenge 7 days in a row."),
+        Achievement(id: "gauntlet", name: "Gauntlet", desc: "Defeat every champion in a single Boss Rush."),
         Achievement(id: "rich", name: "Coin of the Realm", desc: "Hold 1,000 gold.")
     ]
 
@@ -30,6 +31,7 @@ enum Achievements {
         if save.bestSurvival >= 10 { out.insert("survivor10") }
         if save.bestDailyStreak >= 3 { out.insert("devotee") }
         if save.bestDailyStreak >= 7 { out.insert("loyal") }
+        if !rosterIds.isEmpty && save.bestRush >= rosterIds.count { out.insert("gauntlet") }
         if save.gold >= 1000 { out.insert("rich") }
         return out
     }
