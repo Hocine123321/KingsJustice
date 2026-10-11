@@ -160,7 +160,10 @@ struct SettingsView<Engine: UIEngine>: View {
                     HStack(spacing: 10) {
                         PillButton(title: "Done", action: onBack)
                         PillButton(title: "Reset", action: {
+                            // Reset is for settings only: keep the fighting style the player chose.
+                            let keptStyle = engine.settings.style
                             engine.settings = GameSettings()
+                            engine.settings.style = keptStyle
                             engine.saveAll()
                         })
                         PillButton(title: "Erase Save", action: {

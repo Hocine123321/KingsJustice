@@ -128,6 +128,30 @@ struct EndScreenView<Engine: UIEngine>: View {
         }
     }
 
+    private func boonRecap() -> some View {
+        Group {
+            if !engine.boons.isEmpty {
+                var counts: [(String, Int)] = []
+                for id in engine.boons {
+                    if let i = counts.firstIndex(where: { $0.0 == id }) {
+                        counts[i].1 += 1
+                    } else {
+                        counts.append((id, 1))
+                    }
+                }
+                let parts: [String] = counts.map { pair in
+                    let name = BoonCatalog.boon(pair.0)?.name ?? pair.0
+                    return pair.1 > 1 ? "\(name) x\(pair.1)" : name
+                }
+                Text("Boons: " + parts.joined(separator: ", "))
+                    .font(.system(size: 11, weight: .regular, design: .serif).italic())
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(UITheme.textGold.opacity(0.85))
+                    .padding(.horizontal, 8)
+            }
+        }
+    }
+
     private func tipLine(_ r: FightResult) -> some View {
         Group {
             if !engine.won && !r.tip.isEmpty {
@@ -216,6 +240,7 @@ struct EndScreenView<Engine: UIEngine>: View {
             rankStamp(r, size: 76)
             bestBadge(r)
             flawlessBadge(r)
+            boonRecap()
             statsCard(r, compact: false)
             tipLine(r)
             actionButtons
@@ -232,6 +257,7 @@ struct EndScreenView<Engine: UIEngine>: View {
                 rankStamp(r, size: 64)
                 bestBadge(r)
                 flawlessBadge(r)
+                boonRecap()
                 tipLine(r)
                 Spacer(minLength: 0)
             }
