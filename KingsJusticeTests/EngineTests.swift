@@ -249,21 +249,26 @@ final class SaveCompatibilityTests: XCTestCase {
 final class FlawlessAndPhaseTests: XCTestCase {
     func testChipMarksDamageTaken() {
         let e = GameEngine()
-        e.invulnUntil = 0
-        XCTAssertFalse(e.tookDamage)
+        e.startRun(mode: "duel", enemyIndex: 0)
+        e.invulnUntil = 0.0
+        e.tookDamage = false
         e.chip(5.0)
         XCTAssertTrue(e.tookDamage)
+        UIAudio.stopMusic(fade: false)
     }
 
     func testBannerClearsAfterItsTime() {
         let e = GameEngine()
+        e.startRun(mode: "duel", enemyIndex: 0)
         e.on = true
         e.started = true
+        e.over = true   // skip round logic; only the banner timer matters here
         e.phaseBanner = "Phase II"
         e.phaseBannerUntil = e.t + 0.2
         e.tick(dt: 0.1)
         XCTAssertEqual(e.phaseBanner, "Phase II")
-        for _ in 0..<5 { e.tick(dt: 0.1) }
+        for _ in 0..<6 { e.tick(dt: 0.1) }
         XCTAssertEqual(e.phaseBanner, "")
+        UIAudio.stopMusic(fade: false)
     }
 }

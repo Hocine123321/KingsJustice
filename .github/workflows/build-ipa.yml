@@ -100,6 +100,19 @@ jobs:
           xcodebuild test -project KingsJustice.xcodeproj -scheme KingsJustice \
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -only-testing:KingsJusticeTests 2>&1 | tee build/unit.log | tail -n 60
+      - name: Surface test failures as annotations
+        if: failure()
+        shell: bash
+        run: |
+          {
+            echo "test failures:"
+            grep -E 'error:|failed|Fatal error|Crash|Testing failed' build/unit.log | sed 's#/Users/runner/work/KingsJustice/KingsJustice/##' | awk '!seen[$0]++' | head -40
+            echo "--- last 30 log lines:"
+            tail -n 30 build/unit.log | sed 's#/Users/runner/work/KingsJustice/KingsJustice/##'
+          } > build/test-errors.txt
+          MSG=$(python3 -c "print(open('build/test-errors.txt').read().replace('%','%25').replace('\r','%0D').replace('\n','%0A'))")
+          echo "::error title=Unit test failures::$MSG"
+
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
