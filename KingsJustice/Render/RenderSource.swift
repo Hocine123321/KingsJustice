@@ -75,9 +75,11 @@ protocol RenderSource: AnyObject {
     var rsFocusActive: Bool { get }
     var rsPerfectGlow: Double { get }
     var rsKillCam: Double { get }
+    var rsReduceMotion: Bool { get }
     func rsDrainFX() -> [RenderFX]
 }
 
 extension RenderSource {
     var rsKillCam: Double { return 0.0 }
+    var rsReduceMotion: Bool { return false }
 }

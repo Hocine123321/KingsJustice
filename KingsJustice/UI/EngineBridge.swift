@@ -43,6 +43,7 @@ protocol UIEngine: ObservableObject {
     var enemyTitle: String { get }
     var fightResult: FightResult { get }
     var phaseBanner: String { get }
+    var boons: [String] { get }
     
     var settings: GameSettings { get set }
     var save: SaveData { get set }
@@ -88,6 +89,7 @@ final class MockGameEngine: UIEngine, ObservableObject {
     @Published var enemyTitle: String = "Broken Foot-Soldier"
     @Published var fightResult: FightResult = FightResult()
     @Published var phaseBanner: String = ""
+    @Published var boons: [String] = []
     
     var settings: GameSettings = GameSettings()
     var save: SaveData = SaveData()

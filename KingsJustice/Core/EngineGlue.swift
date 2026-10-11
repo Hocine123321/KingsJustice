@@ -46,7 +46,8 @@ extension GameEngine: RenderSource {
     var rsStyle: StyleDef { return styleDef }
     var rsPlayerPose: [Double] { return playerPoseState.cur }
     var rsEnemyPose: [Double] { return enemyPoseState.cur }
-    var rsShake: Double { return shake }
+    var rsShake: Double { return settings.reduceMotion ? 0.0 : shake }
+    var rsReduceMotion: Bool { return settings.reduceMotion }
     var rsHurt: Double { return hurtLevel }
     var rsRoundIsDefend: Bool { return roundType == .defend }
     var rsArenaKey: String { return enemyDef?.arena ?? "castle" }

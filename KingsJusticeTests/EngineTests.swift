@@ -272,3 +272,21 @@ final class FlawlessAndPhaseTests: XCTestCase {
         UIAudio.stopMusic(fade: false)
     }
 }
+
+final class ReduceMotionTests: XCTestCase {
+    func testSettingDefaultsOffAndLoadsFromOldSettings() throws {
+        XCTAssertFalse(GameSettings().reduceMotion)
+        let old = #"{"music":0.7}"#
+        XCTAssertFalse(try JSONDecoder().decode(GameSettings.self, from: Data(old.utf8)).reduceMotion)
+    }
+
+    @MainActor
+    func testReduceMotionZeroesShakeForTheRenderer() {
+        let e = GameEngine()
+        e.shake2(2.0)
+        XCTAssertGreaterThan(e.rsShake, 0.0)
+        e.settings.reduceMotion = true
+        XCTAssertEqual(e.rsShake, 0.0, accuracy: 1e-9)
+        XCTAssertTrue(e.rsReduceMotion)
+    }
+}

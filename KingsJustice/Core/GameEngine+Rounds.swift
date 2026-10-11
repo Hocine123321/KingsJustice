@@ -198,6 +198,7 @@ extension GameEngine {
                 let numerals = ["I", "II", "III", "IV", "V"]
                 phaseBanner = "Phase \(numerals[min(i + 1, numerals.count - 1)])"
                 phaseBannerUntil = t + 2.0
+                UIAudio.setMusicIntensity(1.0)
             }
         }
     }

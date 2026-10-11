@@ -11,8 +11,41 @@ struct FightIntroView<Engine: UIEngine>: View {
         self.engine = engine
     }
 
+    private var uniqueBoons: [String] {
+        var seen = Set<String>()
+        return engine.boons.filter { seen.insert($0).inserted }
+    }
+
+    private func chipText(_ id: String) -> String {
+        let count = engine.boons.filter { $0 == id }.count
+        let name = (BoonCatalog.boon(id)?.name ?? id).uppercased()
+        return count > 1 ? "\(name) x\(count)" : name
+    }
+
     var body: some View {
         ZStack {
+            // Active Survival boons, top-left under the health bars.
+            if !engine.boons.isEmpty {
+                VStack {
+                    HStack(spacing: 4) {
+                        ForEach(uniqueBoons, id: \.self) { id in
+                            Text(chipText(id))
+                                .font(.system(size: 9, weight: .bold))
+                                .tracking(1.0)
+                                .foregroundColor(UITheme.textGold)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(Color.black.opacity(0.45)))
+                                .overlay(Capsule().stroke(UITheme.textGold.opacity(0.5), lineWidth: 0.8))
+                        }
+                        Spacer()
+                    }
+                    .padding(.leading, 14)
+                    .padding(.top, 34)
+                    Spacer()
+                }
+            }
+
             if !engine.started {
                 VStack(spacing: 8) {
                     Rectangle()

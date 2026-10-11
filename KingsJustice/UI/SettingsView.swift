@@ -145,6 +145,11 @@ struct SettingsView<Engine: UIEngine>: View {
                             set: { engine.settings.leftHand = $0; engine.saveAll() }
                         ))
 
+                        toggleRow(label: "REDUCE MOTION", isOn: Binding(
+                            get: { engine.settings.reduceMotion },
+                            set: { engine.settings.reduceMotion = $0; engine.saveAll() }
+                        ))
+
                         toggleRow(label: "COLOUR-BLIND COLOURS", isOn: Binding(
                             get: { engine.settings.colorSafe },
                             set: { engine.settings.colorSafe = $0; engine.saveAll() }

@@ -55,7 +55,9 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                     let lowHpPush = max(0.0, min(1.0, (source.rsWound - 0.4) / 0.4))
                     // Slightly tighter framing in landscape so the fighters read larger
                     let camZoom = isPortrait ? 1.0 : 1.05
-                    let zoomPunch = (1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))) * (1.0 + 0.22 * killCam) * (1.0 + 0.045 * lowHpPush) * camZoom
+                    let punch: Double = 1.0 + min(0.08, shake * 0.05 + (hitStop ? 0.03 : 0.0))
+                    let cinematic: Double = (1.0 + 0.22 * killCam) * (1.0 + 0.045 * lowHpPush)
+                    let zoomPunch: Double = source.rsReduceMotion ? camZoom : punch * cinematic * camZoom
                     let pivotX = 800.0 + 60.0 * killCam
                     let pivotY = (isPortrait ? 450.0 : 500.0) + 20.0 * killCam
                     let effScale = scale * zoomPunch
@@ -252,6 +254,21 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                     // Target Hit Ring
                     let targetPath = Path(ellipseIn: CGRect(x: cx - rEnd, y: cy - rEnd, width: rEnd * 2.0, height: rEnd * 2.0))
                     ringCtx.stroke(targetPath, with: .color(col.opacity(0.9)), style: StrokeStyle(lineWidth: 2.5))
+                }
+
+                // Tell marker above the champion: shows what is coming (in the button's colour) while the eyes are on him.
+                if u > 0.3 && !(event.feint && !event.feintOk) {
+                    let tellX = 930.0
+                    let tellY = 250.0
+                    let markR = 17.0 + 7.0 * u
+                    context.drawLayer { markCtx in
+                        markCtx.opacity = min(1.0, 0.25 + 0.9 * (u - 0.3))
+                        Atmosphere.softGlow(in: markCtx, center: CGPoint(x: tellX, y: tellY), rx: markR * 2.4, ry: markR * 2.4, color: col, opacity: 0.55)
+                        markCtx.stroke(Path(ellipseIn: CGRect(x: tellX - markR, y: tellY - markR, width: markR * 2.0, height: markR * 2.0)),
+                                       with: .color(isPerfectNow ? Color.white : col), lineWidth: 4.0)
+                        let word = Text(event.input.uppercased()).font(.system(size: 20, weight: .heavy)).foregroundColor(Color.white.opacity(0.95))
+                        markCtx.draw(word, at: CGPoint(x: tellX, y: tellY + markR + 20.0))
+                    }
                 }
             }
         } else {
