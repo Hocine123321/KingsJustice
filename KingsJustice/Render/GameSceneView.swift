@@ -91,11 +91,16 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         model.drawGndLayer(in: sceneCtx, size: worldSize)
 
                         // Ground Blood Stains & Ground Dust Puffs
+                        let quality = source.rsQuality
                         model.particleSystem.drawStains(in: sceneCtx)
-                        model.particleSystem.drawDust(in: sceneCtx)
+                        if quality >= 1 {
+                            model.particleSystem.drawDust(in: sceneCtx)
+                        }
 
-                        // Weapon Motion Trails
-                        model.drawWeaponTrails(in: sceneCtx)
+                        // Weapon Motion Trails (high quality only)
+                        if quality >= 2 {
+                            model.drawWeaponTrails(in: sceneCtx)
+                        }
 
                         // 4. Fighters
                         let playerLook = source.rsStyle.look
@@ -124,7 +129,9 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         }
 
                         // Drifting mist in front of the fighters' feet
-                        Atmosphere.drawFog(in: sceneCtx, arenaKey: source.rsArenaKey, time: renderTime, strength: 1.0 - 0.5 * killCam)
+                        if quality >= 2 {
+                            Atmosphere.drawFog(in: sceneCtx, arenaKey: source.rsArenaKey, time: renderTime, strength: 1.0 - 0.5 * killCam)
+                        }
 
                         // 5. Foreground (fg 1.5)
                         model.drawFgLayer(in: sceneCtx, size: worldSize)
@@ -133,7 +140,9 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         let arena = GameData.arenas[source.rsArenaKey]
                         let wType = arena?.weather.type ?? "embers"
                         let defCol = SVGColorParser.parseColor(arena?.weather.color ?? "#ffffff") ?? Color.white
-                        model.particleSystem.drawWeather(in: sceneCtx, type: wType, defaultColor: defCol)
+                        if quality >= 1 {
+                            model.particleSystem.drawWeather(in: sceneCtx, type: wType, defaultColor: defCol)
+                        }
 
                         // Sparks and Blood
                         model.particleSystem.drawBlood(in: sceneCtx)

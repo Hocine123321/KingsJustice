@@ -124,6 +124,8 @@ Still open:
 - [x] Saves and settings used auto-generated decoding, so adding any field would have silently reset players' progress. Now tolerant (missing fields fall back to defaults), with tests
 - [x] Ambient beds: wind (pass), crowd (castle), crackling fire (village), crickets (swamp), waves (cliff), choir hum (cathedral). Seamless 8 s loops, synthesized in code
 
+- [x] The Graphics Quality setting did nothing before. Now High keeps everything, Medium drops weapon trails and mist, Low also drops weather and dust (for slower phones)
+
 ## Stretch ideas (parked until the core is polished)
 - Photo mode / replay of the final blow
 - Ghost data for Daily Challenge

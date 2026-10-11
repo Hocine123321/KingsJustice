@@ -76,10 +76,13 @@ protocol RenderSource: AnyObject {
     var rsPerfectGlow: Double { get }
     var rsKillCam: Double { get }
     var rsReduceMotion: Bool { get }
+    /// 2 = high, 1 = medium, 0 = low. Lower tiers skip optional effects to save frame time.
+    var rsQuality: Int { get }
     func rsDrainFX() -> [RenderFX]
 }
 
 extension RenderSource {
     var rsKillCam: Double { return 0.0 }
     var rsReduceMotion: Bool { return false }
+    var rsQuality: Int { return 2 }
 }

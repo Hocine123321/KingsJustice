@@ -290,3 +290,16 @@ final class ReduceMotionTests: XCTestCase {
         XCTAssertTrue(e.rsReduceMotion)
     }
 }
+
+final class QualityTests: XCTestCase {
+    @MainActor
+    func testQualitySettingMapsToRenderTier() {
+        let e = GameEngine()
+        e.settings.quality = "high"
+        XCTAssertEqual(e.rsQuality, 2)
+        e.settings.quality = "med"
+        XCTAssertEqual(e.rsQuality, 1)
+        e.settings.quality = "low"
+        XCTAssertEqual(e.rsQuality, 0)
+    }
+}
