@@ -250,7 +250,7 @@ final class FlawlessAndPhaseTests: XCTestCase {
     func testChipMarksDamageTaken() {
         let e = GameEngine()
         e.startRun(mode: "duel", enemyIndex: 0)
-        e.invulnUntil = 0.0
+        e.invulnUntil = -1000.0   // the clock is negative during the countdown, so 0 would still count as invulnerable
         e.tookDamage = false
         e.chip(5.0)
         XCTAssertTrue(e.tookDamage)
