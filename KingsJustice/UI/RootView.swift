@@ -69,6 +69,9 @@ struct RootView: View {
                 .id(screen)
         }
         .animation(.easeInOut(duration: 0.3), value: screen)
+        .onReceive(NotificationCenter.default.publisher(for: AudioEngine.outputLostNotification)) { _ in
+            if screen == .fight { engine.pause() }
+        }
         .onChange(of: scenePhase) { newPhase in
             // Never lose a fight to a notification, call or app switch: pause as soon as we leave the foreground.
             if newPhase != .active && screen == .fight {

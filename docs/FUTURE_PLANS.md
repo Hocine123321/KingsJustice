@@ -93,7 +93,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 ### 10. Technical quality
 - [ ] Performance profile on the heaviest scene; keep every effect cheap (gradients over blur filters)
 - [ ] More unit tests around engine edge cases and fight length (~60 s)
-- [x] Launch screen is now the game's dark colour (it was a white flash) and the app is forced to dark appearance. Fights now auto-pause when the app leaves the foreground. Audio route changes (headphones unplugged) still open
+- [x] Launch screen is now the game's dark colour (it was a white flash) and the app is forced to dark appearance. Fights now auto-pause when the app leaves the foreground. Unplugging headphones now pauses the fight too
 - [ ] CI: add a lint step and a simple fight-length simulation test
 - [ ] Localization-ready strings
 

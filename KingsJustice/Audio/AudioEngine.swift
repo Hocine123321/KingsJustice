@@ -18,6 +18,8 @@ final class AudioEngine {
 
     private let dronePlayer = AVAudioPlayerNode()
     private let ambiencePlayer = AVAudioPlayerNode()
+    /// Posted when the audio output device disappears (e.g. headphones unplugged).
+    static let outputLostNotification = Notification.Name("KingsJusticeAudioOutputLost")
     private var ambienceKind: String = ""
 
     // Drum players
@@ -438,6 +440,12 @@ final class AudioEngine {
             name: AVAudioSession.interruptionNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleRouteChange),
+            name: AVAudioSession.routeChangeNotification,
+            object: nil
+        )
         #if canImport(UIKit)
         NotificationCenter.default.addObserver(
             self,
@@ -452,6 +460,23 @@ final class AudioEngine {
             object: nil
         )
         #endif
+        #endif
+    }
+
+    /// Headphones unplugged or a Bluetooth speaker dropped: tell the game so a fight can pause
+    /// instead of blasting out of the phone speaker mid-parry.
+    @objc private func handleRouteChange(notification: Notification) {
+        #if canImport(AVFoundation)
+        guard let userInfo = notification.userInfo,
+              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+            return
+        }
+        if reason == .oldDeviceUnavailable {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: AudioEngine.outputLostNotification, object: nil)
+            }
+        }
         #endif
     }
 
