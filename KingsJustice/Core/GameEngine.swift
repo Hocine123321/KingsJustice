@@ -36,7 +36,6 @@ final class GameEngine: ObservableObject {
     var phaseBannerUntil: Double = 0.0
     @Published var boonOffer: [Boon] = []
     @Published var won: Bool = false
-    @Published var phaseBanner: String? = nil
     @Published var tutorialTip: String? = nil
     @Published var gold: Int = 0
     @Published var potion: Int = 0

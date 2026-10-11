@@ -415,7 +415,10 @@ extension GameEngine {
         if n > 0 { tookDamage = true }
         let D = difficultyParams(settings.difficulty)
         let toughMul = tough ? 0.8 : 1.0
-        hp -= n * D.take * styleDef.takeMul * earlyEase() * toughMul * BoonCatalog.damageTakenMul(boons) * (dailyMod.id == "brittle" ? 1.3 : 1.0)
+        let boonTakeMul: Double = BoonCatalog.damageTakenMul(boons)
+        let brittleMul: Double = (dailyMod.id == "brittle") ? 1.3 : 1.0
+        let extraTakeMul: Double = boonTakeMul * brittleMul
+        hp -= n * D.take * styleDef.takeMul * earlyEase() * toughMul * extraTakeMul
 
         if hp <= 0 {
             if !windUsed {

@@ -156,13 +156,19 @@ extension GameEngine {
             let base = GameData.roster[Int(floor(r.next() * Double(GameData.roster.count)))]
             let arenaKeys = Array(GameData.arenas.keys)
             let arenaKey = arenaKeys.isEmpty ? base.arena : arenaKeys[Int(floor(r.next() * Double(arenaKeys.count)))]
+            // Roll order matters: the seeded sequence must stay the same for everyone.
+            let dailyId: String = DailyModifiers.forDate(todayDateString()).id
+            let hpMul: Double = (dailyId == "marathon") ? 1.4 : 1.0
+            let bpmAdd: Double = (dailyId == "tempo") ? 10.0 : 0.0
+            let hpRoll: Double = 0.9 + r.next() * 0.4
+            let bpmRoll: Double = floor(r.next() * 10.0)
             return EnemyDef(
                 id: base.id,
                 name: base.name,
                 title: base.title,
-                hp: floor(base.hp * (0.9 + r.next() * 0.4) * ((DailyModifiers.forDate(todayDateString()).id == "marathon") ? 1.4 : 1.0)),
+                hp: floor(base.hp * hpRoll * hpMul),
                 arena: arenaKey,
-                bpm: base.bpm + floor(r.next() * 10.0) + ((DailyModifiers.forDate(todayDateString()).id == "tempo") ? 10.0 : 0.0),
+                bpm: base.bpm + bpmRoll + bpmAdd,
                 look: base.look,
                 intro: base.intro,
                 ai: base.ai,
