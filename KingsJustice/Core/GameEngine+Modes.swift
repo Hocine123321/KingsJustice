@@ -132,13 +132,16 @@ extension GameEngine {
 
     func enemyFor(mode: String, idx: Int) -> EnemyDef {
         if mode == "survival" {
-            let base = GameData.roster[min(GameData.roster.count - 2, wave % 6)]
+            // Every fifth wave the King himself takes the field.
+            let boss = (wave + 1) % 5 == 0
+            let base = boss ? GameData.roster[GameData.roster.count - 1] : GameData.roster[min(GameData.roster.count - 2, wave % 6)]
             let k = 1.0 + Double(wave / 6) * 0.25
+            let hpScale: Double = boss ? 0.7 : 0.55
             return EnemyDef(
                 id: base.id,
                 name: base.name,
                 title: base.title,
-                hp: floor(base.hp * 0.55 * k),
+                hp: floor(base.hp * hpScale * k),
                 arena: base.arena,
                 bpm: min(124.0, base.bpm + Double(wave) * 1.2),
                 look: base.look,
@@ -273,7 +276,9 @@ extension GameEngine {
         if win && mode == "survival" {
             wave += 1
             hp = min(maxhp, hp + 22.0)
-            boonOffer = BoonCatalog.offer(taken: boons, seed: UInt32(truncatingIfNeeded: wave &* 7919 &+ boons.count &* 31 &+ score))
+            let bossBeaten = (wave % 5 == 0)
+            if bossBeaten { hp = min(maxhp, hp + 25.0) }
+            boonOffer = BoonCatalog.offer(taken: boons, seed: UInt32(truncatingIfNeeded: wave &* 7919 &+ boons.count &* 31 &+ score), count: bossBeaten ? 4 : 3)
             if wave > save.bestSurvival {
                 save.bestSurvival = wave
             }

@@ -44,6 +44,7 @@ protocol UIEngine: ObservableObject {
     var fightResult: FightResult { get }
     var phaseBanner: String { get }
     var boons: [String] { get }
+    var isBossWave: Bool { get }
     
     var settings: GameSettings { get set }
     var save: SaveData { get set }
@@ -90,6 +91,7 @@ final class MockGameEngine: UIEngine, ObservableObject {
     @Published var fightResult: FightResult = FightResult()
     @Published var phaseBanner: String = ""
     @Published var boons: [String] = []
+    var isBossWave: Bool = false
     
     var settings: GameSettings = GameSettings()
     var save: SaveData = SaveData()

@@ -48,6 +48,12 @@ struct FightIntroView<Engine: UIEngine>: View {
 
             if !engine.started {
                 VStack(spacing: 8) {
+                    if engine.isBossWave {
+                        Text("BOSS WAVE")
+                            .font(.system(size: 11, weight: .heavy))
+                            .tracking(5.0)
+                            .foregroundColor(UITheme.bloodRed)
+                    }
                     Rectangle()
                         .fill(UITheme.textGold.opacity(0.8))
                         .frame(width: cardIn ? 220.0 : 0.0, height: 1)

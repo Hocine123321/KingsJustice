@@ -53,4 +53,20 @@ final class BoonTests: XCTestCase {
         XCTAssertTrue(e.boons.isEmpty)
         UIAudio.stopMusic(fade: false)
     }
+
+    @MainActor
+    func testEveryFifthSurvivalWaveIsTheKing() {
+        let e = GameEngine()
+        let king = GameData.roster[GameData.roster.count - 1]
+        e.wave = 4
+        XCTAssertTrue(e.isBossWave)
+        XCTAssertEqual(e.enemyFor(mode: "survival", idx: 0).id, king.id)
+        e.wave = 3
+        XCTAssertFalse(e.isBossWave)
+        XCTAssertNotEqual(e.enemyFor(mode: "survival", idx: 0).id, king.id)
+    }
+
+    func testBossOfferHasFourChoices() {
+        XCTAssertEqual(BoonCatalog.offer(taken: [], seed: 9, count: 4).count, 4)
+    }
 }

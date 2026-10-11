@@ -15,7 +15,7 @@ struct BoonPickView: View {
             GeometryReader { geo in
                 let wide = geo.size.width > geo.size.height
                 VStack(spacing: wide ? 12 : 18) {
-                    HeaderKickView(kick: "Wave \(wave) survived", title: "Choose a Boon")
+                    HeaderKickView(kick: (wave % 5 == 0) ? "Boss wave conquered" : "Wave \(wave) survived", title: "Choose a Boon")
 
                     if wide {
                         HStack(spacing: 12) { cards }

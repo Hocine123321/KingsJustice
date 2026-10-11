@@ -69,8 +69,8 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] Haptic patterns matched to hit type (menu taps and enemy hits were silently doing nothing before; added tap, parry, impact, perfect, kill patterns)
 
 ### 7. Gameplay depth
-- [ ] Clearer, more varied enemy tells; per-champion signature mechanic
-- [x] Survival: pick one of three boons after each wave (Keen Edge, Iron Ward, Vigor, Mending Draught, Glass Cannon risk/reward, Spoils of War). None touch enemy AI. Still open: boss waves, a leaderboard-style best-run list, showing active boons on the HUD
+- [x] Clearer tells: a coloured marker with the move name now appears above the champion as an attack closes in (matches the button colour). Per-champion signature mechanics still open
+- [x] Survival: pick one of three boons after each wave (Keen Edge, Iron Ward, Vigor, Mending Draught, Glass Cannon risk/reward, Spoils of War). None touch enemy AI. Boss waves (the King every 5th wave, 4-boon reward) and boon chips on the HUD are in. Still open: a leaderboard-style best-run list
 - [x] BUG FIXED: Survival and Boss Rush reset your health to full and your score to zero after every win (the "one health bar" rule was not enforced); they now carry health and score between fights
 - [x] Daily Challenge: modifier of the day (Steady Hands, Brittle, Marathon, Quickstep, One Chance, each with a score bonus) and a win streak shown on the menu
 - [x] Flawless bonus (any mode): win without taking a hit for +20% gold and a result badge. Dedicated Boss Rush scoring still open
@@ -86,7 +86,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 
 ### 9. UI/UX and accessibility
 - [ ] Consistent HUD style, safe-area handling on all iPhones, compact layout check on small screens
-- [x] Colour-blind palette toggle (Okabe-Ito). Reduced-flash already exists; reduced-motion still open
+- [x] Colour-blind palette toggle (Okabe-Ito). Reduced-flash already exists; reduce-motion toggle added (no shake or camera zoom)
 - [ ] Left-handed layout option
 - [ ] Pause menu polish, clearer settings
 

@@ -48,6 +48,8 @@ extension GameEngine: RenderSource {
     var rsEnemyPose: [Double] { return enemyPoseState.cur }
     var rsShake: Double { return settings.reduceMotion ? 0.0 : shake }
     var rsReduceMotion: Bool { return settings.reduceMotion }
+    /// Survival: every fifth wave is the King.
+    var isBossWave: Bool { return mode == "survival" && (wave + 1) % 5 == 0 }
     var rsHurt: Double { return hurtLevel }
     var rsRoundIsDefend: Bool { return roundType == .defend }
     var rsArenaKey: String { return enemyDef?.arena ?? "castle" }
