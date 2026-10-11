@@ -128,22 +128,27 @@ struct EndScreenView<Engine: UIEngine>: View {
         }
     }
 
+    /// "Keen Edge x2, Iron Ward" for the boons taken this run (empty when none).
+    private func boonRecapText() -> String {
+        var counts: [(String, Int)] = []
+        for id in engine.boons {
+            if let i = counts.firstIndex(where: { $0.0 == id }) {
+                counts[i].1 += 1
+            } else {
+                counts.append((id, 1))
+            }
+        }
+        let parts: [String] = counts.map { pair in
+            let name = BoonCatalog.boon(pair.0)?.name ?? pair.0
+            return pair.1 > 1 ? "\(name) x\(pair.1)" : name
+        }
+        return parts.joined(separator: ", ")
+    }
+
     private func boonRecap() -> some View {
         Group {
             if !engine.boons.isEmpty {
-                var counts: [(String, Int)] = []
-                for id in engine.boons {
-                    if let i = counts.firstIndex(where: { $0.0 == id }) {
-                        counts[i].1 += 1
-                    } else {
-                        counts.append((id, 1))
-                    }
-                }
-                let parts: [String] = counts.map { pair in
-                    let name = BoonCatalog.boon(pair.0)?.name ?? pair.0
-                    return pair.1 > 1 ? "\(name) x\(pair.1)" : name
-                }
-                Text("Boons: " + parts.joined(separator: ", "))
+                Text("Boons: " + boonRecapText())
                     .font(.system(size: 11, weight: .regular, design: .serif).italic())
                     .multilineTextAlignment(.center)
                     .foregroundColor(UITheme.textGold.opacity(0.85))
