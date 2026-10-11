@@ -58,6 +58,7 @@ final class BoonTests: XCTestCase {
     func testEveryFifthSurvivalWaveIsTheKing() {
         let e = GameEngine()
         let king = GameData.roster[GameData.roster.count - 1]
+        e.mode = "survival"
         e.wave = 4
         XCTAssertTrue(e.isBossWave)
         XCTAssertEqual(e.enemyFor(mode: "survival", idx: 0).id, king.id)
