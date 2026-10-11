@@ -321,6 +321,7 @@ extension GameEngine {
             res.bestLabel = "New daily best"
         }
         if !win { res.tip = FightResult.defeatTip(perfects: nP, goods: nG, misses: nM) }
+        res.shareText = FightResult.shareLine(won: win, enemy: E.name, rank: res.rankLetter, score: score, combo: maxCombo, mode: mode, wave: wave)
         fightResult = res
 
         // Unlock styles if gold thresholds met

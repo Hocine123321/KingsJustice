@@ -37,6 +37,18 @@ struct FightResult: Equatable, Sendable {
     var flawless: Bool = false
     var bestLabel: String = ""
     var tip: String = ""
+    var shareText: String = ""
+
+    /// A short, brag-worthy line for the Share button.
+    static func shareLine(won: Bool, enemy: String, rank: String, score: Int, combo: Int, mode: String, wave: Int) -> String {
+        if mode == "survival" {
+            return "I reached wave \(wave) in Survival in The King's Justice: rank \(rank), \(score) points, best combo \(combo)."
+        }
+        if won {
+            return "I defeated \(enemy) in The King's Justice: rank \(rank), \(score) points, best combo \(combo)."
+        }
+        return "\(enemy) bested me in The King's Justice. Rematch incoming."
+    }
 
     /// One tip tied to what actually went wrong, shown after a defeat.
     static func defeatTip(perfects: Int, goods: Int, misses: Int) -> String {

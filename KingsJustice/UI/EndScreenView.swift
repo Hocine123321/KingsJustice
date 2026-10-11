@@ -188,6 +188,18 @@ struct EndScreenView<Engine: UIEngine>: View {
                 PillButton(title: "Tonics", action: onShop)
                 PillButton(title: "Main Menu", action: onMainMenu)
             }
+
+            if !engine.fightResult.shareText.isEmpty {
+                ShareLink(item: engine.fightResult.shareText) {
+                    Text("SHARE RESULT")
+                        .font(.system(size: 11, weight: .semibold))
+                        .tracking(3.0)
+                        .foregroundColor(UITheme.textCream.opacity(0.85))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 9)
+                        .overlay(Capsule().stroke(UITheme.borderCream, lineWidth: 1))
+                }
+            }
         }
         .opacity(shown ? 1.0 : 0.0)
         .animation(.easeOut(duration: 0.5).delay(1.2), value: shown)
