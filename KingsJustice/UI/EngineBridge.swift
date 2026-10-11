@@ -45,6 +45,8 @@ protocol UIEngine: ObservableObject {
     var phaseBanner: String { get }
     var boons: [String] { get }
     var isBossWave: Bool { get }
+    /// Short mode/progress line for the fight HUD, e.g. "SURVIVAL · WAVE 3". Empty in Trial by Combat.
+    var modeLabel: String { get }
     
     var settings: GameSettings { get set }
     var save: SaveData { get set }
@@ -92,6 +94,7 @@ final class MockGameEngine: UIEngine, ObservableObject {
     @Published var phaseBanner: String = ""
     @Published var boons: [String] = []
     var isBossWave: Bool = false
+    var modeLabel: String = ""
     
     var settings: GameSettings = GameSettings()
     var save: SaveData = SaveData()

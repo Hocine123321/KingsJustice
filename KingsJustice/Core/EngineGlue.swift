@@ -55,6 +55,15 @@ extension GameEngine: RenderSource {
         default: return 2
         }
     }
+    var modeLabel: String {
+        switch mode {
+        case "survival": return "SURVIVAL · WAVE \(wave + 1)" + (isBossWave ? " · BOSS" : "")
+        case "rush": return "BOSS RUSH · \(enemyIdx + 1)/\(GameData.roster.count)"
+        case "daily": return "DAILY · \(dailyMod.name.uppercased())"
+        case "training": return "TRAINING YARD"
+        default: return ""
+        }
+    }
     /// Survival: every fifth wave is the King.
     var isBossWave: Bool { return mode == "survival" && (wave + 1) % 5 == 0 }
     var rsHurt: Double { return hurtLevel }

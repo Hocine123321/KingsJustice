@@ -303,3 +303,22 @@ final class QualityTests: XCTestCase {
         XCTAssertEqual(e.rsQuality, 0)
     }
 }
+
+final class ModeLabelTests: XCTestCase {
+    @MainActor
+    func testModeLabels() {
+        let e = GameEngine()
+        e.mode = "duel"
+        XCTAssertEqual(e.modeLabel, "")
+        e.mode = "survival"
+        e.wave = 2
+        XCTAssertEqual(e.modeLabel, "SURVIVAL · WAVE 3")
+        e.wave = 4
+        XCTAssertTrue(e.modeLabel.hasSuffix("BOSS"))
+        e.mode = "training"
+        XCTAssertEqual(e.modeLabel, "TRAINING YARD")
+        e.mode = "rush"
+        e.enemyIdx = 1
+        XCTAssertEqual(e.modeLabel, "BOSS RUSH · 2/\(GameData.roster.count)")
+    }
+}

@@ -24,6 +24,25 @@ struct FightIntroView<Engine: UIEngine>: View {
 
     var body: some View {
         ZStack {
+            // Where you are in the run, top-right under the health bars.
+            if !engine.modeLabel.isEmpty {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text(engine.modeLabel)
+                            .font(.system(size: 9, weight: .bold))
+                            .tracking(1.6)
+                            .foregroundColor(UITheme.textCream.opacity(0.8))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(Color.black.opacity(0.4)))
+                    }
+                    .padding(.trailing, 14)
+                    .padding(.top, 34)
+                    Spacer()
+                }
+            }
+
             // Active Survival boons, top-left under the health bars.
             if !engine.boons.isEmpty {
                 VStack {
