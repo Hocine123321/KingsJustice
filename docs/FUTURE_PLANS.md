@@ -126,6 +126,9 @@ Still open:
 
 - [x] The Graphics Quality setting did nothing before. Now High keeps everything, Medium drops weapon trails and mist, Low also drops weather and dust (for slower phones)
 
+- [x] Boss Rush was unfinished: best run was never saved, and winning the last champion tried to start a non-existent fight. Now it records your best, ends at the King with a +150 gold gauntlet bonus and a "Return to the Hall" result, and unlocks the Gauntlet achievement
+- [x] HUD shows where you are (Survival wave, Rush 2/7, Daily twist, Training Yard); result screen recaps the boons you took; Settings Reset no longer changes your fighting style
+
 ## Stretch ideas (parked until the core is polished)
 - Photo mode / replay of the final blow
 - Ghost data for Daily Challenge
