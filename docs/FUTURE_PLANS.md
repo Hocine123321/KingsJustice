@@ -92,7 +92,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 
 ### 10. Technical quality
 - [ ] Performance profile on the heaviest scene; keep every effect cheap (gradients over blur filters)
-- [ ] More unit tests around engine edge cases and fight length (~60 s)
+- [x] Fight length is now measured by simulation (CI reports it every run). Typical player (45% Perfect, 45% Good, 10% missed): 49-72 s per champion, about 57 s on average, matching the 60 s target. Perfect play: 28-45 s. The test fails if any champion drifts outside 35-90 s. More edge-case tests still welcome
 - [x] Launch screen is now the game's dark colour (it was a white flash) and the app is forced to dark appearance. Fights now auto-pause when the app leaves the foreground. Unplugging headphones now pauses the fight too
 - [ ] CI: add a lint step and a simple fight-length simulation test
 - [ ] Localization-ready strings

@@ -60,7 +60,8 @@ final class AccuracyAndGlowTests: XCTestCase {
         r.goods = 5
         XCTAssertEqual(r.accuracyPercent, 75)
         r.misses = 10
-        XCTAssertEqual(r.accuracyPercent, 50)
+        // (5 perfect x2 + 5 good) / (20 notes x2) = 37.5, rounded to 38
+        XCTAssertEqual(r.accuracyPercent, 38)
     }
 
     @MainActor

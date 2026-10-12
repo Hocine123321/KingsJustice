@@ -126,6 +126,7 @@ final class FightLengthTests: XCTestCase {
 
     func testTypicalPlayerFightLengths() {
         var failures: [String] = []
+        var averages: [(String, Double)] = []
         for (i, champion) in GameData.roster.enumerated() {
             var secs: [Double] = []
             var wins = 0
@@ -136,7 +137,12 @@ final class FightLengthTests: XCTestCase {
                 if !r.finished { failures.append("\(champion.name) never ended") }
             }
             let avg = secs.reduce(0, +) / Double(secs.count)
+            averages.append((champion.name, avg))
             print("FIGHTLEN typical champion=\(champion.name) avg=\(Int(avg.rounded()))s runs=\(secs.map { Int($0.rounded()) }) wins=\(wins)/3")
+        }
+        // Design target: a standard fight lasts about 60 seconds for a typical player.
+        for (name, avg) in averages where avg < 35 || avg > 90 {
+            failures.append("\(name) averages \(Int(avg.rounded()))s for a typical player (target about 60s)")
         }
         XCTAssertTrue(failures.isEmpty, failures.joined(separator: "; "))
     }
