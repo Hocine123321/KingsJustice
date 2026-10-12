@@ -73,11 +73,21 @@ final class FightLengthTests: XCTestCase {
         var plan: [Int: Double] = [:]      // event id -> time to press (absent = deliberately missed)
         var decided = Set<Int>()
         var pressed = Set<Int>()
+        var lastRoundKey = -2
 
         while !e.over && frames < 60 * 400 {
             e.tick(dt: dt)
             frames += 1
             guard e.started && !e.over else { continue }
+
+            // Event ids restart every round, so forget our bookkeeping whenever a new round's events appear.
+            let roundKey = e.events.first.map { Int($0.time * 1000.0) } ?? -1
+            if roundKey != lastRoundKey {
+                lastRoundKey = roundKey
+                plan.removeAll()
+                decided.removeAll()
+                pressed.removeAll()
+            }
 
             let w = e.currentWindows()
             for ev in e.events where ev.state == "live" && !decided.contains(ev.id) {
