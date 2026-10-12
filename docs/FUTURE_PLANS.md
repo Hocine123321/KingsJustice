@@ -29,7 +29,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 ## Next up (in order)
 ### 1. First impressions
 - [x] Animated title screen: blood moon, parallax ridges, flickering castle, embers, staged logo reveal
-- [ ] Polished menu cards with press animation, subtle glow, mode art (staggered entrance + skyline backdrop done; card art still open)
+- [x] Polished menu cards: spring press animation, pulsing accent glow, vector emblem per main mode (crossed blades for Trial by Combat, rising waves for Survival). Extras stay compact rows. Glow pulse is skipped under system Reduce Motion
 - [x] Smooth screen transitions (fade) instead of hard cuts
 - [ ] Short first-launch intro / story hook (the old "Watch Cinematic" button was a dead end and was removed; bring it back only with a real cinematic)
 

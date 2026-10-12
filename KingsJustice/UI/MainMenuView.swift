@@ -13,6 +13,19 @@ enum MenuModeCatalog {
         MenuModeEntry(id: "survival", name: "Survival", desc: "Endless waves. Every kill restores a little health. How long can you stand?")
     ]
 
+    /// Emblem and glow colour for the two main cards. Extras stay compact rows with no art.
+    static func art(for id: String) -> ModeArtKind? {
+        switch id {
+        case "duel": return .duel
+        case "survival": return .survival
+        default: return nil
+        }
+    }
+
+    static func accent(for id: String) -> Color {
+        id == "survival" ? UITheme.textGold : UITheme.brightRed
+    }
+
     static let extras: [MenuModeEntry] = [
         MenuModeEntry(id: "rush", name: "Boss Rush", desc: "Every champion back to back. One health bar."),
         MenuModeEntry(id: "daily", name: "Daily Challenge", desc: "One seeded fight per day. Beat your best."),
@@ -140,6 +153,8 @@ struct MainMenuView<Engine: UIEngine>: View {
                                 title: mode.name,
                                 description: mode.desc,
                                 badgeText: badgeForMode(mode.id),
+                                art: MenuModeCatalog.art(for: mode.id),
+                                accent: MenuModeCatalog.accent(for: mode.id),
                                 action: { onSelectMode(mode.id) }
                             )
                         }
