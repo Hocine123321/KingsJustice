@@ -201,6 +201,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         Atmosphere.drawFocus(in: context, size: size, time: renderTime)
                     }
                     Atmosphere.drawKillCam(in: context, size: size, amount: killCam)
+                    Atmosphere.drawPerfectEdge(in: context, size: size, amount: source.rsPerfectGlow)
                 }
             }
         }

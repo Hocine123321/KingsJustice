@@ -135,7 +135,10 @@ extension GameEngine {
 
             if events[index].input == "parry" {
                 onSpawnFX?(.spark(x: 650, y: 430, count: perfect ? 36 : 22))
-                if perfect { onSpawnFX?(.shockwave(x: 650, y: 430, color: "#e8f2ff")) }
+                if perfect {
+                    onSpawnFX?(.shockwave(x: 650, y: 430, color: "#e8f2ff"))
+                    perfectGlowLevel = 1.0
+                }
                 onSfx?(.clang, perfect ? 1.2 : 0.9)
                 onSfx?(.parry, perfect ? 1.0 : 0.7)
                 if perfect { onSfx?(.perfect, 0.8) }
@@ -368,7 +371,10 @@ extension GameEngine {
                 onSpawnFX?(.floatText(text: "\(shown)", x: 930.0, y: 300.0, color: perfect ? "#ffd36b" : "#f4ead8", big: perfect))
             }
         }
-        if perfect { onSpawnFX?(.shockwave(x: 720.0, y: 430.0, color: col)) }
+        if perfect {
+            onSpawnFX?(.shockwave(x: 720.0, y: 430.0, color: col))
+            perfectGlowLevel = 1.0
+        }
         if combo > 0 && combo % 8 == 0 {
             onSpawnFX?(.floatText(text: "\(combo) COMBO", x: 560.0, y: 250.0, color: "#ffe08a", big: true))
         }

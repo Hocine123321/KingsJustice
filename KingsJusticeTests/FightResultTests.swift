@@ -49,3 +49,31 @@ final class RushCompletionTests: XCTestCase {
         XCTAssertFalse(FightResult().finalVictory)
     }
 }
+
+final class AccuracyAndGlowTests: XCTestCase {
+    func testAccuracyPercent() {
+        var r = FightResult()
+        XCTAssertEqual(r.accuracyPercent, 0)
+        r.perfects = 10
+        XCTAssertEqual(r.accuracyPercent, 100)
+        r.perfects = 5
+        r.goods = 5
+        XCTAssertEqual(r.accuracyPercent, 75)
+        r.misses = 10
+        XCTAssertEqual(r.accuracyPercent, 50)
+    }
+
+    @MainActor
+    func testPerfectGlowFadesAndRespectsFlashSetting() {
+        let e = GameEngine()
+        e.on = true
+        e.started = true
+        e.over = true
+        e.perfectGlowLevel = 1.0
+        XCTAssertEqual(e.rsPerfectGlow, 1.0, accuracy: 1e-9)
+        e.tick(dt: 0.1)
+        XCTAssertLessThan(e.rsPerfectGlow, 1.0)
+        e.settings.flash = false
+        XCTAssertEqual(e.rsPerfectGlow, 0.0, accuracy: 1e-9)
+    }
+}

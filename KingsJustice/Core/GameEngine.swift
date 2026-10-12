@@ -31,6 +31,8 @@ final class GameEngine: ObservableObject {
     var dailyMod: DailyModifier = DailyModifiers.steady
     /// True once the player has lost any health this fight (flawless tracking).
     var tookDamage: Bool = false
+    /// 1.0 right after a Perfect, fading to 0. Drives the gold screen-edge flash.
+    var perfectGlowLevel: Double = 0.0
     /// Big centre-screen callout when the champion changes phase.
     @Published var phaseBanner: String = ""
     var phaseBannerUntil: Double = 0.0
@@ -167,6 +169,9 @@ final class GameEngine: ObservableObject {
             dtFrame = dt * 0.08
         }
 
+        if perfectGlowLevel > 0.0 {
+            perfectGlowLevel = max(0.0, perfectGlowLevel - dt * 3.0)
+        }
         if !phaseBanner.isEmpty && t > phaseBannerUntil {
             phaseBanner = ""
         }

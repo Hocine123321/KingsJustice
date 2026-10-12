@@ -96,6 +96,15 @@ struct EndScreenView<Engine: UIEngine>: View {
             .animation(.spring(response: 0.45, dampingFraction: 0.55).delay(0.35), value: shown)
     }
 
+    private func accuracyLine(_ r: FightResult) -> some View {
+        Text("ACCURACY \(r.accuracyPercent)%")
+            .font(.system(size: 11, weight: .bold))
+            .tracking(3.0)
+            .foregroundColor(UITheme.textCream.opacity(0.75))
+            .opacity(shown ? 1.0 : 0.0)
+            .animation(.easeOut(duration: 0.4).delay(0.9), value: shown)
+    }
+
     private func bestBadge(_ r: FightResult) -> some View {
         Group {
             if r.newBest {
@@ -243,6 +252,7 @@ struct EndScreenView<Engine: UIEngine>: View {
         VStack(spacing: 14) {
             HeaderKickView(kick: subtitleText, title: titleText)
             rankStamp(r, size: 76)
+            accuracyLine(r)
             bestBadge(r)
             flawlessBadge(r)
             boonRecap()
@@ -260,6 +270,7 @@ struct EndScreenView<Engine: UIEngine>: View {
                 Spacer(minLength: 0)
                 HeaderKickView(kick: subtitleText, title: titleText)
                 rankStamp(r, size: 64)
+                accuracyLine(r)
                 bestBadge(r)
                 flawlessBadge(r)
                 boonRecap()

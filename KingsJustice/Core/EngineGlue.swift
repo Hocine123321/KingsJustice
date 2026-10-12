@@ -76,7 +76,8 @@ extension GameEngine: RenderSource {
     }
     var rsFlash: Double { return flashOpacity }
     var rsFocusActive: Bool { return focusUntil > t }
-    var rsPerfectGlow: Double { return 0.0 }
+    /// Respects the "impact flashes" setting and reduce-motion.
+    var rsPerfectGlow: Double { return (settings.flash && !settings.reduceMotion) ? perfectGlowLevel : 0.0 }
     var rsKillCam: Double {
         guard over && won else { return 0.0 }
         let rampIn = min(1.0, endClock / 0.3)

@@ -86,4 +86,18 @@ enum Atmosphere {
         context.fill(Path(CGRect(x: 0, y: 0, width: w, height: h)),
                      with: .radialGradient(grad, center: CGPoint(x: w * 0.54, y: h * 0.52), startRadius: 0, endRadius: max(w, h) * 0.6))
     }
+
+    /// A brief gold glow around the screen edge after a Perfect (screen space, so it hugs the real edge).
+    static func drawPerfectEdge(in context: GraphicsContext, size: CGSize, amount: Double) {
+        guard amount > 0.01 else { return }
+        let w = Double(size.width)
+        let h = Double(size.height)
+        let gold = Color(red: 1.0, green: 0.82, blue: 0.35)
+        let grad = Gradient(stops: [
+            Gradient.Stop(color: gold.opacity(0.0), location: 0.62),
+            Gradient.Stop(color: gold.opacity(0.34 * amount), location: 1.0)
+        ])
+        context.fill(Path(CGRect(x: 0, y: 0, width: w, height: h)),
+                     with: .radialGradient(grad, center: CGPoint(x: w / 2.0, y: h / 2.0), startRadius: 0, endRadius: max(w, h) * 0.62))
+    }
 }

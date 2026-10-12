@@ -23,6 +23,13 @@ struct SettingsView<Engine: UIEngine>: View {
         [("high", "High"), ("med", "Medium"), ("low", "Low (fastest)")]
     }
     
+    private var versionText: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return "THE KING'S JUSTICE  v\(version) (\(build))"
+    }
+
     var body: some View {
         ZStack {
             BackgroundGradientView()
@@ -171,6 +178,12 @@ struct SettingsView<Engine: UIEngine>: View {
                         })
                     }
                     .padding(.vertical, 16)
+
+                    Text(versionText)
+                        .font(.system(size: 10, weight: .regular))
+                        .tracking(1.5)
+                        .foregroundColor(UITheme.textCream.opacity(0.4))
+                        .padding(.bottom, 12)
                 }
             }
         }

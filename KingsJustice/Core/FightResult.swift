@@ -41,6 +41,13 @@ struct FightResult: Equatable, Sendable {
     var tip: String = ""
     var shareText: String = ""
 
+    /// Timing accuracy as a whole percent: Perfect counts double, Miss counts zero.
+    var accuracyPercent: Int {
+        let total = perfects + goods + misses
+        guard total > 0 else { return 0 }
+        return Int((Double(perfects * 2 + goods) / Double(total * 2) * 100.0).rounded())
+    }
+
     /// A short, brag-worthy line for the Share button.
     static func shareLine(won: Bool, enemy: String, rank: String, score: Int, combo: Int, mode: String, wave: Int) -> String {
         if mode == "survival" {
