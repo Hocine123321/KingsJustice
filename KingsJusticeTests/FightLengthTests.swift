@@ -15,6 +15,7 @@ final class FightLengthTests: XCTestCase {
         let e = GameEngine()
         e.settings.difficulty = "normal"
         e.startRun(mode: mode, enemyIndex: enemyIndex)
+        e.on = true
         let dt = 1.0 / 60.0
         var frames = 0
         let maxFrames = 60 * 400
