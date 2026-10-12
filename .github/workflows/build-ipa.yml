@@ -100,6 +100,15 @@ jobs:
           xcodebuild test -project KingsJustice.xcodeproj -scheme KingsJustice \
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -only-testing:KingsJusticeTests 2>&1 | tee build/unit.log | tail -n 60
+      - name: Report simulated fight lengths
+        if: always()
+        shell: bash
+        run: |
+          if grep -q FIGHTLEN build/unit.log; then
+            MSG=$(grep -o 'FIGHTLEN.*' build/unit.log | awk '!seen[$0]++' | python3 -c "import sys; print(sys.stdin.read().replace('%','%25').replace('\r','%0D').replace('\n','%0A'))")
+            echo "::notice title=Simulated fight lengths::$MSG"
+          fi
+
       - name: Surface test failures as annotations
         if: failure()
         shell: bash
