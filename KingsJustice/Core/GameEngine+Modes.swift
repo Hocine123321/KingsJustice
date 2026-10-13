@@ -339,6 +339,7 @@ extension GameEngine {
         }
         if !win { res.tip = FightResult.defeatTip(perfects: nP, goods: nG, misses: nM) }
         res.shareText = FightResult.shareLine(won: win, enemy: E.name, rank: res.rankLetter, score: score, combo: maxCombo, mode: mode, wave: wave)
+        res.unlocks = FightResult.newUnlocks(gold: save.gold, hasDuelist: save.unlockedDuelist, hasBerserker: save.unlockedBerserker)
         fightResult = res
 
         // Unlock styles if gold thresholds met

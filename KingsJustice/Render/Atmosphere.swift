@@ -101,3 +101,122 @@ enum Atmosphere {
                      with: .radialGradient(grad, center: CGPoint(x: w / 2.0, y: h / 2.0), startRadius: 0, endRadius: max(w, h) * 0.62))
     }
 }
+
+// MARK: - Ambient life
+
+extension Atmosphere {
+    enum AmbientKind: Equatable {
+        case crows, bats, fireflies, embers, motes, quiet
+    }
+
+    struct AmbientSpot: Equatable {
+        var x: Double
+        var y: Double
+        var size: Double
+        var flap: Double
+        var alpha: Double
+    }
+
+    /// Which small background creature or particle belongs to each battlefield.
+    static func ambientKind(for arenaKey: String) -> AmbientKind {
+        switch arenaKey {
+        case "castle", "throne", "cliff": return .crows
+        case "cathedral": return .bats
+        case "swamp": return .fireflies
+        case "village": return .embers
+        case "pass": return .motes
+        default: return .quiet
+        }
+    }
+
+    private static func unit(_ i: Int, _ salt: Double) -> Double {
+        let v = sin(Double(i) * 12.9898 + salt * 78.233) * 43758.5453
+        return v - floor(v)
+    }
+
+    private static func wrap(_ v: Double, _ span: Double) -> Double {
+        let r = v.truncatingRemainder(dividingBy: span)
+        return r < 0.0 ? r + span : r
+    }
+
+    /// Positions for one frame, in the 1600x900 world. A pure function of time, so it needs no state
+    /// and is cheap enough for every frame.
+    static func ambientSpots(kind: AmbientKind, time: Double) -> [AmbientSpot] {
+        var out: [AmbientSpot] = []
+        switch kind {
+        case .crows:
+            for i in 0..<4 {
+                let u = unit(i, 1.0)
+                let dir: Double = (i % 2 == 0) ? 1.0 : -1.0
+                let x = wrap(time * (38.0 + u * 30.0) * dir + u * 2000.0, 2000.0) - 200.0
+                let y = 90.0 + unit(i, 2.0) * 170.0 + 14.0 * sin(time * 0.7 + Double(i))
+                let flap = 7.0 * sin(time * (4.0 + u * 3.0) + Double(i) * 1.3)
+                out.append(AmbientSpot(x: x, y: y, size: 16.0 + u * 8.0, flap: flap, alpha: 0.8))
+            }
+        case .bats:
+            for i in 0..<5 {
+                let u = unit(i, 1.0)
+                let dir: Double = (i % 2 == 0) ? -1.0 : 1.0
+                let x = wrap(time * (70.0 + u * 50.0) * dir + u * 2000.0, 2000.0) - 200.0
+                let y = 130.0 + unit(i, 2.0) * 230.0 + 38.0 * sin(time * 1.9 + Double(i) * 2.0)
+                let flap = 9.0 * sin(time * (9.0 + u * 4.0) + Double(i))
+                out.append(AmbientSpot(x: x, y: y, size: 11.0 + u * 5.0, flap: flap, alpha: 0.85))
+            }
+        case .fireflies:
+            for i in 0..<9 {
+                let u = unit(i, 1.0)
+                let x = 140.0 + u * 1320.0 + 55.0 * sin(time * 0.31 + Double(i) * 1.7)
+                let y = 470.0 + unit(i, 2.0) * 260.0 + 28.0 * sin(time * 0.47 + Double(i) * 2.3)
+                let pulse = 0.5 + 0.5 * sin(time * 1.6 + Double(i) * 2.1)
+                out.append(AmbientSpot(x: x, y: y, size: 12.0 + u * 8.0, flap: 0.0, alpha: pulse))
+            }
+        case .embers:
+            for i in 0..<14 {
+                let u = unit(i, 1.0)
+                let phase = wrap(time * (0.10 + u * 0.10) + unit(i, 3.0), 1.0)
+                let y = 840.0 - phase * 700.0
+                let x = u * 1600.0 + 24.0 * sin(time * 1.1 + Double(i))
+                out.append(AmbientSpot(x: x, y: y, size: 2.5 + u * 2.0, flap: 0.0, alpha: 0.9 * sin(phase * Double.pi)))
+            }
+        case .motes:
+            for i in 0..<18 {
+                let u = unit(i, 1.0)
+                let phase = wrap(time * (0.05 + u * 0.05) + unit(i, 3.0), 1.0)
+                let x = wrap(u * 1600.0 + time * (14.0 + u * 10.0) + 18.0 * sin(time * 0.8 + Double(i)), 1600.0)
+                out.append(AmbientSpot(x: x, y: phase * 900.0, size: 1.8 + u * 1.6, flap: 0.0, alpha: 0.55))
+            }
+        case .quiet:
+            break
+        }
+        return out
+    }
+
+    /// Crows over the castle and cliff, bats in the cathedral, fireflies in the marsh,
+    /// rising embers in the village and snow motes in the pass. Fills and strokes only.
+    static func drawAmbientLife(in context: GraphicsContext, arenaKey: String, time: Double, strength: Double) {
+        let kind = ambientKind(for: arenaKey)
+        guard kind != .quiet, strength > 0.01 else { return }
+        for s in ambientSpots(kind: kind, time: time) {
+            let a = max(0.0, min(1.0, s.alpha * strength))
+            switch kind {
+            case .crows, .bats:
+                var p = Path()
+                p.move(to: CGPoint(x: s.x - s.size, y: s.y - s.flap))
+                p.addQuadCurve(to: CGPoint(x: s.x, y: s.y), control: CGPoint(x: s.x - s.size * 0.5, y: s.y - s.size * 0.5 - s.flap * 0.5))
+                p.addQuadCurve(to: CGPoint(x: s.x + s.size, y: s.y - s.flap), control: CGPoint(x: s.x + s.size * 0.5, y: s.y - s.size * 0.5 - s.flap * 0.5))
+                let col = (kind == .bats) ? Color(red: 0.10, green: 0.06, blue: 0.14) : Color(red: 0.04, green: 0.04, blue: 0.05)
+                context.stroke(p, with: .color(col.opacity(a)), style: StrokeStyle(lineWidth: 3.0, lineCap: .round, lineJoin: .round))
+            case .fireflies:
+                softGlow(in: context, center: CGPoint(x: s.x, y: s.y), rx: s.size, ry: s.size, color: Color(red: 0.75, green: 0.95, blue: 0.40), opacity: 0.85 * a)
+            case .embers:
+                let r = CGRect(x: s.x - s.size, y: s.y - s.size, width: s.size * 2.0, height: s.size * 2.0)
+                context.fill(Path(ellipseIn: r), with: .color(Color(red: 1.0, green: 0.55, blue: 0.20).opacity(a)))
+            case .motes:
+                let r = CGRect(x: s.x - s.size, y: s.y - s.size, width: s.size * 2.0, height: s.size * 2.0)
+                context.fill(Path(ellipseIn: r), with: .color(Color(red: 0.90, green: 0.95, blue: 1.0).opacity(a)))
+            case .quiet:
+                break
+            }
+        }
+    }
+}

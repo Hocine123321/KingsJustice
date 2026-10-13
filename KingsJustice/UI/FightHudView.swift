@@ -122,6 +122,13 @@ struct FightHudView<Engine: UIEngine>: View {
                     .allowsHitTesting(false)
             }
         }
+        .overlay(alignment: .top) {
+            if engine.modeLabel.contains("TRAINING") {
+                TrainingMetronomeView(clock: engine as? BeatClockProviding)
+                    .offset(y: 32)
+                    .allowsHitTesting(false)
+            }
+        }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
         .background(

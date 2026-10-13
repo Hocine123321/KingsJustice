@@ -42,13 +42,13 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 
 ### 3. Result and reward feel
 - [x] Rewards sequence: gold/score count-up, S/A/B/C/D rank stamp, personal-best callouts (real stats; the old screen showed a fake +50 gold and the current combo as "best")
-- [ ] "New unlock" celebration moment
+- [x] "New unlock" celebration moment: a gold banner springs in on the result screen when a fight crosses the Duelist (200 gold) or Berserker (500 gold) threshold
 - [x] Better defeat screen: tip tied to the fight stats (misses vs perfects vs Focus)
 
 ### 4. Arena depth (arenas currently read flat)
 - [ ] 3+ parallax layers per arena (far / mid / near) with independent drift
 - [ ] God rays / light shafts where the art implies windows or moon (castle done; cathedral, pass, swamp still open)
-- [ ] Per-arena ambient life: crows, bats, fireflies, falling leaves, torch sparks
+- [x] Per-arena ambient life: crows (castle, cliff), bats (cathedral), fireflies (swamp), rising embers (village), snow motes (pass). Drawn only on High quality, no blur filters, positions are a pure function of time. Falling leaves and torch sparks still open
 - [ ] Arena-specific events mid-fight: lightning flash, wind gust, crowd reaction
 - [ ] Reactive environment: banners sway, puddles ripple on impact, debris on heavy hits
 - [ ] Per-arena colour grading
@@ -74,7 +74,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] BUG FIXED: Survival and Boss Rush reset your health to full and your score to zero after every win (the "one health bar" rule was not enforced); they now carry health and score between fights
 - [x] Daily Challenge: modifier of the day (Steady Hands, Brittle, Marathon, Quickstep, One Chance, each with a score bonus) and a win streak shown on the menu
 - [x] Flawless bonus (any mode): win without taking a hit for +20% gold and a result badge. Dedicated Boss Rush scoring still open
-- [ ] Training Yard: guided drills, a move list, a metronome to practise timing
+- [ ] Training Yard: move list (pause menu, touch wording) and a beat metronome dot are done; guided drills still open
 - [x] How to Play: 3 animated pages (Strike / Defend / Focus and Heal), shown once before the first fight and from the menu. Contextual tips now use touch wording (they said Space / W / S / A). Still open: a guided, interactive practice round
 - [ ] Difficulty assist options that never touch Focus-vs-AI rules
 
@@ -87,7 +87,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 ### 9. UI/UX and accessibility
 - [ ] Consistent HUD style, safe-area handling on all iPhones, compact layout check on small screens
 - [x] Colour-blind palette toggle (Okabe-Ito). Reduced-flash already exists; reduce-motion toggle added (no shake or camera zoom)
-- [ ] Left-handed layout option
+- [x] Left-handed layout option (Settings toggle swaps the parry and evade clusters)
 - [ ] Pause menu polish, clearer settings
 
 ### 10. Technical quality
@@ -110,7 +110,7 @@ Fixed in the "recording fixes" batch:
 - [x] Result screen overflowed in landscape (title and buttons cut off; owner screenshot) - now a two-column landscape layout, scrollable in portrait
 Still open:
 - [ ] Check EVERY screen in phone landscape for overflow (shop, style picker, settings, pause, end screen) with a layout test or screenshot pass
-- [ ] Re-measure fps from a new recording; if still under 60, profile fighter rig layer count and SVG per-frame fallback
+- [x] Re-measure fps: owner confirmed 60 fps on device (Oct 12, 2026). Re-check after the ambient life layer
 - [x] Weapons look oversized: all weapons scaled to 86% (grip anchored, trail tip matched). Revisit after a new recording
 - [x] Fighters are small on screen: landscape camera 5% tighter, centred lower on the fighters
 - [x] Castle arena: real block masonry (highlights, shadows, chips, damp streaks), moonlit windows and light shafts. Cathedral also reworked (complete rose window + halo, stars, coloured light pools, broken pews). Swamp also reworked (two-layer cypress forest with hanging moss, glowing eyes, mud/puddle detail, rotting log). Village also reworked (it only had mountains before; now a burning village skyline with houses, rooftop fires and a church tower). Pass also reworked (aurora, stars, pine forest, snow sparkle, banner). Cliff also reworked (execution scaffold with gallows and axe block, crows over the blood moon, sea stacks, wave crests, rubble and bones). All six arenas now have a depth pass; keep tuning after real-device feedback

@@ -131,6 +131,7 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                         // Drifting mist in front of the fighters' feet
                         if quality >= 2 {
                             Atmosphere.drawFog(in: sceneCtx, arenaKey: source.rsArenaKey, time: renderTime, strength: 1.0 - 0.5 * killCam)
+                            Atmosphere.drawAmbientLife(in: sceneCtx, arenaKey: source.rsArenaKey, time: renderTime, strength: 1.0 - 0.7 * killCam)
                         }
 
                         // 5. Foreground (fg 1.5)

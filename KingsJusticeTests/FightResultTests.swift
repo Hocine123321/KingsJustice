@@ -77,4 +77,14 @@ final class AccuracyAndGlowTests: XCTestCase {
         e.settings.flash = false
         XCTAssertEqual(e.rsPerfectGlow, 0.0, accuracy: 1e-9)
     }
+
+    func testNewUnlocksAppearOnlyWhenAThresholdIsCrossed() {
+        XCTAssertEqual(FightResult.newUnlocks(gold: 199, hasDuelist: false, hasBerserker: false), [])
+        XCTAssertEqual(FightResult.newUnlocks(gold: 200, hasDuelist: false, hasBerserker: false), ["Duelist"])
+        XCTAssertEqual(FightResult.newUnlocks(gold: 350, hasDuelist: true, hasBerserker: false), [])
+        XCTAssertEqual(FightResult.newUnlocks(gold: 500, hasDuelist: true, hasBerserker: false), ["Berserker"])
+        XCTAssertEqual(FightResult.newUnlocks(gold: 650, hasDuelist: false, hasBerserker: false), ["Duelist", "Berserker"])
+        XCTAssertEqual(FightResult.newUnlocks(gold: 900, hasDuelist: true, hasBerserker: true), [])
+        XCTAssertTrue(FightResult().unlocks.isEmpty)
+    }
 }

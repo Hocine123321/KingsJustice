@@ -3,6 +3,7 @@ import SwiftUI
 struct PauseView<Engine: UIEngine>: View {
     @ObservedObject var engine: Engine
     let onSelectSettings: () -> Void
+    @State private var showMoveList: Bool = false
     
     init(engine: Engine, onSelectSettings: @escaping () -> Void) {
         self.engine = engine
@@ -14,6 +15,12 @@ struct PauseView<Engine: UIEngine>: View {
             PillButton(title: "Resume", isPrimary: true, action: {
                 engine.resume()
             })
+
+            if engine.modeLabel.contains("TRAINING") {
+                PillButton(title: "Move List", action: {
+                    showMoveList = true
+                })
+            }
 
             PillButton(title: "Settings", action: {
                 onSelectSettings()
@@ -51,6 +58,10 @@ struct PauseView<Engine: UIEngine>: View {
                     .stroke(UITheme.borderCream, lineWidth: 1)
             )
             .padding(24)
+
+            if showMoveList {
+                TrainingGuideView(onDone: { showMoveList = false })
+            }
         }
     }
 }

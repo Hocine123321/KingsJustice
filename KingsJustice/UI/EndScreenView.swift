@@ -137,6 +137,31 @@ struct EndScreenView<Engine: UIEngine>: View {
         }
     }
 
+    private func unlockBanner(_ r: FightResult) -> some View {
+        Group {
+            if !r.unlocks.isEmpty {
+                VStack(spacing: 3) {
+                    Text("NEW STYLE UNLOCKED")
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(3.0)
+                        .foregroundColor(UITheme.textCream.opacity(0.85))
+                    Text(r.unlocks.joined(separator: " · ").uppercased())
+                        .font(.system(size: 15, weight: .bold, design: .serif))
+                        .tracking(3.0)
+                        .foregroundColor(UITheme.textGold)
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 8)
+                .background(RoundedRectangle(cornerRadius: 8).fill(UITheme.textGold.opacity(0.10)))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(UITheme.textGold, lineWidth: 1))
+                .shadow(color: UITheme.textGold.opacity(shown ? 0.45 : 0.0), radius: 12)
+                .scaleEffect(shown ? 1.0 : 0.82)
+                .opacity(shown ? 1.0 : 0.0)
+                .animation(.spring(response: 0.45, dampingFraction: 0.6).delay(1.3), value: shown)
+            }
+        }
+    }
+
     /// "Keen Edge x2, Iron Ward" for the boons taken this run (empty when none).
     private func boonRecapText() -> String {
         var counts: [(String, Int)] = []
@@ -255,6 +280,7 @@ struct EndScreenView<Engine: UIEngine>: View {
             accuracyLine(r)
             bestBadge(r)
             flawlessBadge(r)
+            unlockBanner(r)
             boonRecap()
             statsCard(r, compact: false)
             tipLine(r)
@@ -273,6 +299,7 @@ struct EndScreenView<Engine: UIEngine>: View {
                 accuracyLine(r)
                 bestBadge(r)
                 flawlessBadge(r)
+                unlockBanner(r)
                 boonRecap()
                 tipLine(r)
                 Spacer(minLength: 0)
