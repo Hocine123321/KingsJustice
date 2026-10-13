@@ -51,7 +51,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] Per-arena ambient life: crows (castle, cliff), bats (cathedral), fireflies (swamp), rising embers (village), snow motes (pass). Drawn only on High quality, no blur filters, positions are a pure function of time. Falling leaves and torch sparks still open
 - [ ] Arena-specific events mid-fight: lightning flash, wind gust, crowd reaction
 - [ ] Reactive environment: banners sway, puddles ripple on impact, debris on heavy hits
-- [ ] Per-arena colour grading
+- [x] Per-arena colour grading (subtle screen-space tint and edge darkening per arena; off on Low quality)
 
 ### 5. Character animation and design
 - [ ] Anticipation / follow-through pass on every attack and block
@@ -63,7 +63,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 
 ### 6. Audio
 - [x] Unique battle theme per arena: own chord progression, melody and drum feel for castle, village, pass, swamp, cliff, cathedral (before, all six used one pattern and differed only by key and speed)
-- [ ] Adaptive intensity: layers escalate with combo and low health, resolve after the kill
+- [x] Adaptive music intensity: rises with the champion wounds, your combo and your own danger; drops after the kill
 - [ ] Title and menu themes, victory / defeat / unlock stingers
 - [ ] Richer impact sounds: parry/perfect/hurt/block/heavy/thud sounds are now layered onto hits (they existed but were never used). Material-aware variants and ambient beds now exist (see below). Material-aware variants still open
 - [x] Haptic patterns matched to hit type (menu taps and enemy hits were silently doing nothing before; added tap, parry, impact, perfect, kill patterns)
@@ -76,7 +76,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] Flawless bonus (any mode): win without taking a hit for +20% gold and a result badge. Dedicated Boss Rush scoring still open
 - [ ] Training Yard: move list (pause menu, touch wording) and a beat metronome dot are done; guided drills still open
 - [x] How to Play: 3 animated pages (Strike / Defend / Focus and Heal), shown once before the first fight and from the menu. Contextual tips now use touch wording (they said Space / W / S / A). Still open: a guided, interactive practice round
-- [ ] Difficulty assist options that never touch Focus-vs-AI rules
+- [x] Timing Assist toggle (+25% timing windows; enemy untouched)
 
 ### 8. Progression and retention
 - [ ] Meaningful unlocks: styles, cosmetics, titles
@@ -114,7 +114,7 @@ Still open:
 - [x] Weapons look oversized: all weapons scaled to 86% (grip anchored, trail tip matched). Revisit after a new recording
 - [x] Fighters are small on screen: landscape camera 5% tighter, centred lower on the fighters
 - [x] Castle arena: real block masonry (highlights, shadows, chips, damp streaks), moonlit windows and light shafts. Cathedral also reworked (complete rose window + halo, stars, coloured light pools, broken pews). Swamp also reworked (two-layer cypress forest with hanging moss, glowing eyes, mud/puddle detail, rotting log). Village also reworked (it only had mountains before; now a burning village skyline with houses, rooftop fires and a church tower). Pass also reworked (aurora, stars, pine forest, snow sparkle, banner). Cliff also reworked (execution scaffold with gallows and axe block, crows over the blood moon, sea stacks, wave crests, rubble and bones). All six arenas now have a depth pass; keep tuning after real-device feedback
-- [ ] Touch zones: consider a first-run hint then auto-fade, and a left-handed check
+- [x] Touch zones: clearer outlines for new players (first 3 wins), then they fade. Left-handed check still open
 - [x] Top HUD: removed the confusing wallet gold from the enemy side; player bar turns red when low
 
 ## Controls (owner feedback)

@@ -219,4 +219,32 @@ extension Atmosphere {
             }
         }
     }
+
+    /// Each arena's overall colour cast and how strong it is. Subtle by design: it ties art, fog and lights together.
+    static func grade(for arenaKey: String) -> (color: Color, opacity: Double) {
+        switch arenaKey {
+        case "castle": return (Color(red: 0.95, green: 0.62, blue: 0.25), 0.07)      // warm torchlight
+        case "village": return (Color(red: 1.0, green: 0.35, blue: 0.12), 0.08)      // fire
+        case "pass": return (Color(red: 0.45, green: 0.65, blue: 1.0), 0.08)         // frost
+        case "swamp": return (Color(red: 0.25, green: 0.8, blue: 0.45), 0.09)        // sickly green
+        case "cliff": return (Color(red: 0.9, green: 0.12, blue: 0.15), 0.07)        // blood moon
+        case "cathedral": return (Color(red: 0.35, green: 0.45, blue: 0.95), 0.07)   // stained-glass blue
+        default: return (Color.clear, 0.0)
+        }
+    }
+
+    /// A full-screen colour wash plus a soft darkening toward the edges, in screen space.
+    static func drawGrade(in context: GraphicsContext, size: CGSize, arenaKey: String) {
+        let g = grade(for: arenaKey)
+        guard g.opacity > 0.0 else { return }
+        let w = Double(size.width)
+        let h = Double(size.height)
+        context.fill(Path(CGRect(x: 0, y: 0, width: w, height: h)), with: .color(g.color.opacity(g.opacity)))
+        let vignette = Gradient(stops: [
+            Gradient.Stop(color: Color.black.opacity(0.0), location: 0.55),
+            Gradient.Stop(color: Color.black.opacity(0.28), location: 1.0)
+        ])
+        context.fill(Path(CGRect(x: 0, y: 0, width: w, height: h)),
+                     with: .radialGradient(vignette, center: CGPoint(x: w / 2.0, y: h / 2.0), startRadius: 0, endRadius: max(w, h) * 0.7))
+    }
 }

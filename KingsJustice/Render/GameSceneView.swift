@@ -198,6 +198,9 @@ struct GameSceneView<S: RenderSource & ObservableObject>: View {
                     }
 
                     // Screen-space polish (reaches the true screen edges on any aspect ratio)
+                    if source.rsQuality >= 1 {
+                        Atmosphere.drawGrade(in: context, size: size, arenaKey: source.rsArenaKey)
+                    }
                     if source.rsFocusActive {
                         Atmosphere.drawFocus(in: context, size: size, time: renderTime)
                     }
