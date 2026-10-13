@@ -49,7 +49,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [ ] 3+ parallax layers per arena (far / mid / near) with independent drift
 - [ ] God rays / light shafts where the art implies windows or moon (castle done; cathedral, pass, swamp still open)
 - [x] Per-arena ambient life: crows (castle, cliff), bats (cathedral), fireflies (swamp), rising embers (village), snow motes (pass). Drawn only on High quality, no blur filters, positions are a pure function of time. Falling leaves and torch sparks still open
-- [ ] Arena-specific events mid-fight: lightning flash, wind gust, crowd reaction
+- [x] Arena events every 14-26 s, cosmetic only: swamp lightning, cliff red lightning, cathedral bell, village roof collapse, pass gust, castle torch flare (crowd reaction still open)
 - [ ] Reactive environment: banners sway, puddles ripple on impact, debris on heavy hits
 - [x] Per-arena colour grading (subtle screen-space tint and edge darkening per arena; off on Low quality)
 
