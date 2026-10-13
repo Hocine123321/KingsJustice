@@ -33,6 +33,8 @@ final class GameEngine: ObservableObject {
     var tookDamage: Bool = false
     /// 1.0 right after a Perfect, fading to 0. Drives the gold screen-edge flash.
     var perfectGlowLevel: Double = 0.0
+    /// Counts down to the next arena event (lightning, bell toll...). Cosmetic only.
+    var arenaEventTimer: Double = 14.0
     /// Big centre-screen callout when the champion changes phase.
     @Published var phaseBanner: String = ""
     var phaseBannerUntil: Double = 0.0
@@ -172,6 +174,9 @@ final class GameEngine: ObservableObject {
         if perfectGlowLevel > 0.0 {
             perfectGlowLevel = max(0.0, perfectGlowLevel - dt * 3.0)
         }
+        if started && !over {
+            tickArenaEvents(dt: dt)
+        }
         if !phaseBanner.isEmpty && t > phaseBannerUntil {
             phaseBanner = ""
         }
@@ -277,7 +282,7 @@ final class GameEngine: ObservableObject {
         }
         if musicIntensityTick > 0.5 {
             musicIntensityTick = 0.0
-            UIAudio.setMusicIntensity(min(1.0, 0.35 + frac * 0.65))
+            UIAudio.setMusicIntensity(adaptiveIntensity(woundFraction: frac))
         }
         musicIntensityTick += dt
 

@@ -266,13 +266,13 @@ struct FightHudView<Engine: UIEngine>: View {
     // Attack Pads Layout (3 Lanes), compact and low
     private func attackControls(h: CGFloat) -> some View {
         HStack(spacing: 8) {
-            TouchPadButton(title: "Slash", colorHex: "#d9b45a", minHeight: h) {
+            TouchPadButton(title: "Slash", colorHex: "#d9b45a", minHeight: h, hint: engine.save.kills < 3) {
                 engine.input(kind: "lane", lane: 0)
             }
-            TouchPadButton(title: "Thrust", colorHex: "#c8d4e0", minHeight: h) {
+            TouchPadButton(title: "Thrust", colorHex: "#c8d4e0", minHeight: h, hint: engine.save.kills < 3) {
                 engine.input(kind: "lane", lane: 1)
             }
-            TouchPadButton(title: "Overhead", colorHex: "#c23a2a", minHeight: h) {
+            TouchPadButton(title: "Overhead", colorHex: "#c23a2a", minHeight: h, hint: engine.save.kills < 3) {
                 engine.input(kind: "lane", lane: 2)
             }
         }
@@ -280,14 +280,14 @@ struct FightHudView<Engine: UIEngine>: View {
 
     private func evadeCluster(h: CGFloat) -> some View {
         VStack(spacing: 6) {
-            TouchPadButton(title: "Jump", colorHex: InputPalette.jump, minHeight: h) {
+            TouchPadButton(title: "Jump", colorHex: InputPalette.jump, minHeight: h, hint: engine.save.kills < 3) {
                 engine.input(kind: "jump", lane: 0)
             }
             HStack(spacing: 6) {
-                TouchPadButton(title: "Dodge", colorHex: InputPalette.dodge, minHeight: h) {
+                TouchPadButton(title: "Dodge", colorHex: InputPalette.dodge, minHeight: h, hint: engine.save.kills < 3) {
                     engine.input(kind: "dodge", lane: 0)
                 }
-                TouchPadButton(title: "Duck", colorHex: InputPalette.duck, minHeight: h) {
+                TouchPadButton(title: "Duck", colorHex: InputPalette.duck, minHeight: h, hint: engine.save.kills < 3) {
                     engine.input(kind: "duck", lane: 0)
                 }
             }
@@ -296,7 +296,7 @@ struct FightHudView<Engine: UIEngine>: View {
     }
 
     private func parryCluster(h: CGFloat) -> some View {
-        TouchPadButton(title: "Parry", colorHex: InputPalette.parry, minHeight: h) {
+        TouchPadButton(title: "Parry", colorHex: InputPalette.parry, minHeight: h, hint: engine.save.kills < 3) {
             engine.input(kind: "parry", lane: 0)
         }
         .frame(maxWidth: isLandscape ? 220 : .infinity)

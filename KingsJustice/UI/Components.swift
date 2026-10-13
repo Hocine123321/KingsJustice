@@ -242,13 +242,16 @@ struct TouchPadButton: View {
     let colorHex: String
     let action: () -> Void
     var minHeight: CGFloat = 85.0
+    /// New players get clearer outlines; they fade back once the player has a few wins.
+    var hint: Bool = false
     
     @State private var isPressed: Bool = false
     
-    init(title: String, colorHex: String, minHeight: CGFloat = 85.0, action: @escaping () -> Void) {
+    init(title: String, colorHex: String, minHeight: CGFloat = 85.0, hint: Bool = false, action: @escaping () -> Void) {
         self.title = title
         self.colorHex = colorHex
         self.minHeight = minHeight
+        self.hint = hint
         self.action = action
     }
     
@@ -258,7 +261,7 @@ struct TouchPadButton: View {
                 .fill(isPressed ? Color(hex: colorHex).opacity(0.6) : Color(hex: "#0e0a08").opacity(0.06))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color(hex: colorHex).opacity(isPressed ? 0.9 : 0.30), lineWidth: 1.5)
+                        .stroke(Color(hex: colorHex).opacity(isPressed ? 0.9 : (hint ? 0.7 : 0.30)), lineWidth: 1.5)
                 )
                 .scaleEffect(isPressed ? 0.95 : 1.0)
                 .animation(.easeOut(duration: 0.06), value: isPressed)
@@ -266,7 +269,7 @@ struct TouchPadButton: View {
             Text(title.uppercased())
                 .font(.system(size: 11, weight: .bold))
                 .tracking(1.5)
-                .foregroundColor(Color(hex: colorHex).opacity(isPressed ? 1.0 : 0.5))
+                .foregroundColor(Color(hex: colorHex).opacity(isPressed ? 1.0 : (hint ? 0.95 : 0.5)))
         }
         .frame(minHeight: minHeight)
         .contentShape(Rectangle())

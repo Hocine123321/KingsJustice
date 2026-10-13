@@ -152,6 +152,11 @@ struct SettingsView<Engine: UIEngine>: View {
                             set: { engine.settings.leftHand = $0; engine.saveAll() }
                         ))
 
+                        toggleRow(label: "TIMING ASSIST (WIDER WINDOWS)", isOn: Binding(
+                            get: { engine.settings.assist },
+                            set: { engine.settings.assist = $0; engine.saveAll() }
+                        ))
+
                         toggleRow(label: "REDUCE MOTION", isOn: Binding(
                             get: { engine.settings.reduceMotion },
                             set: { engine.settings.reduceMotion = $0; engine.saveAll() }

@@ -153,6 +153,7 @@ struct GameSettings: Codable, Equatable {
     var leftHand: Bool = false
     var colorSafe: Bool = false   // colour-blind friendly circle and button colours
     var reduceMotion: Bool = false   // no screen shake or camera zoom
+    var assist: Bool = false   // wider timing windows (accessibility)
 
     init() {}
 
@@ -174,6 +175,7 @@ struct GameSettings: Codable, Equatable {
         self.leftHand = try c.decodeIfPresent(Bool.self, forKey: .leftHand) ?? false
         self.colorSafe = try c.decodeIfPresent(Bool.self, forKey: .colorSafe) ?? false
         self.reduceMotion = try c.decodeIfPresent(Bool.self, forKey: .reduceMotion) ?? false
+        self.assist = try c.decodeIfPresent(Bool.self, forKey: .assist) ?? false
     }
 }
 

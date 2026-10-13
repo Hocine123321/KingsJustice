@@ -42,6 +42,7 @@ extension GameEngine {
         self.resultReady = false
         self.fightResult = FightResult()
         self.tookDamage = false
+        self.arenaEventTimer = 12.0 + Double.random(in: 0.0...8.0)
         self.phaseBanner = ""
         self.endClock = 0.0
         self.paused = false
@@ -227,6 +228,7 @@ extension GameEngine {
             onSfx?(.slash, 1.3)
             onSfx?(.heavy, 1.2)
             onHaptic?("kill")
+            UIAudio.setMusicIntensity(0.15)   // let the music exhale after the kill
             shake2(2.2)
             flashScreen(color: "#fff", opacity: 0.25)
             onSfx?(.bell, 1.0)

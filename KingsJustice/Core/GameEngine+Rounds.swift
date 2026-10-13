@@ -7,7 +7,10 @@ extension GameEngine {
         let w = styleDef.windows
         let D = difficultyParams(settings.difficulty)
         let k = 0.8
-        let f = (focusUntil > t) ? 1.5 : 1.0
+        let focusMul = (focusUntil > t) ? 1.5 : 1.0
+        // Timing assist is an accessibility option: it only widens the player's windows. Enemy AI is untouched.
+        let assistMul = settings.assist ? 1.25 : 1.0
+        let f = focusMul * assistMul
         return TimingWindowsCalc(
             perfect: w.perfect * k * D.win * f,
             good: w.good * k * D.win * f,
