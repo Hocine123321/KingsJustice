@@ -121,6 +121,22 @@ final class UITests: XCTestCase {
         for m in TrainingGuide.moves { XCTAssertTrue(keys.contains(m.how), m.id) }
     }
 
+    func testIntroStoryIsShortAndEndsAfterTheLastLine() {
+        XCTAssertEqual(IntroStory.lines.count, 3)
+        for line in IntroStory.lines { XCTAssertLessThanOrEqual(line.count, 95, line) }
+        XCTAssertEqual(IntroStory.next(after: 0), 1)
+        XCTAssertEqual(IntroStory.next(after: 1), 2)
+        XCTAssertNil(IntroStory.next(after: 2))
+    }
+
+    func testIntroShowsOnlyUntilSeen() {
+        var s = SaveData()
+        XCTAssertTrue(IntroStory.shouldShow(save: s))
+        s.seen["intro"] = true
+        XCTAssertFalse(IntroStory.shouldShow(save: s))
+        _ = IntroView(onDone: {})
+    }
+
     func testMetronomePulsePeaksOnTheBeat() {
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.0), 1.0, accuracy: 1e-9)
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.5), 0.0, accuracy: 1e-9)

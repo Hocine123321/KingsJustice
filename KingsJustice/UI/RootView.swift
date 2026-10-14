@@ -4,6 +4,7 @@ import UIKit
 
 enum AppScreen: Equatable {
     case title
+    case intro
     case menu
     case campaign
     case style
@@ -104,6 +105,12 @@ struct RootView: View {
                 UIAudio.onFirstUserTap()
                 UIAudio.setVolumes(music: engine.settings.music, sfx: engine.settings.sfx)
                 UIAudio.playSfx(.uiConfirm)
+                screen = IntroStory.shouldShow(save: engine.save) ? .intro : .menu
+            })
+        case .intro:
+            IntroView(onDone: {
+                engine.save.seen["intro"] = true
+                engine.saveAll()
                 screen = .menu
             })
         case .menu:

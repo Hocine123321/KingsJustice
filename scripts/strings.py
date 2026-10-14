@@ -19,6 +19,9 @@ PATTERNS = [
 ]
 
 
+ARRAY_ITEM = re.compile(r'^\s{8}"([^"\\]{2,})",?\s*$', re.M)
+
+
 def found_in_sources():
     keys = set()
     for path in SOURCES:
@@ -26,6 +29,8 @@ def found_in_sources():
         for pat in PATTERNS:
             for m in pat.finditer(text):
                 keys.add(m.group(m.lastindex))
+        for m in ARRAY_ITEM.finditer(text):
+            keys.add(m.group(1))
     return keys
 
 
