@@ -48,6 +48,40 @@ final class UITests: XCTestCase {
         XCTAssertTrue(TrainingGuide.moves.first(where: { $0.id == "focus" })!.how.contains("do not get easier"))
     }
 
+    func testEveryDrillMatchesItsMoveInput() {
+        XCTAssertEqual(TrainingGuide.drills.count, 5)
+        for d in TrainingGuide.drills {
+            XCTAssertEqual(GameData.moves[d.move]?.input, d.id, d.id)
+        }
+        XCTAssertNil(TrainingGuide.drillMove(for: nil))
+        XCTAssertNil(TrainingGuide.drillMove(for: "nonsense"))
+        XCTAssertEqual(TrainingGuide.drillMove(for: "jump"), "high")
+    }
+
+    func testDrillRoundsOnlyAskForTheChosenInput() {
+        for d in TrainingGuide.drills {
+            let e = GameEngine()
+            e.startRun(mode: "training", enemyIndex: 0)
+            e.drill = d.id
+            e.round = 0
+            e.buildRound()
+            XCTAssertFalse(e.events.isEmpty, d.id)
+            XCTAssertTrue(e.events.allSatisfy { $0.input == d.id }, d.id)
+            XCTAssertTrue(e.modeLabel.contains("\(d.id.uppercased()) DRILL"), d.id)
+        }
+    }
+
+    func testDrillIsIgnoredOutsideTrainingAndClearedOnNewRun() {
+        let e = GameEngine()
+        e.startRun(mode: "duel", enemyIndex: 0)
+        e.drill = "jump"
+        e.round = 0
+        e.buildRound()
+        XCTAssertTrue(e.events.contains { $0.input != "jump" })
+        e.startRun(mode: "training", enemyIndex: 0)
+        XCTAssertNil(e.drill)
+    }
+
     func testMetronomePulsePeaksOnTheBeat() {
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.0), 1.0, accuracy: 1e-9)
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.5), 0.0, accuracy: 1e-9)

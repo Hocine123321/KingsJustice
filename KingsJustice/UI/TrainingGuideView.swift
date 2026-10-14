@@ -14,6 +14,13 @@ extension GameEngine: BeatClockProviding {
     }
 }
 
+/// Lets the pause screen pick a Training Yard drill.
+protocol TrainingDrillControlling: AnyObject {
+    var drill: String? { get set }
+}
+
+extension GameEngine: TrainingDrillControlling {}
+
 /// The Training Yard move list: what each button is for and which ring colour it answers.
 enum TrainingGuide {
     struct Move: Equatable {
@@ -34,6 +41,28 @@ enum TrainingGuide {
         Move(id: "focus", name: "Focus", paletteKey: nil, how: "Fill the meter with good timing, then tap Focus. You hit harder and your timing windows widen. Enemies do not get easier."),
         Move(id: "heal", name: "Heal", paletteKey: nil, how: "Tap Heal to drink a tonic and restore health.")
     ]
+
+    struct Drill: Equatable {
+        /// The input the drill repeats; matches the move's input in GameData.
+        let id: String
+        let name: String
+        /// The enemy move that asks for that input.
+        let move: String
+    }
+
+    /// Single-input practice: every defend note becomes this input until the drill is turned off.
+    static let drills: [Drill] = [
+        Drill(id: "parry", name: "Parry", move: "slash"),
+        Drill(id: "duck", name: "Duck", move: "low"),
+        Drill(id: "jump", name: "Jump", move: "high"),
+        Drill(id: "dodge", name: "Dodge", move: "unblockable"),
+        Drill(id: "grab", name: "Grab", move: "grab")
+    ]
+
+    static func drillMove(for id: String?) -> String? {
+        guard let id = id else { return nil }
+        return drills.first(where: { $0.id == id })?.move
+    }
 
     /// 1.0 on the beat, fading to 0 well before the next one.
     static func metronomePulse(phase: Double) -> Double {
@@ -60,7 +89,15 @@ struct TrainingMetronomeView: View {
 }
 
 struct TrainingGuideView: View {
+    var drills: TrainingDrillControlling?
     let onDone: () -> Void
+    @State private var selected: String?
+
+    init(drills: TrainingDrillControlling? = nil, onDone: @escaping () -> Void) {
+        self.drills = drills
+        self.onDone = onDone
+        _selected = State(initialValue: drills?.drill)
+    }
 
     var body: some View {
         ZStack {
@@ -71,6 +108,9 @@ struct TrainingGuideView: View {
                     .tracking(4.0)
                     .foregroundColor(UITheme.textGold)
                     .padding(.top, 14)
+                if drills != nil {
+                    drillBar
+                }
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 8) {
                         ForEach(TrainingGuide.moves, id: \.id) { move in
@@ -83,6 +123,42 @@ struct TrainingGuideView: View {
                     .padding(.bottom, 14)
             }
         }
+    }
+
+    private var drillBar: some View {
+        VStack(spacing: 6) {
+            Text("DRILL · ONLY THIS INPUT")
+                .font(.system(size: 9, weight: .bold))
+                .tracking(3.0)
+                .foregroundColor(UITheme.textCream.opacity(0.7))
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    chip(id: nil, name: "Free")
+                    ForEach(TrainingGuide.drills, id: \.id) { d in
+                        chip(id: d.id, name: d.name)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+        }
+    }
+
+    private func chip(id: String?, name: String) -> some View {
+        let on = (selected == id)
+        return Button(action: {
+            selected = id
+            drills?.drill = id
+        }) {
+            Text(name.uppercased())
+                .font(.system(size: 11, weight: .bold))
+                .tracking(2.0)
+                .foregroundColor(on ? UITheme.bgNearBlack : UITheme.textCream)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(on ? UITheme.textGold : UITheme.bgCard))
+                .overlay(Capsule().stroke(UITheme.borderCream.opacity(0.4), lineWidth: 1))
+        }
+        .buttonStyle(DriftButtonStyle())
     }
 
     private func row(_ move: TrainingGuide.Move) -> some View {

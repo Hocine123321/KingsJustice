@@ -60,7 +60,7 @@ struct PauseView<Engine: UIEngine>: View {
             .padding(24)
 
             if showMoveList {
-                TrainingGuideView(onDone: { showMoveList = false })
+                TrainingGuideView(drills: engine as? TrainingDrillControlling, onDone: { showMoveList = false })
             }
         }
     }

@@ -106,7 +106,7 @@ enum Atmosphere {
 
 extension Atmosphere {
     enum AmbientKind: Equatable {
-        case crows, bats, fireflies, embers, motes, quiet
+        case crows, bats, fireflies, embers, motes, leaves, sparks, quiet
     }
 
     struct AmbientSpot: Equatable {
@@ -129,6 +129,16 @@ extension Atmosphere {
         }
     }
 
+    /// A second, lighter layer on some arenas: falling leaves in the village, torch sparks at the
+    /// castle and cliff.
+    static func ambientAccent(for arenaKey: String) -> AmbientKind {
+        switch arenaKey {
+        case "village": return .leaves
+        case "castle", "cliff": return .sparks
+        default: return .quiet
+        }
+    }
+
     private static func unit(_ i: Int, _ salt: Double) -> Double {
         let v = sin(Double(i) * 12.9898 + salt * 78.233) * 43758.5453
         return v - floor(v)
@@ -141,7 +151,7 @@ extension Atmosphere {
 
     /// Positions for one frame, in the 1600x900 world. A pure function of time, so it needs no state
     /// and is cheap enough for every frame.
-    static func ambientSpots(kind: AmbientKind, time: Double) -> [AmbientSpot] {
+    static func ambientSpots(kind: AmbientKind, time: Double, emitters: [CGPoint] = []) -> [AmbientSpot] {
         var out: [AmbientSpot] = []
         switch kind {
         case .crows:
@@ -185,18 +195,49 @@ extension Atmosphere {
                 let x = wrap(u * 1600.0 + time * (14.0 + u * 10.0) + 18.0 * sin(time * 0.8 + Double(i)), 1600.0)
                 out.append(AmbientSpot(x: x, y: phase * 900.0, size: 1.8 + u * 1.6, flap: 0.0, alpha: 0.55))
             }
+        case .leaves:
+            for i in 0..<7 {
+                let u = unit(i, 1.0)
+                let phase = wrap(time * (0.06 + u * 0.05) + unit(i, 3.0), 1.0)
+                let x = wrap(u * 1600.0 + time * (20.0 + u * 12.0) + 60.0 * sin(time * 0.9 + Double(i) * 1.4), 1600.0)
+                out.append(AmbientSpot(x: x, y: phase * 860.0, size: 5.0 + u * 3.0, flap: 0.9 * sin(time * 2.2 + Double(i)), alpha: 0.8))
+            }
+        case .sparks:
+            for (n, e) in emitters.enumerated() {
+                for j in 0..<5 {
+                    let i = n * 5 + j
+                    let u = unit(i, 1.0)
+                    let phase = wrap(time * (0.35 + u * 0.30) + unit(i, 3.0), 1.0)
+                    let x = Double(e.x) + (u - 0.5) * 50.0 + 26.0 * sin(time * 3.0 + Double(i)) * phase
+                    let y = Double(e.y) - phase * 240.0
+                    out.append(AmbientSpot(x: x, y: y, size: 1.6 + u * 1.2, flap: 0.0, alpha: 0.95 * (1.0 - phase)))
+                }
+            }
         case .quiet:
             break
         }
         return out
     }
 
-    /// Crows over the castle and cliff, bats in the cathedral, fireflies in the marsh,
-    /// rising embers in the village and snow motes in the pass. Fills and strokes only.
+    /// Torch positions for an arena, in world coordinates.
+    static func torchPoints(for arenaKey: String) -> [CGPoint] {
+        guard let l = GameData.arenas[arenaKey]?.light else { return [] }
+        return [CGPoint(x: l.keyLX, y: l.keyLY), CGPoint(x: l.keyRX, y: l.keyRY)]
+    }
+
+    /// Crows over the castle and cliff, bats in the cathedral, fireflies in the marsh, rising embers
+    /// in the village and snow motes in the pass, plus falling leaves and torch sparks as a second
+    /// layer. Fills and strokes only.
     static func drawAmbientLife(in context: GraphicsContext, arenaKey: String, time: Double, strength: Double) {
-        let kind = ambientKind(for: arenaKey)
-        guard kind != .quiet, strength > 0.01 else { return }
-        for s in ambientSpots(kind: kind, time: time) {
+        guard strength > 0.01 else { return }
+        drawLayer(in: context, kind: ambientKind(for: arenaKey), arenaKey: arenaKey, time: time, strength: strength)
+        drawLayer(in: context, kind: ambientAccent(for: arenaKey), arenaKey: arenaKey, time: time, strength: strength)
+    }
+
+    private static func drawLayer(in context: GraphicsContext, kind: AmbientKind, arenaKey: String, time: Double, strength: Double) {
+        guard kind != .quiet else { return }
+        let emitters = (kind == .sparks) ? torchPoints(for: arenaKey) : []
+        for s in ambientSpots(kind: kind, time: time, emitters: emitters) {
             let a = max(0.0, min(1.0, s.alpha * strength))
             switch kind {
             case .crows, .bats:
@@ -208,12 +249,17 @@ extension Atmosphere {
                 context.stroke(p, with: .color(col.opacity(a)), style: StrokeStyle(lineWidth: 3.0, lineCap: .round, lineJoin: .round))
             case .fireflies:
                 softGlow(in: context, center: CGPoint(x: s.x, y: s.y), rx: s.size, ry: s.size, color: Color(red: 0.75, green: 0.95, blue: 0.40), opacity: 0.85 * a)
-            case .embers:
+            case .embers, .sparks:
                 let r = CGRect(x: s.x - s.size, y: s.y - s.size, width: s.size * 2.0, height: s.size * 2.0)
-                context.fill(Path(ellipseIn: r), with: .color(Color(red: 1.0, green: 0.55, blue: 0.20).opacity(a)))
+                let col = (kind == .sparks) ? Color(red: 1.0, green: 0.75, blue: 0.35) : Color(red: 1.0, green: 0.55, blue: 0.20)
+                context.fill(Path(ellipseIn: r), with: .color(col.opacity(a)))
             case .motes:
                 let r = CGRect(x: s.x - s.size, y: s.y - s.size, width: s.size * 2.0, height: s.size * 2.0)
                 context.fill(Path(ellipseIn: r), with: .color(Color(red: 0.90, green: 0.95, blue: 1.0).opacity(a)))
+            case .leaves:
+                let leaf = Path(ellipseIn: CGRect(x: -s.size, y: -s.size * 0.45, width: s.size * 2.0, height: s.size * 0.9))
+                    .applying(CGAffineTransform(rotationAngle: s.flap).concatenating(CGAffineTransform(translationX: s.x, y: s.y)))
+                context.fill(leaf, with: .color(Color(red: 0.72, green: 0.42, blue: 0.16).opacity(a)))
             case .quiet:
                 break
             }

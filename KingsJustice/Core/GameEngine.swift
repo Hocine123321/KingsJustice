@@ -125,6 +125,8 @@ final class GameEngine: ObservableObject {
     var pendEdge: Bool = false
     var startFocus: Double = 0.0
     var training: Bool = false
+    /// Training Yard drill: when set, every defend note asks for this input. Ignored outside training.
+    var drill: String? = nil
     var rushList: [Int] = []
     var startTimer: Double = 0.0
     var fReadyBit: Int = 0

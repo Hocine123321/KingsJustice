@@ -40,4 +40,36 @@ final class AtmosphereTests: XCTestCase {
             XCTAssertNotEqual(Atmosphere.ambientSpots(kind: kind, time: 2.0), Atmosphere.ambientSpots(kind: kind, time: 4.0), "\(kind)")
         }
     }
+
+    func testSecondLayerOnlyOnTheArenasThatEarnIt() {
+        XCTAssertEqual(Atmosphere.ambientAccent(for: "village"), .leaves)
+        XCTAssertEqual(Atmosphere.ambientAccent(for: "castle"), .sparks)
+        XCTAssertEqual(Atmosphere.ambientAccent(for: "cliff"), .sparks)
+        XCTAssertEqual(Atmosphere.ambientAccent(for: "swamp"), .quiet)
+    }
+
+    func testLeavesAndSparksStayFiniteAndOnStage() {
+        let torches = [CGPoint(x: 200.0, y: 300.0), CGPoint(x: 1400.0, y: 500.0)]
+        for kind in [Atmosphere.AmbientKind.leaves, .sparks] {
+            var t = -5.0
+            while t < 300.0 {
+                let spots = Atmosphere.ambientSpots(kind: kind, time: t, emitters: torches)
+                XCTAssertFalse(spots.isEmpty, "\(kind)")
+                for s in spots {
+                    XCTAssertTrue(s.x.isFinite && s.y.isFinite && s.size.isFinite && s.flap.isFinite, "\(kind)")
+                    XCTAssertTrue(s.x >= -100.0 && s.x <= 1700.0, "\(kind) x=\(s.x)")
+                    XCTAssertTrue(s.y >= 0.0 && s.y <= 900.0, "\(kind) y=\(s.y)")
+                    XCTAssertTrue(s.alpha >= -1e-9 && s.alpha <= 1.0 + 1e-9, "\(kind) a=\(s.alpha)")
+                }
+                t += 0.41
+            }
+        }
+        XCTAssertTrue(Atmosphere.ambientSpots(kind: .sparks, time: 2.0).isEmpty)
+    }
+
+    func testEveryArenaHasTorchPointsForSparks() {
+        for key in GameData.arenas.keys {
+            XCTAssertEqual(Atmosphere.torchPoints(for: key).count, 2, key)
+        }
+    }
 }

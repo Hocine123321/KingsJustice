@@ -74,7 +74,7 @@ extension GameEngine {
             let pat = E.defendPatterns[idx]
             for raw in pat {
                 let b = raw.time
-                let kind = raw.move
+                let kind = (training ? TrainingGuide.drillMove(for: drill) : nil) ?? raw.move
                 let M = GameData.moves[kind] ?? GameData.moves["slash"]!
 
                 let push = { (bb: Double, k: String, extraDmg: Double?, extraTell: Double?, extraInput: String?, extraPose: String?, isFeint: Bool, feintAtVal: Double) in

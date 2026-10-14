@@ -48,7 +48,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 ### 4. Arena depth (arenas currently read flat)
 - [ ] 3+ parallax layers per arena (far / mid / near) with independent drift
 - [ ] God rays / light shafts where the art implies windows or moon (castle done; cathedral, pass, swamp still open)
-- [x] Per-arena ambient life: crows (castle, cliff), bats (cathedral), fireflies (swamp), rising embers (village), snow motes (pass). Drawn only on High quality, no blur filters, positions are a pure function of time. Falling leaves and torch sparks still open
+- [x] Per-arena ambient life: crows (castle, cliff), bats (cathedral), fireflies (swamp), rising embers (village), snow motes (pass). Drawn only on High quality, no blur filters, positions are a pure function of time. Second layer: falling leaves (village) and torch sparks from the real torch points (castle, cliff)
 - [x] Arena events every 14-26 s, cosmetic only: swamp lightning, cliff red lightning, cathedral bell, village roof collapse, pass gust, castle torch flare (crowd reaction still open)
 - [ ] Reactive environment: banners sway, puddles ripple on impact, debris on heavy hits
 - [x] Per-arena colour grading (subtle screen-space tint and edge darkening per arena; off on Low quality)
@@ -74,7 +74,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] BUG FIXED: Survival and Boss Rush reset your health to full and your score to zero after every win (the "one health bar" rule was not enforced); they now carry health and score between fights
 - [x] Daily Challenge: modifier of the day (Steady Hands, Brittle, Marathon, Quickstep, One Chance, each with a score bonus) and a win streak shown on the menu
 - [x] Flawless bonus (any mode): win without taking a hit for +20% gold and a result badge. Dedicated Boss Rush scoring still open
-- [ ] Training Yard: move list (pause menu, touch wording) and a beat metronome dot are done; guided drills still open
+- [x] Training Yard: move list (pause menu, touch wording), beat metronome dot, and five single-input drills (Parry, Duck, Jump, Dodge, Grab) picked from the move list. Drills change only which defend input is asked, never the enemy AI or timing windows
 - [x] How to Play: 3 animated pages (Strike / Defend / Focus and Heal), shown once before the first fight and from the menu. Contextual tips now use touch wording (they said Space / W / S / A). Still open: a guided, interactive practice round
 - [x] Timing Assist toggle (+25% timing windows; enemy untouched)
 

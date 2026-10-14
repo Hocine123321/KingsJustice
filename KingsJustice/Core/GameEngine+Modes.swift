@@ -6,6 +6,7 @@ extension GameEngine {
     func startRun(mode: String, enemyIndex: Int) {
         self.mode = mode
         self.training = (mode == "training")
+        self.drill = nil
         self.boons = []
         self.boonOffer = []
 
