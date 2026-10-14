@@ -36,3 +36,25 @@ enum Achievements {
         return out
     }
 }
+
+extension Achievements {
+    /// A cosmetic title each achievement grants. Wearing one changes nothing about the fight.
+    static let titles: [String: String] = [
+        "first_blood": "the Blooded",
+        "slayer": "Kingslayer",
+        "untouchable": "the Untouchable",
+        "ghost": "the Ghost",
+        "survivor5": "the Survivor",
+        "survivor10": "the Unbroken",
+        "devotee": "the Devoted",
+        "loyal": "the Loyal",
+        "gauntlet": "of the Gauntlet",
+        "rich": "the Wealthy"
+    ]
+
+    /// The title the player chose to wear, or nil when none is chosen or it is not earned (so an old or edited save can't show one early).
+    static func wornTitle(save: SaveData, rosterIds: [String]) -> String? {
+        guard !save.title.isEmpty, unlocked(save: save, rosterIds: rosterIds).contains(save.title) else { return nil }
+        return titles[save.title]
+    }
+}

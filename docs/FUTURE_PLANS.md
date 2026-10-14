@@ -79,7 +79,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] Timing Assist toggle (+25% timing windows; enemy untouched)
 
 ### 8. Progression and retention
-- [ ] Meaningful unlocks: styles, cosmetics, titles
+- [x] Meaningful unlocks: styles (200 and 500 gold, with a celebration) and titles. Every achievement grants a cosmetic title; pick one to wear in the Chronicle and it shows in your header and Share text. Purely cosmetic, no effect on fights. Armour and weapon cosmetics are still open
 - [x] Chronicle screen: deeds, defeated champions, 9 achievements derived from the save
 - [ ] Gold sinks that matter in the shop
 - [ ] Optional Game Center leaderboards and achievements

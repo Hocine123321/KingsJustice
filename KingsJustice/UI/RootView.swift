@@ -145,7 +145,10 @@ struct RootView: View {
                 screen = settingsFromPause ? .fight : .menu
             })
         case .chronicle:
-            ChronicleView(save: engine.save, onBack: { screen = .menu })
+            ChronicleView(save: engine.save, onWear: { id in
+                engine.save.title = id
+                engine.saveAll()
+            }, onBack: { screen = .menu })
         case .howTo:
             HowToPlayView(onDone: {
                 engine.save.seen["howto"] = true

@@ -38,4 +38,34 @@ final class AchievementTests: XCTestCase {
         s.gold = 99999
         XCTAssertEqual(Achievements.unlocked(save: s, rosterIds: roster).count, Achievements.all.count)
     }
+
+    func testEveryAchievementGrantsADistinctTitle() {
+        var seen = Set<String>()
+        for a in Achievements.all {
+            guard let t = Achievements.titles[a.id] else { return XCTFail("no title for \(a.id)") }
+            XCTAssertTrue(seen.insert(t).inserted, "duplicate title \(t)")
+        }
+        XCTAssertEqual(Achievements.titles.count, Achievements.all.count)
+    }
+
+    func testTitleShowsOnlyWhenWornAndEarned() {
+        var s = SaveData()
+        XCTAssertNil(Achievements.wornTitle(save: s, rosterIds: roster))
+        s.title = "ghost"
+        XCTAssertNil(Achievements.wornTitle(save: s, rosterIds: roster), "not earned yet")
+        s.flawless = 10
+        XCTAssertEqual(Achievements.wornTitle(save: s, rosterIds: roster), "the Ghost")
+        s.title = "nonsense"
+        XCTAssertNil(Achievements.wornTitle(save: s, rosterIds: roster))
+    }
+
+    func testOldSavesStillLoadAndTheTitleSurvivesARoundTrip() throws {
+        let old = try JSONDecoder().decode(SaveData.self, from: Data("{\"gold\": 5}".utf8))
+        XCTAssertEqual(old.gold, 5)
+        XCTAssertEqual(old.title, "")
+        var s = SaveData()
+        s.title = "slayer"
+        let back = try JSONDecoder().decode(SaveData.self, from: try JSONEncoder().encode(s))
+        XCTAssertEqual(back.title, "slayer")
+    }
 }

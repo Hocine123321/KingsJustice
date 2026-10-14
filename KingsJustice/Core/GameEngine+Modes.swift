@@ -341,7 +341,7 @@ extension GameEngine {
             res.bestLabel = "New daily best"
         }
         if !win { res.tip = FightResult.defeatTip(perfects: nP, goods: nG, misses: nM) }
-        res.shareText = FightResult.shareLine(won: win, enemy: E.name, rank: res.rankLetter, score: score, combo: maxCombo, mode: mode, wave: wave)
+        res.shareText = FightResult.shareLine(won: win, enemy: E.name, rank: res.rankLetter, score: score, combo: maxCombo, mode: mode, wave: wave, title: Achievements.wornTitle(save: save, rosterIds: GameData.roster.map { $0.id }))
         res.unlocks = FightResult.newUnlocks(gold: save.gold, hasDuelist: save.unlockedDuelist, hasBerserker: save.unlockedBerserker)
         fightResult = res
 

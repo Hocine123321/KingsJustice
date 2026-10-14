@@ -87,4 +87,13 @@ final class AccuracyAndGlowTests: XCTestCase {
         XCTAssertEqual(FightResult.newUnlocks(gold: 900, hasDuelist: true, hasBerserker: true), [])
         XCTAssertTrue(FightResult().unlocks.isEmpty)
     }
+
+    func testShareLineAddsTheWornTitleOnlyWhenThereIsOne() {
+        let plain = FightResult.shareLine(won: true, enemy: "X", rank: "A", score: 1, combo: 2, mode: "duel", wave: 0)
+        XCTAssertEqual(FightResult.shareLine(won: true, enemy: "X", rank: "A", score: 1, combo: 2, mode: "duel", wave: 0, title: nil), plain)
+        XCTAssertEqual(FightResult.shareLine(won: true, enemy: "X", rank: "A", score: 1, combo: 2, mode: "duel", wave: 0, title: ""), plain)
+        let titled = FightResult.shareLine(won: true, enemy: "X", rank: "A", score: 1, combo: 2, mode: "duel", wave: 0, title: "the Unbroken")
+        XCTAssertTrue(titled.hasPrefix(plain))
+        XCTAssertTrue(titled.hasSuffix("the Unbroken"))
+    }
 }

@@ -3,7 +3,21 @@ import SwiftUI
 /// The player's record: stats, defeated champions and achievements.
 struct ChronicleView: View {
     let save: SaveData
+    let onWear: (String) -> Void
     let onBack: () -> Void
+    @State private var worn: String
+
+    init(save: SaveData, onWear: @escaping (String) -> Void = { _ in }, onBack: @escaping () -> Void) {
+        self.save = save
+        self.onWear = onWear
+        self.onBack = onBack
+        _worn = State(initialValue: save.title)
+    }
+
+    private var wornName: String? {
+        guard !worn.isEmpty, unlocked.contains(worn) else { return nil }
+        return Achievements.titles[worn]
+    }
 
     private var rosterIds: [String] { return GameData.roster.map { $0.id } }
     private var unlocked: Set<String> { return Achievements.unlocked(save: save, rosterIds: rosterIds) }
@@ -13,7 +27,7 @@ struct ChronicleView: View {
             BackgroundGradientView()
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 16) {
-                    HeaderKickView(kick: "Your Legend", title: "The Chronicle")
+                    HeaderKickView(kick: wornName.map { "Your Legend · " + $0 } ?? "Your Legend", title: "The Chronicle")
                         .padding(.top, 12)
 
                     statsCard
@@ -84,6 +98,30 @@ struct ChronicleView: View {
         }
     }
 
+    private func wearButton(_ id: String) -> some View {
+        let isWorn = (worn == id)
+        return Button(action: {
+            worn = isWorn ? "" : id
+            onWear(worn)
+        }) {
+            Group {
+                if isWorn {
+                    Text("Worn")
+                } else {
+                    Text("Wear")
+                }
+            }
+            .font(.system(size: 10, weight: .bold))
+            .tracking(1.5)
+            .foregroundColor(isWorn ? UITheme.bgNearBlack : UITheme.textCreamBright)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(isWorn ? UITheme.textGold : UITheme.bgCard))
+            .overlay(Capsule().stroke(UITheme.borderCream.opacity(0.4), lineWidth: 1))
+        }
+        .buttonStyle(DriftButtonStyle())
+    }
+
     private var achievementsCard: some View {
         let got = unlocked
         return card("Achievements  \(got.count)/\(Achievements.all.count)") {
@@ -101,8 +139,16 @@ struct ChronicleView: View {
                         Text(a.desc)
                             .font(.system(size: 11, weight: .regular, design: .serif))
                             .foregroundColor(UITheme.textCream.opacity(has ? 0.85 : 0.4))
+                        if has, let t = Achievements.titles[a.id] {
+                            Text(t)
+                                .font(.system(size: 11, weight: .regular, design: .serif).italic())
+                                .foregroundColor(UITheme.textGold)
+                        }
                     }
                     Spacer()
+                    if has {
+                        wearButton(a.id)
+                    }
                 }
             }
         }

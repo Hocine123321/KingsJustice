@@ -60,7 +60,13 @@ struct FightResult: Equatable, Sendable {
     }
 
     /// A short, brag-worthy line for the Share button.
-    static func shareLine(won: Bool, enemy: String, rank: String, score: Int, combo: Int, mode: String, wave: Int) -> String {
+    static func shareLine(won: Bool, enemy: String, rank: String, score: Int, combo: Int, mode: String, wave: Int, title: String? = nil) -> String {
+        let line = baseShareLine(won: won, enemy: enemy, rank: rank, score: score, combo: combo, mode: mode, wave: wave)
+        guard let t = title, !t.isEmpty else { return line }
+        return line + " - " + t
+    }
+
+    private static func baseShareLine(won: Bool, enemy: String, rank: String, score: Int, combo: Int, mode: String, wave: Int) -> String {
         if mode == "survival" {
             return "I reached wave \(wave) in Survival in The King's Justice: rank \(rank), \(score) points, best combo \(combo)."
         }

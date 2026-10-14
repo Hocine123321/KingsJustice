@@ -197,6 +197,7 @@ struct SaveData: Codable, Equatable {
     var dailyStreak: Int = 0   // consecutive days with a Daily Challenge win
     var bestDailyStreak: Int = 0
     var lastDailyWin: String = ""   // yyyy-MM-dd of the last Daily Challenge win
+    var title: String = ""   // id of the achievement whose title is worn ("" for none)
 
     init() {}
 
@@ -221,6 +222,7 @@ struct SaveData: Codable, Equatable {
         self.dailyStreak = try c.decodeIfPresent(Int.self, forKey: .dailyStreak) ?? 0
         self.bestDailyStreak = try c.decodeIfPresent(Int.self, forKey: .bestDailyStreak) ?? 0
         self.lastDailyWin = try c.decodeIfPresent(String.self, forKey: .lastDailyWin) ?? ""
+        self.title = try c.decodeIfPresent(String.self, forKey: .title) ?? ""
     }
 }
 
