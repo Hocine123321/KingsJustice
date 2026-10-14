@@ -220,7 +220,7 @@ struct SettingsView<Engine: UIEngine>: View {
     
     private func settingRow<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
         HStack {
-            Text(label.uppercased())
+            Text(L10n.t(label).uppercased())
                 .font(.system(size: 11, weight: .bold))
                 .tracking(1.5)
                 .foregroundColor(UITheme.textCream)
@@ -244,7 +244,7 @@ struct SettingsView<Engine: UIEngine>: View {
     private func toggleRow(label: String, hint: String? = nil, isOn: Binding<Bool>) -> some View {
         VStack(alignment: .leading, spacing: 6) {
         HStack {
-            Text(label.uppercased())
+            Text(L10n.t(label).uppercased())
                 .font(.system(size: 11, weight: .bold))
                 .tracking(1.5)
                 .foregroundColor(UITheme.textCream)
@@ -256,7 +256,7 @@ struct SettingsView<Engine: UIEngine>: View {
                 .toggleStyle(SwitchToggleStyle(tint: UITheme.brightRed))
         }
         if let hint = hint {
-            Text(hint)
+            Text(L10n.t(hint))
                 .font(.system(size: 10))
                 .foregroundColor(UITheme.textCream.opacity(0.65))
                 .fixedSize(horizontal: false, vertical: true)

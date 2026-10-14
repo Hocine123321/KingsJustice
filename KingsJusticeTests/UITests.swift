@@ -97,6 +97,30 @@ final class UITests: XCTestCase {
         XCTAssertTrue(e.modeLabel.contains("TRAINING"))
     }
 
+    func testL10nFallsBackToTheEnglishText() {
+        XCTAssertEqual(L10n.t("Resume"), "Resume")
+        XCTAssertEqual(L10n.t("A string nobody translated"), "A string nobody translated")
+    }
+
+    func testEnglishStringsFileCoversTheMenuSettingsAndMoveList() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let url = root.appendingPathComponent("KingsJustice/Resources/en.lproj/Localizable.strings")
+        guard FileManager.default.fileExists(atPath: url.path) else { throw XCTSkip("source tree not available") }
+        let text = try String(contentsOf: url, encoding: .utf8)
+        var keys = Set<String>()
+        for line in text.split(separator: "\n") {
+            guard line.hasPrefix("\""), let r = line.range(of: "\" = \"") else { continue }
+            keys.insert(String(line[line.index(after: line.startIndex)..<r.lowerBound]))
+        }
+        XCTAssertGreaterThan(keys.count, 80)
+        for entry in MenuModeCatalog.main + MenuModeCatalog.extras {
+            XCTAssertTrue(keys.contains(entry.name), entry.name)
+            XCTAssertTrue(keys.contains(entry.desc), entry.desc)
+        }
+        for h in SettingsHints.all { XCTAssertTrue(keys.contains(h), h) }
+        for m in TrainingGuide.moves { XCTAssertTrue(keys.contains(m.how), m.id) }
+    }
+
     func testMetronomePulsePeaksOnTheBeat() {
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.0), 1.0, accuracy: 1e-9)
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.5), 0.0, accuracy: 1e-9)

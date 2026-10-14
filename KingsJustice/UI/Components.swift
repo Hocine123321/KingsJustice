@@ -33,7 +33,7 @@ struct PillButton: View {
             UIAudio.triggerHaptic("tap")
             action()
         }) {
-            Text(title.uppercased())
+            Text(L10n.t(title).uppercased())
                 .font(.system(size: 11, weight: .semibold))
                 .tracking(2.5)
                 .foregroundColor(isDisabled ? UITheme.textMuted : (isPrimary ? .white : UITheme.textCream))
@@ -101,7 +101,7 @@ struct MenuCard: View {
             HStack(alignment: .center, spacing: 10) {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(alignment: .top) {
-                        Text(title.uppercased())
+                        Text(L10n.t(title).uppercased())
                             .font(.system(size: 14, weight: .semibold))
                             .tracking(1.5)
                             .foregroundColor(isSelected ? .white : UITheme.textCreamBright)
@@ -109,14 +109,14 @@ struct MenuCard: View {
                         Spacer()
                     
                         if let badge = badgeText {
-                            Text(badge.uppercased())
+                            Text(L10n.t(badge).uppercased())
                                 .font(.system(size: 9, weight: .bold))
                                 .tracking(2.0)
                                 .foregroundColor(UITheme.textGold)
                         }
                     }
                 
-                    Text(description)
+                    Text(L10n.t(description))
                         .font(.system(size: 11))
                         .foregroundColor(UITheme.textCream.opacity(0.8))
                         .multilineTextAlignment(.leading)
@@ -266,7 +266,7 @@ struct TouchPadButton: View {
                 .scaleEffect(isPressed ? 0.95 : 1.0)
                 .animation(.easeOut(duration: 0.06), value: isPressed)
             
-            Text(title.uppercased())
+            Text(L10n.t(title).uppercased())
                 .font(.system(size: 11, weight: .bold))
                 .tracking(1.5)
                 .foregroundColor(Color(hex: colorHex).opacity(isPressed ? 1.0 : (hint ? 0.95 : 0.5)))
@@ -341,13 +341,13 @@ struct CircularActionButton: View {
                 .shadow(color: isReady ? Color(hex: colorHex).opacity(0.8) : .clear, radius: isReady ? 10 : 0)
             
             VStack(spacing: 2) {
-                Text(title.uppercased())
+                Text(L10n.t(title).uppercased())
                     .font(.system(size: 10, weight: .bold))
                     .tracking(1.5)
                     .foregroundColor(Color(hex: colorHex))
                 
                 if let badge = badgeText {
-                    Text(badge)
+                    Text(L10n.t(badge))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(.white)
                 }
@@ -385,12 +385,12 @@ struct HeaderKickView: View {
     
     var body: some View {
         VStack(spacing: 4) {
-            Text(kick.uppercased())
+            Text(L10n.t(kick).uppercased())
                 .font(UITheme.kickFont)
                 .tracking(4.0)
                 .foregroundColor(UITheme.textMuted)
             
-            Text(title)
+            Text(L10n.t(title))
                 .font(UITheme.titleFont)
                 .foregroundColor(UITheme.textCreamBright)
                 .shadow(color: UITheme.bloodRed.opacity(0.55), radius: 14)

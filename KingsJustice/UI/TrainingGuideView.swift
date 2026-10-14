@@ -149,7 +149,7 @@ struct TrainingGuideView: View {
             selected = id
             drills?.drill = id
         }) {
-            Text(name.uppercased())
+            Text(L10n.t(name).uppercased())
                 .font(.system(size: 11, weight: .bold))
                 .tracking(2.0)
                 .foregroundColor(on ? UITheme.bgNearBlack : UITheme.textCream)
@@ -169,11 +169,11 @@ struct TrainingGuideView: View {
                 .frame(width: 18, height: 18)
                 .padding(.top, 1)
             VStack(alignment: .leading, spacing: 2) {
-                Text(move.name.uppercased())
+                Text(L10n.t(move.name).uppercased())
                     .font(.system(size: 11, weight: .bold))
                     .tracking(2.0)
                     .foregroundColor(tint)
-                Text(move.how)
+                Text(L10n.t(move.how))
                     .font(.system(size: 11))
                     .foregroundColor(UITheme.textCream.opacity(0.85))
                     .fixedSize(horizontal: false, vertical: true)

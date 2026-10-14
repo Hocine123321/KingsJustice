@@ -32,7 +32,7 @@ struct ChronicleView: View {
 
     private func card<Content: View>(_ title: String, @ViewBuilder _ content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(title.uppercased())
+            Text(L10n.t(title).uppercased())
                 .font(.system(size: 10, weight: .bold))
                 .tracking(3.0)
                 .foregroundColor(UITheme.textGold)
@@ -46,7 +46,7 @@ struct ChronicleView: View {
 
     private func statRow(_ label: String, _ value: String) -> some View {
         HStack {
-            Text(label)
+            Text(L10n.t(label))
                 .font(.system(size: 12, weight: .regular, design: .serif))
                 .foregroundColor(UITheme.textCream)
             Spacer()

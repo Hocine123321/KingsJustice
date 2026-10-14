@@ -47,7 +47,7 @@ struct ExtraModeRow: View {
         }) {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title.uppercased())
+                    Text(L10n.t(title).uppercased())
                         .font(.system(size: 12, weight: .semibold))
                         .tracking(1.2)
                         .foregroundColor(UITheme.textCreamBright)
@@ -58,7 +58,7 @@ struct ExtraModeRow: View {
                 }
                 Spacer()
                 if let b = badge {
-                    Text(b.uppercased())
+                    Text(L10n.t(b).uppercased())
                         .font(.system(size: 9, weight: .bold))
                         .tracking(1.5)
                         .foregroundColor(UITheme.textGold)

@@ -24,5 +24,8 @@ if [ -n "$files" ]; then report "doubled backslash key path in: $files"; fi
 files=$(git grep -lIE '^[[:space:]]*print\(' -- 'KingsJustice/*.swift')
 if [ -n "$files" ]; then report "print() in app code: $files"; fi
 
+# 6. Every UI string has a Localizable.strings entry.
+python3 scripts/strings.py --check || fail=1
+
 if [ "$fail" -eq 0 ]; then echo "Lint passed."; fi
 exit "$fail"
