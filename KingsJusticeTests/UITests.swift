@@ -82,6 +82,21 @@ final class UITests: XCTestCase {
         XCTAssertNil(e.drill)
     }
 
+    func testSettingsHintsStayShortAndAssistSaysEnemiesAreUnchanged() {
+        XCTAssertEqual(SettingsHints.all.count, 7)
+        for h in SettingsHints.all {
+            XCTAssertFalse(h.isEmpty)
+            XCTAssertLessThanOrEqual(h.count, 80, h)
+        }
+        XCTAssertTrue(SettingsHints.assist.contains("Enemies are not changed"))
+    }
+
+    func testPauseKickNamesTheMode() {
+        let e = GameEngine()
+        e.startRun(mode: "training", enemyIndex: 0)
+        XCTAssertTrue(e.modeLabel.contains("TRAINING"))
+    }
+
     func testMetronomePulsePeaksOnTheBeat() {
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.0), 1.0, accuracy: 1e-9)
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.5), 0.0, accuracy: 1e-9)

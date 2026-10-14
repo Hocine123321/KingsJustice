@@ -589,7 +589,7 @@ final class AudioEngine {
         let allKinds: [SfxKind] = [
             .clang, .thud, .slash, .whoosh, .heartbeat, .bell,
             .heavy, .parry, .perfect, .hurt, .block, .miss,
-            .uiTap, .uiConfirm, .focus, .potion, .win, .lose
+            .uiTap, .uiConfirm, .focus, .potion, .win, .lose, .unlock
         ]
 
         var newSfxBuffers: [SfxKind: [AVAudioPCMBuffer]] = [:]

@@ -158,6 +158,9 @@ struct EndScreenView<Engine: UIEngine>: View {
                 .scaleEffect(shown ? 1.0 : 0.82)
                 .opacity(shown ? 1.0 : 0.0)
                 .animation(.spring(response: 0.45, dampingFraction: 0.6).delay(1.3), value: shown)
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) { UIAudio.playSfx(.unlock) }
+                }
             }
         }
     }

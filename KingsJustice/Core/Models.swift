@@ -227,7 +227,7 @@ struct SaveData: Codable, Equatable {
 // MARK: - Shared enums
 
 enum SfxKind: String {
-    case clang, thud, slash, whoosh, heartbeat, bell, heavy, parry, perfect, hurt, block, miss, uiTap, uiConfirm, focus, potion, win, lose
+    case clang, thud, slash, whoosh, heartbeat, bell, heavy, parry, perfect, hurt, block, miss, uiTap, uiConfirm, focus, potion, win, lose, unlock
 }
 
 enum RoundType: String { case attack, defend }

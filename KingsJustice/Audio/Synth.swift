@@ -74,6 +74,8 @@ enum Synth {
             samples = stingerBuffer(win: true, sampleRate: sr)
         case .lose:
             samples = stingerBuffer(win: false, sampleRate: sr)
+        case .unlock:
+            samples = synthUnlock(variant: variant, sampleRate: sr)
         }
 
         normalize(&samples, targetPeak: 0.95)
@@ -855,6 +857,31 @@ enum Synth {
 
     private static func synthWin(variant: Int, sampleRate: Double) -> [Float] {
         return stingerBuffer(win: true, sampleRate: sampleRate)
+    }
+
+    /// A bright rising arpeggio with a bell shimmer: the "something new is yours" cue.
+    private static func synthUnlock(variant: Int, sampleRate: Double) -> [Float] {
+        let duration = 1.6
+        var samples = [Float](repeating: 0, count: max(1, Int(sampleRate * duration)))
+        let notes = [72, 76, 79, 84, 88]
+        let detune = 1.0 + 0.003 * Double(variant)
+        for (idx, note) in notes.enumerated() {
+            let start = Double(idx) * 0.09
+            let freq = midiToFreq(note) * detune
+            for i in 0..<samples.count {
+                let t = Double(i) / sampleRate
+                if t >= start {
+                    let nt = t - start
+                    let env = exp(-nt * 3.2) * min(1.0, nt * 400.0)
+                    let tone = sin(2.0 * .pi * freq * nt) * 0.6
+                    let shimmer = sin(2.0 * .pi * freq * 2.76 * nt) * 0.18 * exp(-nt * 6.0)
+                    let octave = sin(2.0 * .pi * freq * 2.0 * nt) * 0.22
+                    samples[i] += Float((tone + shimmer + octave) * env)
+                }
+            }
+        }
+        applyReverb(&samples, delaySec: 0.04, feedback: 0.3, sampleRate: sampleRate)
+        return samples
     }
 
     private static func synthLose(variant: Int, sampleRate: Double) -> [Float] {

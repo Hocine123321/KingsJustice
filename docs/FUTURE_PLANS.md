@@ -64,7 +64,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 ### 6. Audio
 - [x] Unique battle theme per arena: own chord progression, melody and drum feel for castle, village, pass, swamp, cliff, cathedral (before, all six used one pattern and differed only by key and speed)
 - [x] Adaptive music intensity: rises with the champion wounds, your combo and your own danger; drops after the kill
-- [ ] Title and menu themes, victory / defeat / unlock stingers
+- [ ] Title and menu themes (victory, defeat and unlock stingers are done; the unlock chime plays with the result-screen banner)
 - [ ] Richer impact sounds: parry/perfect/hurt/block/heavy/thud sounds are now layered onto hits (they existed but were never used). Material-aware variants and ambient beds now exist (see below). Material-aware variants still open
 - [x] Haptic patterns matched to hit type (menu taps and enemy hits were silently doing nothing before; added tap, parry, impact, perfect, kill patterns)
 
@@ -88,13 +88,13 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [ ] Consistent HUD style, safe-area handling on all iPhones, compact layout check on small screens
 - [x] Colour-blind palette toggle (Okabe-Ito). Reduced-flash already exists; reduce-motion toggle added (no shake or camera zoom)
 - [x] Left-handed layout option (Settings toggle swaps the parry and evade clusters)
-- [ ] Pause menu polish, clearer settings
+- [x] Pause menu polish, clearer settings: the pause header names your mode (and drill), and every Settings toggle has a one-line plain explanation (Timing Assist says enemies are unchanged)
 
 ### 10. Technical quality
 - [ ] Performance profile on the heaviest scene; keep every effect cheap (gradients over blur filters)
 - [x] Fight length is now measured by simulation (CI reports it every run). Typical player (45% Perfect, 45% Good, 10% missed): 49-72 s per champion, about 57 s on average, matching the 60 s target. Perfect play: 28-45 s. The test fails if any champion drifts outside 35-90 s. More edge-case tests still welcome
 - [x] Launch screen is now the game's dark colour (it was a white flash) and the app is forced to dark appearance. Fights now auto-pause when the app leaves the foreground. Unplugging headphones now pauses the fight too
-- [ ] CI: add a lint step and a simple fight-length simulation test
+- [x] CI: fight-length simulation test, plus a fast lint job (scripts/lint.sh: leaked GitHub tokens, merge-conflict markers, tabs, doubled-backslash key paths, stray print calls)
 - [ ] Localization-ready strings
 
 ## Findings from the owner's gameplay recording (Oct 2026)

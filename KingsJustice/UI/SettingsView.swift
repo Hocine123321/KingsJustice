@@ -1,5 +1,18 @@
 import SwiftUI
 
+/// One-line plain-language explanations shown under the settings toggles.
+enum SettingsHints {
+    static let flash = "A brief screen flash when a hit lands. Turn it off if it bothers your eyes."
+    static let guide = "Shows on-screen hints about which move to use."
+    static let haptics = "Vibration on hits and parries."
+    static let leftHand = "Swaps the two button clusters for left-handed play."
+    static let assist = "Widens YOUR timing windows by 25%. Enemies are not changed."
+    static let reduceMotion = "Calms screen shake and camera zoom."
+    static let colorSafe = "Uses colour-blind friendly ring colours."
+
+    static var all: [String] { [flash, guide, haptics, leftHand, assist, reduceMotion, colorSafe] }
+}
+
 struct SettingsView<Engine: UIEngine>: View {
     @ObservedObject var engine: Engine
     let onBack: () -> Void
@@ -132,37 +145,37 @@ struct SettingsView<Engine: UIEngine>: View {
                         }
                         
                         // Toggles
-                        toggleRow(label: "IMPACT FLASHES", isOn: Binding(
+                        toggleRow(label: "IMPACT FLASHES", hint: SettingsHints.flash, isOn: Binding(
                             get: { engine.settings.flash },
                             set: { engine.settings.flash = $0; engine.saveAll() }
                         ))
                         
-                        toggleRow(label: "SHOW INPUT HINTS", isOn: Binding(
+                        toggleRow(label: "SHOW INPUT HINTS", hint: SettingsHints.guide, isOn: Binding(
                             get: { engine.settings.guide },
                             set: { engine.settings.guide = $0; engine.saveAll() }
                         ))
                         
-                        toggleRow(label: "VIBRATION (HAPTICS)", isOn: Binding(
+                        toggleRow(label: "VIBRATION (HAPTICS)", hint: SettingsHints.haptics, isOn: Binding(
                             get: { engine.settings.haptics },
                             set: { engine.settings.haptics = $0; engine.saveAll() }
                         ))
                         
-                        toggleRow(label: "LEFT-HAND LAYOUT", isOn: Binding(
+                        toggleRow(label: "LEFT-HAND LAYOUT", hint: SettingsHints.leftHand, isOn: Binding(
                             get: { engine.settings.leftHand },
                             set: { engine.settings.leftHand = $0; engine.saveAll() }
                         ))
 
-                        toggleRow(label: "TIMING ASSIST (WIDER WINDOWS)", isOn: Binding(
+                        toggleRow(label: "TIMING ASSIST (WIDER WINDOWS)", hint: SettingsHints.assist, isOn: Binding(
                             get: { engine.settings.assist },
                             set: { engine.settings.assist = $0; engine.saveAll() }
                         ))
 
-                        toggleRow(label: "REDUCE MOTION", isOn: Binding(
+                        toggleRow(label: "REDUCE MOTION", hint: SettingsHints.reduceMotion, isOn: Binding(
                             get: { engine.settings.reduceMotion },
                             set: { engine.settings.reduceMotion = $0; engine.saveAll() }
                         ))
 
-                        toggleRow(label: "COLOUR-BLIND COLOURS", isOn: Binding(
+                        toggleRow(label: "COLOUR-BLIND COLOURS", hint: SettingsHints.colorSafe, isOn: Binding(
                             get: { engine.settings.colorSafe },
                             set: { engine.settings.colorSafe = $0; engine.saveAll() }
                         ))
@@ -228,7 +241,8 @@ struct SettingsView<Engine: UIEngine>: View {
         )
     }
     
-    private func toggleRow(label: String, isOn: Binding<Bool>) -> some View {
+    private func toggleRow(label: String, hint: String? = nil, isOn: Binding<Bool>) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
         HStack {
             Text(label.uppercased())
                 .font(.system(size: 11, weight: .bold))
@@ -240,6 +254,13 @@ struct SettingsView<Engine: UIEngine>: View {
             Toggle("", isOn: isOn)
                 .labelsHidden()
                 .toggleStyle(SwitchToggleStyle(tint: UITheme.brightRed))
+        }
+        if let hint = hint {
+            Text(hint)
+                .font(.system(size: 10))
+                .foregroundColor(UITheme.textCream.opacity(0.65))
+                .fixedSize(horizontal: false, vertical: true)
+        }
         }
         .padding(12)
         .background(

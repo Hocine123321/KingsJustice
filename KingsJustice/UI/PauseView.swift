@@ -40,11 +40,11 @@ struct PauseView<Engine: UIEngine>: View {
             // Short phone landscape can't fit the stacked version, so it falls back to side by side.
             ViewThatFits(in: .vertical) {
                 VStack(spacing: 24) {
-                    HeaderKickView(kick: "Paused", title: "The Blades Wait")
+                    HeaderKickView(kick: "Paused · \(engine.modeLabel)", title: "The Blades Wait")
                     pauseButtons
                 }
                 HStack(spacing: 28) {
-                    HeaderKickView(kick: "Paused", title: "The Blades Wait")
+                    HeaderKickView(kick: "Paused · \(engine.modeLabel)", title: "The Blades Wait")
                     pauseButtons
                 }
             }
