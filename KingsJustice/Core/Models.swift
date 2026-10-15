@@ -198,6 +198,15 @@ struct SaveData: Codable, Equatable {
     var bestDailyStreak: Int = 0
     var lastDailyWin: String = ""   // yyyy-MM-dd of the last Daily Challenge win
     var title: String = ""   // id of the achievement whose title is worn ("" for none)
+    var fights: Int = 0   // fights played, Training Yard excluded
+    var wins: Int = 0
+    var bestCombo: Int = 0
+    var perfectHits: Int = 0
+    var goodHits: Int = 0
+    var missedHits: Int = 0
+    var sRanks: Int = 0
+    var champWins: [String: Int] = [:]   // by champion id
+    var champLosses: [String: Int] = [:]
 
     init() {}
 
@@ -223,6 +232,15 @@ struct SaveData: Codable, Equatable {
         self.bestDailyStreak = try c.decodeIfPresent(Int.self, forKey: .bestDailyStreak) ?? 0
         self.lastDailyWin = try c.decodeIfPresent(String.self, forKey: .lastDailyWin) ?? ""
         self.title = try c.decodeIfPresent(String.self, forKey: .title) ?? ""
+        self.fights = try c.decodeIfPresent(Int.self, forKey: .fights) ?? 0
+        self.wins = try c.decodeIfPresent(Int.self, forKey: .wins) ?? 0
+        self.bestCombo = try c.decodeIfPresent(Int.self, forKey: .bestCombo) ?? 0
+        self.perfectHits = try c.decodeIfPresent(Int.self, forKey: .perfectHits) ?? 0
+        self.goodHits = try c.decodeIfPresent(Int.self, forKey: .goodHits) ?? 0
+        self.missedHits = try c.decodeIfPresent(Int.self, forKey: .missedHits) ?? 0
+        self.sRanks = try c.decodeIfPresent(Int.self, forKey: .sRanks) ?? 0
+        self.champWins = try c.decodeIfPresent([String: Int].self, forKey: .champWins) ?? [:]
+        self.champLosses = try c.decodeIfPresent([String: Int].self, forKey: .champLosses) ?? [:]
     }
 }
 

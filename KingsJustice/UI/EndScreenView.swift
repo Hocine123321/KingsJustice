@@ -137,6 +137,22 @@ struct EndScreenView<Engine: UIEngine>: View {
         }
     }
 
+    private func comboRecordBadge(_ r: FightResult) -> some View {
+        Group {
+            if r.comboRecord {
+                Text("NEW BEST COMBO · \(r.maxCombo)")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(2.5)
+                    .foregroundColor(UITheme.textGold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(UITheme.textGold, lineWidth: 1))
+                    .opacity(shown ? 1.0 : 0.0)
+                    .animation(.easeOut(duration: 0.4).delay(1.2), value: shown)
+            }
+        }
+    }
+
     private func unlockBanner(_ r: FightResult) -> some View {
         Group {
             if !r.unlocks.isEmpty {
@@ -283,6 +299,7 @@ struct EndScreenView<Engine: UIEngine>: View {
             accuracyLine(r)
             bestBadge(r)
             flawlessBadge(r)
+            comboRecordBadge(r)
             unlockBanner(r)
             boonRecap()
             statsCard(r, compact: false)
@@ -302,6 +319,7 @@ struct EndScreenView<Engine: UIEngine>: View {
                 accuracyLine(r)
                 bestBadge(r)
                 flawlessBadge(r)
+                comboRecordBadge(r)
                 unlockBanner(r)
                 boonRecap()
                 tipLine(r)

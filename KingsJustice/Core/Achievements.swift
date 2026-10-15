@@ -18,7 +18,9 @@ enum Achievements {
         Achievement(id: "devotee", name: "Devotee", desc: "Win the Daily Challenge 3 days in a row."),
         Achievement(id: "loyal", name: "Loyal Subject", desc: "Win the Daily Challenge 7 days in a row."),
         Achievement(id: "gauntlet", name: "Gauntlet", desc: "Defeat every champion in a single Boss Rush."),
-        Achievement(id: "rich", name: "Coin of the Realm", desc: "Hold 1,000 gold.")
+        Achievement(id: "rich", name: "Coin of the Realm", desc: "Hold 1,000 gold."),
+        Achievement(id: "veteran", name: "Veteran", desc: "Fight 25 battles."),
+        Achievement(id: "deadeye", name: "Deadeye", desc: "Earn five S ranks.")
     ]
 
     static func unlocked(save: SaveData, rosterIds: [String]) -> Set<String> {
@@ -33,6 +35,8 @@ enum Achievements {
         if save.bestDailyStreak >= 7 { out.insert("loyal") }
         if !rosterIds.isEmpty && save.bestRush >= rosterIds.count { out.insert("gauntlet") }
         if save.gold >= 1000 { out.insert("rich") }
+        if save.fights >= 25 { out.insert("veteran") }
+        if save.sRanks >= 5 { out.insert("deadeye") }
         return out
     }
 }
@@ -49,7 +53,9 @@ extension Achievements {
         "devotee": "the Devoted",
         "loyal": "the Loyal",
         "gauntlet": "of the Gauntlet",
-        "rich": "the Wealthy"
+        "rich": "the Wealthy",
+        "veteran": "the Veteran",
+        "deadeye": "the Deadeye"
     ]
 
     /// The title the player chose to wear, or nil when none is chosen or it is not earned (so an old or edited save can't show one early).

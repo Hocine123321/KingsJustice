@@ -73,6 +73,10 @@ struct ChronicleView: View {
     private var statsCard: some View {
         card("Deeds") {
             statRow("Champions slain", "\(save.kills)")
+            statRow("Fights won", save.fights > 0 ? "\(save.wins) of \(save.fights) (\(LifetimeStats.winRatePercent(save) ?? 0)%)" : "-")
+            statRow("Timing accuracy", LifetimeStats.accuracyPercent(save).map { "\($0)%" } ?? "-")
+            statRow("Best combo", save.bestCombo > 0 ? "\(save.bestCombo)" : "-")
+            statRow("S ranks earned", "\(save.sRanks)")
             statRow("Fights without a scratch", "\(save.flawless)")
             statRow("Best Survival", save.bestSurvival > 0 ? "Wave \(save.bestSurvival)" : "-")
             statRow("Best Boss Rush", save.bestRush > 0 ? "\(save.bestRush)" : "-")
@@ -86,9 +90,16 @@ struct ChronicleView: View {
             ForEach(Array(GameData.roster.enumerated()), id: \.element.id) { _, e in
                 let beaten = save.beat.contains(e.id)
                 HStack {
-                    Text(beaten ? e.name : "???")
-                        .font(.system(size: 12, weight: .semibold, design: .serif))
-                        .foregroundColor(beaten ? UITheme.textCreamBright : UITheme.textCream.opacity(0.4))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(beaten ? e.name : "???")
+                            .font(.system(size: 12, weight: .semibold, design: .serif))
+                            .foregroundColor(beaten ? UITheme.textCreamBright : UITheme.textCream.opacity(0.4))
+                        if let rec = LifetimeStats.championRecord(save, id: e.id) {
+                            Text(rec)
+                                .font(.system(size: 10))
+                                .foregroundColor(UITheme.textCream.opacity(0.55))
+                        }
+                    }
                     Spacer()
                     Text(beaten ? e.title : "Undefeated")
                         .font(.system(size: 11, weight: .regular, design: .serif).italic())

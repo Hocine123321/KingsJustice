@@ -36,6 +36,8 @@ final class AchievementTests: XCTestCase {
         s.bestDailyStreak = 99
         s.bestRush = 99
         s.gold = 99999
+        s.fights = 99
+        s.sRanks = 99
         XCTAssertEqual(Achievements.unlocked(save: s, rosterIds: roster).count, Achievements.all.count)
     }
 

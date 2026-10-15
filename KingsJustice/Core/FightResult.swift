@@ -42,6 +42,8 @@ struct FightResult: Equatable, Sendable {
     var shareText: String = ""
     /// Fighting styles that unlocked because of this fight (display names).
     var unlocks: [String] = []
+    /// This fight beat the player's earlier best combo.
+    var comboRecord: Bool = false
 
     /// Timing accuracy as a whole percent: Perfect counts double, Miss counts zero.
     var accuracyPercent: Int {
