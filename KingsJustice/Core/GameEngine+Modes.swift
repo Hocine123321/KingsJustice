@@ -7,6 +7,7 @@ extension GameEngine {
         self.mode = mode
         self.training = (mode == "training")
         self.drill = nil
+        self.phaseMusicUntil = nil
         self.boons = []
         self.boonOffer = []
 

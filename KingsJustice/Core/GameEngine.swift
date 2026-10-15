@@ -35,6 +35,8 @@ final class GameEngine: ObservableObject {
     var perfectGlowLevel: Double = 0.0
     /// Counts down to the next arena event (lightning, bell toll...). Cosmetic only.
     var arenaEventTimer: Double = 14.0
+    /// After a boss phase change the music holds full intensity until this time, instead of dropping back within half a second.
+    var phaseMusicUntil: Double? = nil
     /// Big centre-screen callout when the champion changes phase.
     @Published var phaseBanner: String = ""
     var phaseBannerUntil: Double = 0.0
@@ -284,7 +286,7 @@ final class GameEngine: ObservableObject {
         }
         if musicIntensityTick > 0.5 {
             musicIntensityTick = 0.0
-            UIAudio.setMusicIntensity(adaptiveIntensity(woundFraction: frac))
+            UIAudio.setMusicIntensity(adaptiveIntensity(woundFraction: frac, phasesReached: activePhases.count))
         }
         musicIntensityTick += dt
 

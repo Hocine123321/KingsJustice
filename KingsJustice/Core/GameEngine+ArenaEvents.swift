@@ -3,10 +3,13 @@ import Foundation
 /// Cosmetic mid-fight arena events (lightning, a bell toll, a gust...). They never touch timing or damage.
 extension GameEngine {
     /// 0.35 base, rising with how hurt the champion is, with a long combo and with the player's own danger.
-    func adaptiveIntensity(woundFraction: Double) -> Double {
+    /// Each boss phase reached adds a little more, and a fresh phase change holds full intensity for a few seconds.
+    func adaptiveIntensity(woundFraction: Double, phasesReached: Int = 0) -> Double {
+        if let until = phaseMusicUntil, t < until { return 1.0 }
         let comboLift = min(0.2, Double(combo) * 0.015)
         let danger = (maxhp > 0 && hp / maxhp < 0.3) ? 0.12 : 0.0
-        return min(1.0, 0.35 + woundFraction * 0.5 + comboLift + danger)
+        let phaseLift = min(0.15, Double(max(0, phasesReached)) * 0.075)
+        return min(1.0, 0.35 + woundFraction * 0.5 + comboLift + danger + phaseLift)
     }
 
     func nextArenaEventDelay() -> Double {

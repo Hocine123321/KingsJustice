@@ -47,6 +47,32 @@ final class ArenaEventAndAssistTests: XCTestCase {
         XCTAssertLessThanOrEqual(e.adaptiveIntensity(woundFraction: 1.0), 1.0)
     }
 
+    func testEachBossPhaseLiftsTheMusicAndAPhaseChangeHoldsFullIntensity() {
+        let e = GameEngine()
+        e.hp = 100.0
+        e.maxhp = 100.0
+        e.combo = 0
+        let none = e.adaptiveIntensity(woundFraction: 0.4)
+        let one = e.adaptiveIntensity(woundFraction: 0.4, phasesReached: 1)
+        let two = e.adaptiveIntensity(woundFraction: 0.4, phasesReached: 2)
+        XCTAssertGreaterThan(one, none)
+        XCTAssertGreaterThan(two, one)
+        XCTAssertLessThanOrEqual(e.adaptiveIntensity(woundFraction: 1.0, phasesReached: 9), 1.0)
+
+        e.t = 10.0
+        e.phaseMusicUntil = 14.0
+        XCTAssertEqual(e.adaptiveIntensity(woundFraction: 0.0), 1.0, accuracy: 1e-9)
+        e.t = 14.5
+        XCTAssertLessThan(e.adaptiveIntensity(woundFraction: 0.0), 1.0, "the spike fades after four seconds")
+    }
+
+    func testPhaseMusicHoldClearsOnANewRun() {
+        let e = GameEngine()
+        e.phaseMusicUntil = 99.0
+        e.startRun(mode: "duel", enemyIndex: 0)
+        XCTAssertNil(e.phaseMusicUntil)
+    }
+
     func testTimingAssistWidensPlayerWindowsOnly() {
         let e = GameEngine()
         e.settings.difficulty = "normal"

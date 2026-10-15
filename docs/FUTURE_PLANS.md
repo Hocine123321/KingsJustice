@@ -29,7 +29,6 @@ Checklist below: 65 items done, 16 open. Latest CI build is green (lint, unit te
 **Small engineering items that need nothing from the owner**
 - A distinct title-screen theme (menu screens already have a calm choir theme; the title is silent until Begin)
 - Material-aware variants of the impact sounds
-- Music layer swap on phase change
 - A guided, interactive practice round in How to Play
 - Translating text built from variables (wave numbers, names, scores)
 
@@ -68,7 +67,7 @@ Checklist below: 65 items done, 16 open. Latest CI build is green (lint, unit te
 ### 2. Fight presentation
 - [x] Boss entrance: champion name and title card before round one (signature pose and sting still open)
 - [x] Round-start "FIGHT!" beat
-- [x] Phase-change banner ("PHASE II - <champion> grows desperate") with the existing shake, heartbeat and red flash. Music layer swap still open
+- [x] Phase-change banner ("PHASE II - <champion> grows desperate") with the existing shake, heartbeat and red flash. The music now holds full intensity for four seconds after a phase change, and each phase reached lifts the baseline (the Phase II+ music layer swap); a separate drum-layer swap is still open
 - [x] Parry / Perfect shockwave ring (screen-edge flash still open)
 - [x] Camera framing that pushes in as an enemy gets low on health
 
