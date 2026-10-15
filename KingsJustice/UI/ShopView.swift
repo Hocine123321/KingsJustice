@@ -10,7 +10,7 @@ struct ShopView<Engine: UIEngine>: View {
     }
     
     private var styleName: String {
-        return GameData.styles.first(where: { $0.id == engine.save.style })?.name ?? "fighter"
+        return GameData.styles.first(where: { $0.id == engine.settings.style })?.name ?? "fighter"
     }
 
     @ViewBuilder
@@ -35,7 +35,7 @@ struct ShopView<Engine: UIEngine>: View {
 
     private func liveryRow(_ l: Livery, _ armoury: ArmouryControlling) -> some View {
         let owned = Armoury.isOwned(engine.save, id: l.id)
-        let worn = Armoury.equippedId(engine.save, style: engine.save.style) == l.id
+        let worn = Armoury.equippedId(engine.save, style: engine.settings.style) == l.id
         let affordable = Armoury.canBuy(engine.save, id: l.id)
         return HStack(alignment: .center, spacing: 12) {
             HStack(spacing: -6) {

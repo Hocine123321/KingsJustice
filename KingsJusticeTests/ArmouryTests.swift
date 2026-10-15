@@ -96,7 +96,7 @@ final class ArmouryTests: XCTestCase {
         let e = GameEngine()
         e.save = SaveData()
         e.save.gold = 400
-        e.save.style = "knight"
+        e.settings.style = "knight"
         e.styleDef = GameData.styles.first(where: { $0.id == "knight" })!
         let plain = e.rsStyle.look.colors
         XCTAssertTrue(e.buyLivery("royal"))

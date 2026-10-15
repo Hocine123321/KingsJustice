@@ -94,15 +94,15 @@ extension GameEngine: ArmouryControlling {
 
     func buyLivery(_ id: String) -> Bool {
         guard Armoury.buy(&save, id: id) else { return false }
-        Armoury.equip(&save, id: id, style: save.style)
+        Armoury.equip(&save, id: id, style: settings.style)
         return true
     }
 
     func wearLivery(_ id: String?) {
         if let id = id {
-            Armoury.equip(&save, id: id, style: save.style)
+            Armoury.equip(&save, id: id, style: settings.style)
         } else {
-            Armoury.unequip(&save, style: save.style)
+            Armoury.unequip(&save, style: settings.style)
         }
     }
 }
