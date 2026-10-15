@@ -60,7 +60,9 @@ extension GameEngine: RenderSource {
         case "survival": return "SURVIVAL · WAVE \(wave + 1)" + (isBossWave ? " · BOSS" : "")
         case "rush": return "BOSS RUSH · \(enemyIdx + 1)/\(GameData.roster.count)"
         case "daily": return "DAILY · \(dailyMod.name.uppercased())"
-        case "training": return (drill == nil) ? "TRAINING YARD" : "TRAINING YARD · \(drill!.uppercased()) DRILL"
+        case "training":
+            if let g = guided { return "TRAINING · " + g.progressText }
+            return (drill == nil) ? "TRAINING YARD" : "TRAINING YARD · \(drill!.uppercased()) DRILL"
         default: return ""
         }
     }

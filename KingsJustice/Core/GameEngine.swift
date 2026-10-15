@@ -37,6 +37,8 @@ final class GameEngine: ObservableObject {
     var arenaEventTimer: Double = 14.0
     /// After a boss phase change the music holds full intensity until this time, instead of dropping back within half a second.
     var phaseMusicUntil: Double? = nil
+    /// Training Yard guided practice progress, or nil when not running.
+    var guided: GuidedPractice? = nil
     /// Big centre-screen callout when the champion changes phase.
     @Published var phaseBanner: String = ""
     var phaseBannerUntil: Double = 0.0

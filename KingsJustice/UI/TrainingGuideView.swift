@@ -17,6 +17,9 @@ extension GameEngine: BeatClockProviding {
 /// Lets the pause screen pick a Training Yard drill.
 protocol TrainingDrillControlling: AnyObject {
     var drill: String? { get set }
+    var guidedActive: Bool { get }
+    func startGuidedPractice()
+    func cancelGuidedPractice()
 }
 
 extension GameEngine: TrainingDrillControlling {}
@@ -92,11 +95,13 @@ struct TrainingGuideView: View {
     var drills: TrainingDrillControlling?
     let onDone: () -> Void
     @State private var selected: String?
+    @State private var guidedOn: Bool
 
     init(drills: TrainingDrillControlling? = nil, onDone: @escaping () -> Void) {
         self.drills = drills
         self.onDone = onDone
         _selected = State(initialValue: drills?.drill)
+        _guidedOn = State(initialValue: drills?.guidedActive ?? false)
     }
 
     var body: some View {
@@ -133,6 +138,7 @@ struct TrainingGuideView: View {
                 .foregroundColor(UITheme.textCream.opacity(0.7))
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
+                    guidedChip
                     chip(id: nil, name: "Free")
                     ForEach(TrainingGuide.drills, id: \.id) { d in
                         chip(id: d.id, name: d.name)
@@ -143,9 +149,30 @@ struct TrainingGuideView: View {
         }
     }
 
+    private var guidedChip: some View {
+        Button(action: {
+            guidedOn = true
+            selected = nil
+            drills?.startGuidedPractice()
+        }) {
+            Text("Guided practice")
+                .font(.system(size: 11, weight: .bold))
+                .tracking(2.0)
+                .textCase(.uppercase)
+                .foregroundColor(guidedOn ? UITheme.bgNearBlack : UITheme.textCream)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(guidedOn ? UITheme.textGold : UITheme.bgCard))
+                .overlay(Capsule().stroke(UITheme.borderCream.opacity(0.4), lineWidth: 1))
+        }
+        .buttonStyle(DriftButtonStyle())
+    }
+
     private func chip(id: String?, name: String) -> some View {
-        let on = (selected == id)
+        let on = !guidedOn && (selected == id)
         return Button(action: {
+            guidedOn = false
+            drills?.cancelGuidedPractice()
             selected = id
             drills?.drill = id
         }) {

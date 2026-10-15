@@ -122,6 +122,7 @@ extension GameEngine {
         } else {
             say(perfect ? (events[index].input == "parry" ? "Perfect parry" : "Perfect") : "Good", col: perfect ? "#e8f2ff" : "#c8d4e0")
             if perfect { nP += 1 } else { nG += 1 }
+            registerGuidedSuccess(input: events[index].input)
             addScore2(perfect ? 300 : 150)
 
             let S = styleDef.special
