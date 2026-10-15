@@ -3,6 +3,36 @@
 Living roadmap. Goal: turn the prototype into a high-quality, polished game people actually want to keep playing.
 Update the status boxes as work lands. Never delete an idea; move it to "Done" or "Parked" with a reason.
 
+## Status snapshot (Oct 15, 2026)
+Checklist below: 65 items done, 16 open. Latest CI build is green (lint, unit tests, IPA). Frame rate confirmed at 60 fps on the owner's device (Oct 12), before the newest ambient-life layers.
+
+### What is still open, grouped by what it needs
+**Needs an owner decision (balance and design sign-off)**
+- Gold sinks that matter in the shop: what should gold buy, and at what prices?
+- Armour and weapon cosmetics per fighting style: which styles, how many looks, and are they bought or earned?
+- Per-champion signature mechanics (the current tells are shared by all seven)
+- Dedicated Boss Rush scoring
+
+**Needs the owner's eyes on a phone (art and feel; guessing blind risks hurting timing feel)**
+- Anticipation / follow-through pass, idle variety, distinct silhouettes, hit reactions and death animations, cloth and cape motion
+- 3+ parallax layers per arena, reactive environment (banners, puddles, debris), god rays for cathedral, pass and swamp
+- Boss entrance signature pose and sting; screen-edge flash on Perfect parries; crowd reaction to arena events
+
+**Needs a device or simulator**
+- Layout check of every screen in phone landscape on the smallest phone (shop, style picker, settings, pause, end screen, Chronicle, which keeps growing)
+- Performance profile on the heaviest scene, and an fps re-check with the newest particle layers
+- Left-handed touch-zone check
+
+**Needs an Apple capability**
+- Game Center leaderboards and achievements (an unsigned build cannot use them)
+
+**Small engineering items that need nothing from the owner**
+- A distinct title-screen theme (menu screens already have a calm choir theme; the title is silent until Begin)
+- Material-aware variants of the impact sounds
+- Music layer swap on phase change
+- A guided, interactive practice round in How to Play
+- Translating text built from variables (wave numbers, names, scores)
+
 ## Fixed rules (from the owner — do not drift from these)
 - Two main modes: **Trial by Combat** and **Survival**. Extras: Boss Rush, Daily Challenge, Training Yard.
 - Target 60 fps. A standard fight lasts about 60 seconds.
@@ -66,13 +96,13 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 ### 6. Audio
 - [x] Unique battle theme per arena: own chord progression, melody and drum feel for castle, village, pass, swamp, cliff, cathedral (before, all six used one pattern and differed only by key and speed)
 - [x] Adaptive music intensity: rises with the champion wounds, your combo and your own danger; drops after the kill
-- [ ] Title and menu themes (victory, defeat and unlock stingers are done; the unlock chime plays with the result-screen banner)
+- [ ] A distinct title-screen theme. The menu pages already play a calm, drum-less choir theme (starts on the menu, campaign, style and shop screens); the title screen itself is silent until you tap Begin. Victory, defeat and unlock stingers are done
 - [ ] Richer impact sounds: parry/perfect/hurt/block/heavy/thud sounds are now layered onto hits (they existed but were never used). Material-aware variants and ambient beds now exist (see below). Material-aware variants still open
 - [x] Haptic patterns matched to hit type (menu taps and enemy hits were silently doing nothing before; added tap, parry, impact, perfect, kill patterns)
 
 ### 7. Gameplay depth
 - [x] Clearer tells: a coloured marker with the move name now appears above the champion as an attack closes in (matches the button colour). Per-champion signature mechanics still open
-- [x] Survival: pick one of three boons after each wave (Keen Edge, Iron Ward, Vigor, Mending Draught, Glass Cannon risk/reward, Spoils of War). None touch enemy AI. Boss waves (the King every 5th wave, 4-boon reward) and boon chips on the HUD are in. Still open: a leaderboard-style best-run list
+- [x] Survival: pick one of three boons after each wave (Keen Edge, Iron Ward, Vigor, Mending Draught, Glass Cannon risk/reward, Spoils of War). None touch enemy AI. Boss waves (the King every 5th wave, 4-boon reward) and boon chips on the HUD are in. The best-run list now exists as the Hall of Records in the Chronicle
 - [x] BUG FIXED: Survival and Boss Rush reset your health to full and your score to zero after every win (the "one health bar" rule was not enforced); they now carry health and score between fights
 - [x] Daily Challenge: modifier of the day (Steady Hands, Brittle, Marathon, Quickstep, One Chance, each with a score bonus) and a win streak shown on the menu
 - [x] Flawless bonus (any mode): win without taking a hit for +20% gold and a result badge. Dedicated Boss Rush scoring still open
@@ -82,7 +112,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 
 ### 8. Progression and retention
 - [x] Meaningful unlocks: styles (200 and 500 gold, with a celebration) and titles. Every achievement grants a cosmetic title; pick one to wear in the Chronicle and it shows in your header and Share text. Purely cosmetic, no effect on fights. Armour and weapon cosmetics are still open
-- [x] Chronicle screen: deeds, defeated champions, 9 achievements derived from the save
+- [x] Chronicle screen: deeds, defeated champions, 12 achievements derived from the save (lifetime stats, the Hall of Records and wearable titles were added later)
 - [ ] Gold sinks that matter in the shop
 - [ ] Optional Game Center leaderboards and achievements
 
@@ -97,7 +127,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] Fight length is now measured by simulation (CI reports it every run). Typical player (45% Perfect, 45% Good, 10% missed): 49-72 s per champion, about 57 s on average, matching the 60 s target. Perfect play: 28-45 s. The test fails if any champion drifts outside 35-90 s. More edge-case tests still welcome
 - [x] Launch screen is now the game's dark colour (it was a white flash) and the app is forced to dark appearance. Fights now auto-pause when the app leaves the foreground. Unplugging headphones now pauses the fight too
 - [x] CI: fight-length simulation test, plus a fast lint job (scripts/lint.sh: leaked GitHub tokens, merge-conflict markers, tabs, doubled-backslash key paths, stray print calls)
-- [x] Localization-ready strings: shared components and Settings/Training text go through L10n.t, backed by Resources/en.lproj/Localizable.strings (106+ keys, generated by scripts/strings.py and checked by the lint job). Add a language by copying the folder and translating the values. Text built from variables (wave numbers, names, scores) is not translated yet
+- [x] Localization-ready strings: shared components and Settings/Training text go through L10n.t, backed by Resources/en.lproj/Localizable.strings (120 keys, generated by scripts/strings.py and checked by the lint job). Add a language by copying the folder and translating the values. Text built from variables (wave numbers, names, scores) is not translated yet
 
 ## Findings from the owner's gameplay recording (Oct 2026)
 Fixed in the "recording fixes" batch:
@@ -139,4 +169,4 @@ Still open:
 - Local pass-and-play duel
 
 ## Process for every batch
-1. Pick the next unchecked item above. 2. Implement small. 3. Add or update tests. 4. Push. 5. Confirm CI (tests + IPA) is green. 6. Share the download link and what to look at. 7. Tick the box here.
+1. Pick the next unchecked item above. 2. Implement small. 3. Add or update tests. 4. Push. 5. Confirm CI (tests + IPA) is green. 6. Share the download link and what to look at. 7. Tick the box here. Batches bundle several changes (owner request, Oct 12 2026).
