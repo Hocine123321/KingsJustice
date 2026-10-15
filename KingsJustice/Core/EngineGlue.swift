@@ -43,7 +43,10 @@ extension GameEngine: UIEngine {
 extension GameEngine: RenderSource {
     var rsTime: Double { return t }
     var rsEnemy: EnemyDef? { return enemyDef }
-    var rsStyle: StyleDef { return styleDef }
+    var rsStyle: StyleDef {
+        guard let id = Armoury.equippedId(save, style: styleDef.id) else { return styleDef }
+        return Armoury.dressed(styleDef, with: Armoury.livery(id: id))
+    }
     var rsPlayerPose: [Double] { return playerPoseState.cur }
     var rsEnemyPose: [Double] { return enemyPoseState.cur }
     var rsShake: Double { return settings.reduceMotion ? 0.0 : shake }

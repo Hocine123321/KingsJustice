@@ -8,8 +8,8 @@ Checklist below: 65 items done, 16 open. Latest CI build is green (lint, unit te
 
 ### What is still open, grouped by what it needs
 **Needs an owner decision (balance and design sign-off)**
-- Gold sinks that matter in the shop: what should gold buy, and at what prices?
-- Armour and weapon cosmetics per fighting style: which styles, how many looks, and are they bought or earned?
+- Armoury prices (120 to 320 gold, all in `Armoury.all`): too cheap, too dear? And should style unlocks (200 and 500 gold) count gold earned instead of gold held, so buying tonics or liveries cannot delay them?
+- New cosmetic silhouettes (helm, cape and weapon swaps) per style. Colour liveries are done; changing shapes needs art sign-off
 - Per-champion signature mechanics (the current tells are shared by all seven)
 - Dedicated Boss Rush scoring
 
@@ -61,6 +61,8 @@ Checklist below: 65 items done, 16 open. Latest CI build is green (lint, unit te
 - [x] Smooth screen transitions (fade) instead of hard cuts
 - [x] Lifetime stats and records: fights won and win rate, timing accuracy, best combo and S ranks in the Chronicle, a won/lost record under every champion, a "New best combo" badge on the result screen, and two new achievements with titles (Veteran at 25 fights, Deadeye at five S ranks). The Training Yard never counts
 - [x] Guided practice in the Training Yard: pick Guided practice in the Move List and it walks through Parry, Duck, Jump, Dodge and Grab, four clean (Perfect or Good) answers each, with live progress in the HUD label. A scraped late answer does not count. It builds on the drills, so enemy AI and timing windows are untouched. A fully scripted tutorial inside How to Play is still open
+- [x] The Armoury: six gold-bought liveries (Emberforged, Frostbound, Greenwood, Royal Violet, Ashen Ghost, Gilded Dawn, 120 to 320 gold) in the shop, worn per fighting style and drawn on your fighter. Purely cosmetic: the helm, cape, weapon and every stat are untouched, and tests prove it. A hand-edited save cannot wear a livery it does not own
+- [x] Chronicle overhaul: four tabs (Deeds, Records, Champions, Titles) instead of one long scroll, so each page is short on a small phone
 - [x] Hall of Records (Chronicle): your best five Survival runs, best five Boss Rush runs and top three Daily Challenge scores, plus a "Hall of Records #n" badge on the result screen when a finished run makes the list (a new personal best keeps its own label). Boss waves were already flagged in the fight intro, mode label and boon screen, so no extra banner was added
 - [x] Short first-launch intro / story hook: three text cards after the title screen on the very first launch only (tap or wait, Skip any time) (the old "Watch Cinematic" button was a dead end and was removed; bring it back only with a real cinematic)
 

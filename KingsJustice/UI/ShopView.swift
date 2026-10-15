@@ -9,6 +9,88 @@ struct ShopView<Engine: UIEngine>: View {
         self.onBack = onBack
     }
     
+    private var styleName: String {
+        return GameData.styles.first(where: { $0.id == engine.save.style })?.name ?? "fighter"
+    }
+
+    @ViewBuilder
+    private var armourySection: some View {
+        if let armoury = engine as? ArmouryControlling {
+            VStack(spacing: 10) {
+                Text("THE ARMOURY")
+                    .font(.system(size: 13, weight: .bold))
+                    .tracking(3.0)
+                    .foregroundColor(UITheme.textGold)
+                Text("Liveries for your \(styleName). Cosmetic only: no effect on a fight.")
+                    .font(.system(size: 11))
+                    .foregroundColor(UITheme.textCream.opacity(0.75))
+                    .multilineTextAlignment(.center)
+                ForEach(Armoury.all, id: \.id) { l in
+                    liveryRow(l, armoury)
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+
+    private func liveryRow(_ l: Livery, _ armoury: ArmouryControlling) -> some View {
+        let owned = Armoury.isOwned(engine.save, id: l.id)
+        let worn = Armoury.equippedId(engine.save, style: engine.save.style) == l.id
+        let affordable = Armoury.canBuy(engine.save, id: l.id)
+        return HStack(alignment: .center, spacing: 12) {
+            HStack(spacing: -6) {
+                ForEach(0..<3, id: \.self) { i in
+                    Circle()
+                        .fill(Color(hex: l.colors[i]))
+                        .frame(width: 22, height: 22)
+                        .overlay(Circle().stroke(Color(hex: l.trim), lineWidth: 1))
+                }
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(l.name.uppercased())
+                    .font(.system(size: 12, weight: .bold))
+                    .tracking(1.5)
+                    .foregroundColor(UITheme.textCreamBright)
+                Text(owned ? "Owned" : "\(l.price) GOLD")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(owned ? UITheme.textMuted : UITheme.textGold)
+            }
+            Spacer()
+            Button(action: {
+                if !owned {
+                    _ = armoury.buyLivery(l.id)
+                } else if worn {
+                    armoury.wearLivery(nil)
+                } else {
+                    armoury.wearLivery(l.id)
+                }
+                engine.saveAll()
+            }) {
+                Group {
+                    if !owned {
+                        Text("Buy")
+                    } else if worn {
+                        Text("Worn")
+                    } else {
+                        Text("Wear")
+                    }
+                }
+                .font(.system(size: 11, weight: .bold))
+                .tracking(1.5)
+                .foregroundColor(worn ? UITheme.bgNearBlack : .white)
+                .padding(.vertical, 7)
+                .padding(.horizontal, 14)
+                .background(Capsule().fill(worn ? UITheme.textGold : ((owned || affordable) ? UITheme.bloodRed : UITheme.bgNearBlack.opacity(0.5))))
+                .overlay(Capsule().stroke((owned || affordable) ? UITheme.brightRed : UITheme.borderCream.opacity(0.2), lineWidth: 1))
+            }
+            .disabled(!owned && !affordable)
+            .buttonStyle(DriftButtonStyle())
+        }
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 10).fill(UITheme.bgCard))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(worn ? UITheme.textGold : UITheme.borderCream, lineWidth: 1))
+    }
+
     var body: some View {
         ZStack {
             BackgroundGradientView()
@@ -85,6 +167,8 @@ struct ShopView<Engine: UIEngine>: View {
                     }
                     .padding(.horizontal, 16)
                     
+                    armourySection
+
                     PillButton(title: "Back", action: onBack)
                         .padding(.vertical, 16)
                 }

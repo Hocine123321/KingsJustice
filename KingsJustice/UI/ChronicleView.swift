@@ -1,11 +1,20 @@
 import SwiftUI
 
 /// The player's record: stats, defeated champions and achievements.
+/// The Chronicle is split into tabs so each page stays short on a phone.
+enum ChronicleTab: String, CaseIterable {
+    case deeds = "Deeds"
+    case records = "Records"
+    case champions = "Champions"
+    case titles = "Titles"
+}
+
 struct ChronicleView: View {
     let save: SaveData
     let onWear: (String) -> Void
     let onBack: () -> Void
     @State private var worn: String
+    @State private var tab: ChronicleTab = .deeds
 
     init(save: SaveData, onWear: @escaping (String) -> Void = { _ in }, onBack: @escaping () -> Void) {
         self.save = save
@@ -30,10 +39,18 @@ struct ChronicleView: View {
                     HeaderKickView(kick: wornName.map { "Your Legend · " + $0 } ?? "Your Legend", title: "The Chronicle")
                         .padding(.top, 12)
 
-                    statsCard
-                    hallCard
-                    championsCard
-                    achievementsCard
+                    tabBar
+
+                    switch tab {
+                    case .deeds:
+                        statsCard
+                    case .records:
+                        hallCard
+                    case .champions:
+                        championsCard
+                    case .titles:
+                        achievementsCard
+                    }
 
                     PillButton(title: "Back", isPrimary: true, action: onBack)
                         .padding(.vertical, 8)
@@ -41,6 +58,26 @@ struct ChronicleView: View {
                 .padding(.horizontal, 20)
                 .frame(maxWidth: 640)
                 .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private var tabBar: some View {
+        HStack(spacing: 6) {
+            ForEach(ChronicleTab.allCases, id: \.rawValue) { t in
+                Button(action: { tab = t }) {
+                    Text(L10n.t(t.rawValue).uppercased())
+                        .font(.system(size: 10, weight: .bold))
+                        .tracking(1.5)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .foregroundColor(tab == t ? UITheme.bgNearBlack : UITheme.textCream)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity)
+                        .background(Capsule().fill(tab == t ? UITheme.textGold : UITheme.bgCard))
+                        .overlay(Capsule().stroke(UITheme.borderCream.opacity(0.4), lineWidth: 1))
+                }
+                .buttonStyle(DriftButtonStyle())
             }
         }
     }

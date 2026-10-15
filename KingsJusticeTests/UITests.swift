@@ -137,6 +137,16 @@ final class UITests: XCTestCase {
         _ = IntroView(onDone: {})
     }
 
+    func testChronicleTabsAreFewAndShort() {
+        XCTAssertEqual(ChronicleTab.allCases.count, 4)
+        for t in ChronicleTab.allCases { XCTAssertLessThanOrEqual(t.rawValue.count, 10, t.rawValue) }
+        _ = ChronicleView(save: SaveData(), onBack: {})
+    }
+
+    func testShopBuildsWithTheArmoury() {
+        _ = ShopView(engine: GameEngine(), onBack: {})
+    }
+
     func testMetronomePulsePeaksOnTheBeat() {
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.0), 1.0, accuracy: 1e-9)
         XCTAssertEqual(TrainingGuide.metronomePulse(phase: 0.5), 0.0, accuracy: 1e-9)
