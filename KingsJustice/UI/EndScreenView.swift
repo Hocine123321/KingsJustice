@@ -137,6 +137,22 @@ struct EndScreenView<Engine: UIEngine>: View {
         }
     }
 
+    private func hallBadge(_ r: FightResult) -> some View {
+        Group {
+            if r.recordRank >= 1 && !r.newBest {
+                Text("HALL OF RECORDS · #\(r.recordRank)")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(2.5)
+                    .foregroundColor(UITheme.textCream)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(UITheme.textCream.opacity(0.6), lineWidth: 1))
+                    .opacity(shown ? 1.0 : 0.0)
+                    .animation(.easeOut(duration: 0.4).delay(1.25), value: shown)
+            }
+        }
+    }
+
     private func comboRecordBadge(_ r: FightResult) -> some View {
         Group {
             if r.comboRecord {
@@ -300,6 +316,7 @@ struct EndScreenView<Engine: UIEngine>: View {
             bestBadge(r)
             flawlessBadge(r)
             comboRecordBadge(r)
+            hallBadge(r)
             unlockBanner(r)
             boonRecap()
             statsCard(r, compact: false)
@@ -320,6 +337,7 @@ struct EndScreenView<Engine: UIEngine>: View {
                 bestBadge(r)
                 flawlessBadge(r)
                 comboRecordBadge(r)
+                hallBadge(r)
                 unlockBanner(r)
                 boonRecap()
                 tipLine(r)

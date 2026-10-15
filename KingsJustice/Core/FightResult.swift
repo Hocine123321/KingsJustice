@@ -44,6 +44,8 @@ struct FightResult: Equatable, Sendable {
     var unlocks: [String] = []
     /// This fight beat the player's earlier best combo.
     var comboRecord: Bool = false
+    /// Place (1 to 5) this finished Survival or Boss Rush run took in the Hall of Records, or 0 if it did not make it.
+    var recordRank: Int = 0
 
     /// Timing accuracy as a whole percent: Perfect counts double, Miss counts zero.
     var accuracyPercent: Int {

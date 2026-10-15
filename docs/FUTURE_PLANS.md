@@ -32,6 +32,7 @@ Update the status boxes as work lands. Never delete an idea; move it to "Done" o
 - [x] Polished menu cards: spring press animation, pulsing accent glow, vector emblem per main mode (crossed blades for Trial by Combat, rising waves for Survival). Extras stay compact rows. Glow pulse is skipped under system Reduce Motion
 - [x] Smooth screen transitions (fade) instead of hard cuts
 - [x] Lifetime stats and records: fights won and win rate, timing accuracy, best combo and S ranks in the Chronicle, a won/lost record under every champion, a "New best combo" badge on the result screen, and two new achievements with titles (Veteran at 25 fights, Deadeye at five S ranks). The Training Yard never counts
+- [x] Hall of Records (Chronicle): your best five Survival runs, best five Boss Rush runs and top three Daily Challenge scores, plus a "Hall of Records #n" badge on the result screen when a finished run makes the list (a new personal best keeps its own label). Boss waves were already flagged in the fight intro, mode label and boon screen, so no extra banner was added
 - [x] Short first-launch intro / story hook: three text cards after the title screen on the very first launch only (tap or wait, Skip any time) (the old "Watch Cinematic" button was a dead end and was removed; bring it back only with a real cinematic)
 
 ### 2. Fight presentation

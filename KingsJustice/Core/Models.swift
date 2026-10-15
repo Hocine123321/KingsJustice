@@ -207,6 +207,8 @@ struct SaveData: Codable, Equatable {
     var sRanks: Int = 0
     var champWins: [String: Int] = [:]   // by champion id
     var champLosses: [String: Int] = [:]
+    var topSurvival: [Int] = []   // best five Survival runs (waves survived), highest first
+    var topRush: [Int] = []   // best five Boss Rush runs (champions cleared), highest first
 
     init() {}
 
@@ -241,6 +243,8 @@ struct SaveData: Codable, Equatable {
         self.sRanks = try c.decodeIfPresent(Int.self, forKey: .sRanks) ?? 0
         self.champWins = try c.decodeIfPresent([String: Int].self, forKey: .champWins) ?? [:]
         self.champLosses = try c.decodeIfPresent([String: Int].self, forKey: .champLosses) ?? [:]
+        self.topSurvival = try c.decodeIfPresent([Int].self, forKey: .topSurvival) ?? []
+        self.topRush = try c.decodeIfPresent([Int].self, forKey: .topRush) ?? []
     }
 }
 

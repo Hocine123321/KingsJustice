@@ -341,6 +341,11 @@ extension GameEngine {
             res.bestLabel = "New daily best"
         }
         if !win { res.tip = FightResult.defeatTip(perfects: nP, goods: nG, misses: nM) }
+        if mode == "survival" && !win {
+            res.recordRank = HallOfRecords.insert(&save.topSurvival, value: wave) ?? 0
+        } else if mode == "rush" && (!win || finalVictory) {
+            res.recordRank = HallOfRecords.insert(&save.topRush, value: win ? enemyIdx + 1 : enemyIdx) ?? 0
+        }
         res.comboRecord = LifetimeStats.record(into: &save, enemyId: E.id, won: win, maxCombo: maxCombo, perfects: nP, goods: nG, misses: nM, rank: res.rankLetter, training: training)
         res.shareText = FightResult.shareLine(won: win, enemy: E.name, rank: res.rankLetter, score: score, combo: maxCombo, mode: mode, wave: wave, title: Achievements.wornTitle(save: save, rosterIds: GameData.roster.map { $0.id }))
         res.unlocks = FightResult.newUnlocks(gold: save.gold, hasDuelist: save.unlockedDuelist, hasBerserker: save.unlockedBerserker)

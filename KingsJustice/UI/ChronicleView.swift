@@ -31,6 +31,7 @@ struct ChronicleView: View {
                         .padding(.top, 12)
 
                     statsCard
+                    hallCard
                     championsCard
                     achievementsCard
 
@@ -82,6 +83,15 @@ struct ChronicleView: View {
             statRow("Best Boss Rush", save.bestRush > 0 ? "\(save.bestRush)" : "-")
             statRow("Longest Daily streak", save.bestDailyStreak > 0 ? "\(save.bestDailyStreak) days" : "-")
             statRow("Gold", "\(save.gold)")
+        }
+    }
+
+    private var hallCard: some View {
+        card("Hall of Records") {
+            statRow("Survival (waves)", save.topSurvival.isEmpty ? "-" : save.topSurvival.map { "\($0)" }.joined(separator: " · "))
+            statRow("Boss Rush (cleared)", save.topRush.isEmpty ? "-" : save.topRush.map { "\($0)" }.joined(separator: " · "))
+            let daily = HallOfRecords.topDaily(save.bestDaily)
+            statRow("Daily Challenge", daily.isEmpty ? "-" : daily.map { "\($0.score)" }.joined(separator: " · "))
         }
     }
 
