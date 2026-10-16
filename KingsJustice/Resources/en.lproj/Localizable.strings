@@ -5,6 +5,7 @@
 "A Medieval Duel" = "A Medieval Duel";
 "A brief screen flash when a hit lands. Turn it off if it bothers your eyes." = "A brief screen flash when a hit lands. Turn it off if it bothers your eyes.";
 "A violet ring needs Parry and Dodge together." = "A violet ring needs Parry and Dodge together.";
+"BEAT SYNC (EXPERIMENTAL)" = "BEAT SYNC (EXPERIMENTAL)";
 "BEST COMBO" = "BEST COMBO";
 "BOSS WAVE" = "BOSS WAVE";
 "BUY" = "BUY";
@@ -59,6 +60,7 @@
 "Iron Bark" = "Iron Bark";
 "Jump" = "Jump";
 "LEFT-HAND LAYOUT" = "LEFT-HAND LAYOUT";
+"Locks the music to the notes and the fight's tempo. Off keeps the classic feel." = "Locks the music to the notes and the fight's tempo. Off keeps the classic feel.";
 "MISSED" = "MISSED";
 "MOVE LIST" = "MOVE LIST";
 "MUSIC VOLUME" = "MUSIC VOLUME";

@@ -53,6 +53,14 @@ enum UIAudio {
     }
 
     /// Updates dynamic music intensity (0.0 to 1.0) for combat layering.
+    static func setMusicBPM(_ bpm: Double) {
+        AudioEngine.shared.setMusicBPM(bpm)
+    }
+
+    static func alignMusicBeat(in delay: Double) {
+        AudioEngine.shared.alignMusicBeat(in: delay)
+    }
+
     static func setMusicIntensity(_ intensity: Double) {
         AudioEngine.shared.setMusicIntensity(intensity)
     }

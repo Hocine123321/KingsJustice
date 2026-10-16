@@ -337,6 +337,22 @@ final class AudioEngine {
         musicBPM = max(30.0, min(240.0, bpm))
     }
 
+    /// Nudges the music grid so an on-beat step lands `delay` seconds from now. Small errors are ignored so the music never stutters.
+    func alignMusicBeat(in delay: Double) {
+        musicQueue.async { [weak self] in
+            guard let self = self, self.isMusicPlaying, !self.isMenuMusicMode else { return }
+            let now = CACurrentMediaTime()
+            let beat = 60.0 / self.musicBPM
+            var onBeat = self.nextBeatTime
+            if self.musicStepIndex % 2 != 0 { onBeat += beat / 2.0 }
+            let desired = now + max(0.0, delay)
+            var err = (desired - onBeat).truncatingRemainder(dividingBy: beat)
+            if err > beat / 2.0 { err -= beat } else if err < -beat / 2.0 { err += beat }
+            if abs(err) < 0.03 { return }
+            self.nextBeatTime += err
+        }
+    }
+
     func setMusicIntensity(_ v: Double) {
         musicIntensity = max(0.0, min(1.0, v))
     }

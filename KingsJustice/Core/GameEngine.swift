@@ -58,6 +58,10 @@ final class GameEngine: ObservableObject {
     var hitBarkCount: Int = 0
     var lowHealthBarked: Bool = false
     var musicIntensityTick: Double = 0.0
+    /// Beats elapsed this fight, counted continuously (see BeatClock). Only used when Beat Sync is on.
+    var beatPos: Double = 0.0
+    /// The engine time the most recently built round starts from (its first beat).
+    var roundBase: Double = 0.0
     @Published var started: Bool = false
     @Published var on: Bool = false
 
@@ -162,6 +166,7 @@ final class GameEngine: ObservableObject {
                     started = true
                     let B = 60.0 / bpm
                     t = -B * 2.5
+                    beatPos = -2.5
                     startRound2()
                 }
             }
@@ -199,6 +204,7 @@ final class GameEngine: ObservableObject {
         }
 
         t += dtFrame
+        beatPos = BeatClock.advance(beatPos: beatPos, dt: dtFrame, bpm: bpm)
 
         let B = 60.0 / bpm
         let W = currentWindows()
@@ -288,6 +294,7 @@ final class GameEngine: ObservableObject {
         }
         if musicIntensityTick > 0.5 {
             musicIntensityTick = 0.0
+            if settings.beatSync { UIAudio.setMusicBPM(bpm) }
             UIAudio.setMusicIntensity(adaptiveIntensity(woundFraction: frac, phasesReached: activePhases.count))
         }
         musicIntensityTick += dt

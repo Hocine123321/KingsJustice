@@ -8,9 +8,10 @@ enum SettingsHints {
     static let leftHand = "Swaps the two button clusters for left-handed play."
     static let assist = "Widens YOUR timing windows by 25%. Enemies are not changed."
     static let reduceMotion = "Calms screen shake and camera zoom."
+    static let beatSync = "Locks the music to the notes and the fight's tempo. Off keeps the classic feel."
     static let colorSafe = "Uses colour-blind friendly ring colours."
 
-    static var all: [String] { [flash, guide, haptics, leftHand, assist, reduceMotion, colorSafe] }
+    static var all: [String] { [flash, guide, haptics, leftHand, assist, reduceMotion, colorSafe, beatSync] }
 }
 
 struct SettingsView<Engine: UIEngine>: View {
@@ -168,6 +169,11 @@ struct SettingsView<Engine: UIEngine>: View {
                         toggleRow(label: "TIMING ASSIST (WIDER WINDOWS)", hint: SettingsHints.assist, isOn: Binding(
                             get: { engine.settings.assist },
                             set: { engine.settings.assist = $0; engine.saveAll() }
+                        ))
+
+                        toggleRow(label: "BEAT SYNC (EXPERIMENTAL)", hint: SettingsHints.beatSync, isOn: Binding(
+                            get: { engine.settings.beatSync },
+                            set: { engine.settings.beatSync = $0; engine.saveAll() }
                         ))
 
                         toggleRow(label: "REDUCE MOTION", hint: SettingsHints.reduceMotion, isOn: Binding(

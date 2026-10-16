@@ -83,7 +83,7 @@ final class UITests: XCTestCase {
     }
 
     func testSettingsHintsStayShortAndAssistSaysEnemiesAreUnchanged() {
-        XCTAssertEqual(SettingsHints.all.count, 7)
+        XCTAssertEqual(SettingsHints.all.count, 8)
         for h in SettingsHints.all {
             XCTAssertFalse(h.isEmpty)
             XCTAssertLessThanOrEqual(h.count, 80, h)

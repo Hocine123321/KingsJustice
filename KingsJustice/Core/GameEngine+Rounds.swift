@@ -64,7 +64,16 @@ extension GameEngine {
         }
 
         let lead = (type == .attack) ? 1.0 : 0.0
-        let base = ceil((t + 0.15) / B) * B + lead * B
+        let base: Double
+        if settings.beatSync {
+            // Beat Sync: start the round on a whole beat of the continuous beat clock, and nudge the music onto the same beat.
+            let toBeat = BeatClock.secondsToBeat(beatPos: beatPos, bpm: bpm, minGapBeats: 0.15 / B)
+            base = t + toBeat + lead * B
+            UIAudio.alignMusicBeat(in: toBeat)
+        } else {
+            base = ceil((t + 0.15) / B) * B + lead * B
+        }
+        roundBase = base
 
         var evs: [NoteEvent] = []
         var gid = 0

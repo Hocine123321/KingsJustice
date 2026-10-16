@@ -15,7 +15,7 @@ LITERAL = r'"([^"\\]{2,})"'
 PATTERNS = [
     re.compile(r'Text\(' + LITERAL + r'\)'),
     re.compile(r'\b(?:title|kick|label|description|desc|specialText|badgeText|hint|how|name|subtitle):\s*' + LITERAL),
-    re.compile(r'static let (?:flash|guide|haptics|leftHand|assist|reduceMotion|colorSafe) = ' + LITERAL),
+    re.compile(r'static let (?:flash|guide|haptics|leftHand|assist|reduceMotion|colorSafe|beatSync) = ' + LITERAL),
 ]
 
 

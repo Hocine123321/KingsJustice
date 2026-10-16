@@ -121,7 +121,8 @@ extension GameEngine {
         let introLine = Dialogue.line(.intro, enemyId: E.id, seed: Int(hashStr(E.id)) &+ index) ?? E.intro
         taunt(introLine)
         if let arena = GameData.arenas[E.arena] {
-            UIAudio.startArenaMusic(root: arena.music.root, scale: arena.music.scale, bpm: arena.music.tempo, theme: arena.key)
+            let musicTempo = settings.beatSync ? E.bpm * difficultyParams(settings.difficulty).tempo : arena.music.tempo
+            UIAudio.startArenaMusic(root: arena.music.root, scale: arena.music.scale, bpm: musicTempo, theme: arena.key)
             UIAudio.startArenaAmbience(arena: arena.key)
         }
         promptText = E.name
