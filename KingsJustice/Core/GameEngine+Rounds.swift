@@ -33,8 +33,7 @@ extension GameEngine {
 
     func lenFactor() -> Double {
         let idx = (mode == "duel" || mode == "rush" || mode == "weekly") ? rosterPosition : min(5, wave)
-        let table = [1.0, 0.9, 0.8, 0.7, 0.6, 0.52, 0.42]
-        return table[min(6, idx)]
+        return PaceGovernor.lenTable[min(6, idx)] * PaceGovernor.boost(seconds: t)
     }
 
     func earlyEase() -> Double {

@@ -8,6 +8,8 @@ Checklist below: 65 items done, 16 open. Latest CI build is green (lint, unit te
 
 ### What is still open, grouped by what it needs
 **Needs an owner decision (balance and design sign-off)**
+- Music and the beat: the music runs at the arena's tempo, not the fight's, and the engine re-anchors the beat grid every round. Locking them together needs a continuous beat clock. Worth doing, but timing-critical (details in docs/BALANCE_AUDIT.md)
+- Distinct phase behaviour per champion (today a phase is a tempo bump plus later patterns; the pool names are unused) and whether maps should change how you fight
 - Armoury prices (120 to 320 gold, all in `Armoury.all`): too cheap, too dear? And should style unlocks (200 and 500 gold) count gold earned instead of gold held, so buying tonics or liveries cannot delay them?
 - New cosmetic silhouettes (helm, cape and weapon swaps) per style. Colour liveries are done; changing shapes needs art sign-off
 - Per-champion signature mechanics (the current tells are shared by all seven)
@@ -61,6 +63,7 @@ Checklist below: 65 items done, 16 open. Latest CI build is green (lint, unit te
 - [x] Smooth screen transitions (fade) instead of hard cuts
 - [x] Lifetime stats and records: fights won and win rate, timing accuracy, best combo and S ranks in the Chronicle, a won/lost record under every champion, a "New best combo" badge on the result screen, and two new achievements with titles (Veteran at 25 fights, Deadeye at five S ranks). The Training Yard never counts
 - [x] Guided practice in the Training Yard: pick Guided practice in the Move List and it walks through Parry, Duck, Jump, Dodge and Grab, four clean (Perfect or Good) answers each, with live progress in the HUD label. A scraped late answer does not count. It builds on the drills, so enemy AI and timing windows are untouched. A fully scripted tutorial inside How to Play is still open
+- [x] Pacing pass, measured by simulation (see docs/BALANCE_AUDIT.md): typical-player fight length now spans 52 to 59 s across all seven champions (was 51 to 66), and a player-only "second wind" trims fights that drag past 75 s
 - [x] Weekly Gauntlet (new extra mode): three seeded champions on one health bar, new every Monday (UTC), never the King, easiest first, with a weekly twist from the Daily Challenge list (Marathon health, Tempo, and so on). The twist's score multiplier is applied once when the run ends, and your best score per week is kept and shown in the menu badge and the Chronicle's Records tab. Everyone gets the same gauntlet that week
 - [x] The Armoury: six gold-bought liveries (Emberforged, Frostbound, Greenwood, Royal Violet, Ashen Ghost, Gilded Dawn, 120 to 320 gold) in the shop, worn per fighting style and drawn on your fighter. Purely cosmetic: the helm, cape, weapon and every stat are untouched, and tests prove it. A hand-edited save cannot wear a livery it does not own
 - [x] Chronicle overhaul: four tabs (Deeds, Records, Champions, Titles) instead of one long scroll, so each page is short on a small phone
