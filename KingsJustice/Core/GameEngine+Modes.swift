@@ -23,7 +23,7 @@ extension GameEngine {
         } else if mode == "rush" {
             self.rushList = Array(0..<GameData.roster.count)
             beginFight(index: 0)
-        } else if mode == "daily" {
+        } else if mode == "daily" || mode == "weekly" {
             beginFight(index: 0)
         } else {
             // "duel"
@@ -93,13 +93,26 @@ extension GameEngine {
             self.nM = 0
         }
 
-        let seed: UInt32 = (mode == "daily") ? hashStr(todayDateString()) : UInt32(Int(Date().timeIntervalSince1970 * 1000) & 0xFFFFFF)
+        let seed: UInt32
+        if mode == "daily" {
+            seed = hashStr(todayDateString())
+        } else if mode == "weekly" {
+            seed = hashStr(currentWeekKey + "#\(index)")
+        } else {
+            seed = UInt32(Int(Date().timeIntervalSince1970 * 1000) & 0xFFFFFF)
+        }
         self.rng = MulberryRNG(seed: seed)
         self.bpm = E.bpm
 
         prepareTonicsForFight()
 
-        self.dailyMod = (mode == "daily") ? DailyModifiers.forDate(todayDateString()) : DailyModifiers.steady
+        if mode == "daily" {
+            self.dailyMod = DailyModifiers.forDate(todayDateString())
+        } else if mode == "weekly" {
+            self.dailyMod = WeeklyGauntlet.modifier(week: currentWeekKey)
+        } else {
+            self.dailyMod = DailyModifiers.steady
+        }
         if dailyMod.id == "onechance" { self.windUsed = true }
 
         playerPoseState = PoseState(values: EnginePoses.kIdle)
@@ -156,6 +169,10 @@ extension GameEngine {
                 phases: base.phases,
                 reward: base.reward
             )
+        }
+
+        if mode == "weekly" {
+            return WeeklyGauntlet.enemy(slot: idx, week: currentWeekKey)
         }
 
         if mode == "daily" {
@@ -280,7 +297,19 @@ extension GameEngine {
         let prevBestRush = save.bestRush
         let rosterCount = GameData.roster.count
         // Beating the last champion ends a Trial by Combat or a Boss Rush.
-        let finalVictory = win && (mode == "duel" || mode == "rush") && (enemyIdx + 1 >= rosterCount)
+        let rosterFinal = (mode == "duel" || mode == "rush") && (enemyIdx + 1 >= rosterCount)
+        let weeklyFinal = (mode == "weekly") && (enemyIdx + 1 >= WeeklyGauntlet.length)
+        let finalVictory = win && (rosterFinal || weeklyFinal)
+        var weeklyNewBest = false
+        if mode == "weekly" {
+            let outcome = WeeklyGauntlet.finishRun(save: &save, week: currentWeekKey, score: score, won: win, finalVictory: finalVictory)
+            if win && !finalVictory {
+                // Mid-run: the score carries on to the next champion untouched.
+            } else {
+                score = outcome.score
+                weeklyNewBest = outcome.newBest
+            }
+        }
         var gauntletBonus = 0
         if mode == "rush" {
             let cleared = win ? enemyIdx + 1 : enemyIdx
@@ -341,6 +370,9 @@ extension GameEngine {
         } else if mode == "daily" && score > prevDaily {
             res.newBest = true
             res.bestLabel = "New daily best"
+        } else if weeklyNewBest {
+            res.newBest = true
+            res.bestLabel = "New weekly best"
         }
         if !win { res.tip = FightResult.defeatTip(perfects: nP, goods: nG, misses: nM) }
         if mode == "survival" && !win {

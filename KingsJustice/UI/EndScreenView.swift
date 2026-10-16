@@ -46,7 +46,9 @@ struct EndScreenView<Engine: UIEngine>: View {
     }
 
     private var subtitleText: String {
-        if engine.won && engine.fightResult.finalVictory { return "The Realm Is Yours" }
+        if engine.won && engine.fightResult.finalVictory {
+            return engine.mode == "weekly" ? "The Weekly Gauntlet Is Cleared" : "The Realm Is Yours"
+        }
         return engine.won ? "Trial by Combat Won" : "You Have Been Judged"
     }
 

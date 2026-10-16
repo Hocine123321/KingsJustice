@@ -32,13 +32,13 @@ extension GameEngine {
     }
 
     func lenFactor() -> Double {
-        let idx = (mode == "duel" || mode == "rush") ? enemyIdx : min(5, wave)
+        let idx = (mode == "duel" || mode == "rush" || mode == "weekly") ? rosterPosition : min(5, wave)
         let table = [1.0, 0.9, 0.8, 0.7, 0.6, 0.52, 0.42]
         return table[min(6, idx)]
     }
 
     func earlyEase() -> Double {
-        let idx = (mode == "duel" || mode == "rush") ? enemyIdx : min(4, wave)
+        let idx = (mode == "duel" || mode == "rush" || mode == "weekly") ? rosterPosition : min(4, wave)
         let table = [0.6, 0.68, 0.74, 0.8, 0.85, 0.9, 0.92]
         return table[min(6, idx)]
     }
@@ -60,7 +60,7 @@ extension GameEngine {
         if round < 2 {
             idx = min(idx, 1)
         }
-        if round < 2 && (mode == "duel" || mode == "rush") && enemyIdx > 0 {
+        if round < 2 && (mode == "duel" || mode == "rush" || mode == "weekly") && enemyIdx > 0 {
             idx = min(idx, 2)
         }
 

@@ -129,6 +129,8 @@ struct ChronicleView: View {
             statRow("Boss Rush (cleared)", save.topRush.isEmpty ? "-" : save.topRush.map { "\($0)" }.joined(separator: " · "))
             let daily = HallOfRecords.topDaily(save.bestDaily)
             statRow("Daily Challenge", daily.isEmpty ? "-" : daily.map { "\($0.score)" }.joined(separator: " · "))
+            let weekly = HallOfRecords.topDaily(save.bestWeekly)
+            statRow("Weekly Gauntlet", weekly.isEmpty ? "-" : weekly.map { "\($0.score)" }.joined(separator: " · "))
         }
     }
 

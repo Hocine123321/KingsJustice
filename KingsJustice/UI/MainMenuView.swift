@@ -29,6 +29,7 @@ enum MenuModeCatalog {
     static let extras: [MenuModeEntry] = [
         MenuModeEntry(id: "rush", name: "Boss Rush", desc: "Every champion back to back. One health bar."),
         MenuModeEntry(id: "daily", name: "Daily Challenge", desc: "One seeded fight per day. Beat your best."),
+        MenuModeEntry(id: "weekly", name: "Weekly Gauntlet", desc: "Three seeded champions, one health bar, one twist. New every Monday."),
         MenuModeEntry(id: "training", name: "Training Yard", desc: "No damage dealt or taken. Practice every move.")
     ]
 }
@@ -111,12 +112,31 @@ struct MainMenuView<Engine: UIEngine>: View {
         return formatter.string(from: Date())
     }
     
+    private var weekKey: String {
+        return WeeklyGauntlet.weekKey(for: todayString) ?? todayString
+    }
+
+    private func extraDetail(_ mode: MenuModeEntry) -> String {
+        if mode.id == "daily" {
+            let m = DailyModifiers.forDate(todayString)
+            return "Today: \(m.name). \(m.desc)"
+        }
+        if mode.id == "weekly" {
+            let m = WeeklyGauntlet.modifier(week: weekKey)
+            return "This week: \(m.name). \(m.desc)"
+        }
+        return mode.desc
+    }
+
     private func badgeForMode(_ id: String) -> String? {
         if id == "survival", engine.save.bestSurvival > 0 {
             return "BEST \(engine.save.bestSurvival) WAVES"
         }
         if id == "rush", engine.save.bestRush > 0 {
             return "BEST \(engine.save.bestRush)/\(GameData.roster.count)"
+        }
+        if id == "weekly", let best = engine.save.bestWeekly[weekKey], best > 0 {
+            return "BEST \(best)"
         }
         if id == "daily" {
             var parts: [String] = []
@@ -173,7 +193,7 @@ struct MainMenuView<Engine: UIEngine>: View {
                         ForEach(MenuModeCatalog.extras, id: \.id) { mode in
                             ExtraModeRow(
                                 title: mode.name,
-                                detail: mode.id == "daily" ? "Today: \(DailyModifiers.forDate(todayString).name). \(DailyModifiers.forDate(todayString).desc)" : mode.desc,
+                                detail: extraDetail(mode),
                                 badge: badgeForMode(mode.id),
                                 action: { onSelectMode(mode.id) }
                             )

@@ -254,6 +254,8 @@ struct RootView: View {
             }
         } else if engine.won && engine.mode == "rush" && engine.enemyIdx + 1 < count {
             engine.beginFight(index: engine.enemyIdx + 1, keepHp: true)
+        } else if engine.won && engine.mode == "weekly" && engine.enemyIdx + 1 < WeeklyGauntlet.length {
+            engine.beginFight(index: engine.enemyIdx + 1, keepHp: true)
         } else {
             leaveFight()
         }

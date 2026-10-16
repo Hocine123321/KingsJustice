@@ -19,7 +19,7 @@ final class UITests: XCTestCase {
 
     func testMenuHasTwoMainModesAndThreeExtras() {
         XCTAssertEqual(MenuModeCatalog.main.map { $0.id }, ["duel", "survival"])
-        XCTAssertEqual(MenuModeCatalog.extras.map { $0.id }, ["rush", "daily", "training"])
+        XCTAssertEqual(MenuModeCatalog.extras.map { $0.id }, ["rush", "daily", "weekly", "training"])
     }
 
     func testOnlyMainModesGetCardArt() {
