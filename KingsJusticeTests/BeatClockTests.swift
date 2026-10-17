@@ -16,7 +16,7 @@ final class BeatClockTests: XCTestCase {
             while p < 20.0 {
                 let d = BeatClock.secondsToBeat(beatPos: p, bpm: bpm, minGapBeats: 0.15 / (60.0 / bpm))
                 XCTAssertGreaterThanOrEqual(d, 0.0)
-                XCTAssertLessThanOrEqual(d, (60.0 / bpm) * 1.16 + 1e-9, "never waits more than a beat plus the gap")
+                XCTAssertLessThanOrEqual(d, (60.0 / bpm) + 0.15 + 1e-9, "never waits more than one beat plus the 0.15 s gap")
                 let landed = p + d * bpm / 60.0
                 XCTAssertEqual(landed, landed.rounded(), accuracy: 1e-9, "lands on a whole beat at \(bpm) BPM, pos \(p)")
                 p += 0.137
