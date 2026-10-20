@@ -24,6 +24,29 @@ The casual win counts at the end are small samples (four fights each), so read t
 1. **First champion pacing.** Each strike on the Hollow Conscript now removes 12% more of its health (table value 1.0 to 1.12). Its slow tempo (80 BPM) made it the longest fight in the game for a typical player, in the very first fight a new player sees.
 2. **Second wind.** After 75 seconds, the player's own strikes grow stronger, a little more each second, up to +50%. Typical fights never reach it. It only trims long fights for casual players. It changes only how hard you hit: enemy behaviour, enemy damage and timing windows are untouched, in line with the rule that nothing should make the enemy AI easier. To switch it off, set `PaceGovernor.maxBoost` to 0.
 
+## Second pass: the champions' AI settings were dead data
+
+Every champion has an AI definition (`aggression`, `parryChance`, `feintChance`, `comboLength`, and a `special` such as flame or frostbite).
+**None of it was read by the engine.** The only reference was a no-op line (`value != nil ? 1.0 : 1.0`). Champions differed only by their patterns, health, tempo and move set.
+Every champion's patterns also already contain that champion's signature move (for example exactly one ranged shot in every Frost Warden pattern), so steering a phase toward "signature patterns" would change almost nothing. Distinct phases need new authored patterns, which is a design job for you.
+
+**What changed:** `aggression` now drives a "pressure" mechanic. After a defend round, a champion with aggression above 0.55 may press a second defend round straight away, skipping your strike round. You see a "No opening!" cue. The chance is 0 for the first three champions and rises to 4% (Marsh Hag), 8% (Executioner), 12% (Bishop) and 16% (King), plus 4% per active phase, and never in the first four rounds or in the Training Yard. It only makes champions more relentless.
+
+Simulation at the three skill levels (seconds, wins out of 4, average player health left on a win):
+
+| Champion | Typical, pacing only | Typical, with pressure | Casual, pacing only | Casual, with pressure |
+|---|---|---|---|---|
+| Hollow Conscript | 58 s (4) hp 93 | 57 s (4) hp 93 | 87 s (4) | 88 s (4) |
+| Pyre Marauder | 59 s (4) hp 77 | 58 s (4) hp 79 | 79 s (4) | 78 s (4) |
+| Frost Warden | 56 s (4) hp 96 | 56 s (4) hp 96 | 82 s (4) | 79 s (4) |
+| Marsh Hag Knight | 59 s (4) hp 86 | 55 s (4) hp 77 | 68 s (2) | 70 s (3) |
+| Crimson Executioner | 52 s (4) hp 80 | 50 s (4) hp 78 | 63 s (4) | 63 s (4) |
+| Bishop of Ash | 57 s (4) hp 37 | 55 s (4) hp 53 | 48 s (0) | 51 s (0) |
+| The King | 54 s (4) hp 42 | 55 s (3) hp 37 | 46 s (1) | 45 s (0) |
+
+Fight length is unchanged (about 50 to 58 seconds for a typical player). The King is slightly harder, as a final boss should be (a typical player went from 4 wins to 3 in this small sample). Four fights per cell is a small sample, so treat single-cell changes as noise.
+The other champion settings (`parryChance`, `feintChance`, `comboLength`, `special`) are still unused, see the roadmap.
+
 ## Findings that need your call (nothing below was changed)
 
 - **The music does not follow the fight's tempo.** The music plays at the arena's own tempo (70 to 92 BPM) and never changes. The notes fall on the champion's tempo (80 to 112 BPM), which also creeps up by up to 10 BPM as the champion weakens and jumps at phase changes. `AudioEngine.setMusicBPM` exists but nothing calls it. The engine also re-anchors the beat grid at the start of every round, so there is no single global beat the music could lock to. A real fix is a continuous beat clock under all note scheduling. That is timing-critical, so I would only do it with you playtesting each step.

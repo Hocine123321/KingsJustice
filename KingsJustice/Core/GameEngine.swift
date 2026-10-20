@@ -62,6 +62,8 @@ final class GameEngine: ObservableObject {
     var beatPos: Double = 0.0
     /// The engine time the most recently built round starts from (its first beat).
     var roundBase: Double = 0.0
+    /// The champion just pressed: the round now starting follows a defend round with no strike round between.
+    var pressing: Bool = false
     @Published var started: Bool = false
     @Published var on: Bool = false
 

@@ -103,6 +103,7 @@ extension GameEngine {
         }
         self.rng = MulberryRNG(seed: seed)
         self.bpm = E.bpm
+        self.pressing = false
 
         prepareTonicsForFight()
 

@@ -177,6 +177,10 @@ extension GameEngine {
 
     func startRound2() {
         buildRound()
+        if pressing {
+            pressing = false
+            say("No opening!", col: "#ff8a6a")
+        }
         promptText = (roundType == .defend ? "Defend" : "Strike")
         if roundType == .attack {
             playerPoseState.setTarget(EnginePoses.kWind, speed: 6.0)
@@ -192,6 +196,14 @@ extension GameEngine {
         }
         updateHud()
         round += 1
+        if roundType == .defend && !training && round >= AggressionPressure.firstRound, let E = enemyDef {
+            let phasesActive = E.phases.filter { (khp / kmax) <= $0.at }.count
+            let p = AggressionPressure.chance(aggression: E.ai.aggression, phasesActive: phasesActive)
+            if p > 0.0 && rng.next() < p {
+                round += 1   // press: another defend round, no strike round in between
+                pressing = true
+            }
+        }
     }
 
     func maybePhase() {
