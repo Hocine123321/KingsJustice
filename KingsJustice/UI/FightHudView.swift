@@ -96,6 +96,7 @@ struct FightHudView<Engine: UIEngine>: View {
                     .overlay(Circle().stroke(UITheme.borderCream, lineWidth: 1))
             }
             .buttonStyle(DriftButtonStyle())
+            .accessibilityLabel("Pause")
 
             // Enemy HP
             VStack(alignment: .trailing, spacing: 2) {
