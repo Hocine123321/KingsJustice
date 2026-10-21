@@ -15,11 +15,18 @@ enum Atmosphere {
         }
     }
 
+    /// How thick each battlefield's mist is, from the fog opacity authored in the arena data (0.17 castle up to 0.28 marsh).
+    /// Normalised so the average across the six arenas stays about 1.0 and the overall fog level does not change.
+    static func fogDensity(for arenaKey: String) -> Double {
+        guard let op = GameData.arenas[arenaKey]?.light.fogOp else { return 1.0 }
+        return min(1.4, max(0.6, op / 0.22))
+    }
+
     /// Low drifting mist bands. Cheap: gradient fills only, no blur filters.
     static func drawFog(in context: GraphicsContext, arenaKey: String, time: Double, strength: Double) {
         let col = fogColor(for: arenaKey)
         let grad = Gradient(stops: [
-            Gradient.Stop(color: col.opacity(0.16 * strength), location: 0.0),
+            Gradient.Stop(color: col.opacity(0.16 * strength * fogDensity(for: arenaKey)), location: 0.0),
             Gradient.Stop(color: col.opacity(0.0), location: 1.0)
         ])
         for k in 0..<3 {

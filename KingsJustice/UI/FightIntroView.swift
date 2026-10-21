@@ -84,6 +84,19 @@ struct FightIntroView<Engine: UIEngine>: View {
                     Text(engine.enemyTitle)
                         .font(.system(size: 14, weight: .regular, design: .serif).italic())
                         .foregroundColor(UITheme.textGold)
+                    if let field = engine as? BattlefieldProviding, !field.battlefieldName.isEmpty {
+                        VStack(spacing: 2) {
+                            Text(field.battlefieldName.uppercased())
+                                .font(.system(size: 10, weight: .bold))
+                                .tracking(3.0)
+                                .foregroundColor(UITheme.textCream.opacity(0.85))
+                            Text(field.battlefieldSub)
+                                .font(.system(size: 11, weight: .regular, design: .serif).italic())
+                                .foregroundColor(UITheme.textCream.opacity(0.65))
+                        }
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 4)
+                    }
                     Rectangle()
                         .fill(UITheme.textGold.opacity(0.8))
                         .frame(width: cardIn ? 220.0 : 0.0, height: 1)

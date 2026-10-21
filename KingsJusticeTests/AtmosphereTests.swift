@@ -72,4 +72,40 @@ final class AtmosphereTests: XCTestCase {
             XCTAssertEqual(Atmosphere.torchPoints(for: key).count, 2, key)
         }
     }
+
+    func testFogDensityFollowsTheAuthoredFogAndKeepsTheOverallLevel() {
+        let keys = ["castle", "village", "pass", "swamp", "cliff", "cathedral"]
+        var total = 0.0
+        for k in keys {
+            let d = Atmosphere.fogDensity(for: k)
+            XCTAssertTrue(d >= 0.6 && d <= 1.4, "\(k) \(d)")
+            total += d
+        }
+        XCTAssertEqual(total / Double(keys.count), 1.0, accuracy: 0.1, "the average fog level must not change")
+        XCTAssertGreaterThan(Atmosphere.fogDensity(for: "swamp"), Atmosphere.fogDensity(for: "cliff"))
+        XCTAssertGreaterThan(Atmosphere.fogDensity(for: "cliff"), Atmosphere.fogDensity(for: "village"))
+        XCTAssertLessThan(Atmosphere.fogDensity(for: "castle"), Atmosphere.fogDensity(for: "pass"))
+        XCTAssertEqual(Atmosphere.fogDensity(for: "nowhere"), 1.0)
+    }
+
+    func testEveryArenaHasANameAndSubtitleToShow() {
+        for (key, arena) in GameData.arenas {
+            XCTAssertFalse(arena.name.isEmpty, key)
+            XCTAssertFalse(arena.sub.isEmpty, key)
+            XCTAssertLessThanOrEqual(arena.sub.count, 60, "\(key) must fit one line on a phone")
+        }
+    }
+
+    @MainActor
+    func testTheEngineNamesTheBattlefieldOfTheCurrentFight() {
+        let e = GameEngine()
+        for i in 0..<GameData.roster.count {
+            e.startRun(mode: "duel", enemyIndex: i)
+            let arena = GameData.arenas[GameData.roster[i].arena]
+            XCTAssertEqual(e.battlefieldName, arena?.name)
+            XCTAssertEqual(e.battlefieldSub, arena?.sub)
+            XCTAssertFalse(e.battlefieldName.isEmpty)
+        }
+        UIAudio.stopMusic(fade: false)
+    }
 }

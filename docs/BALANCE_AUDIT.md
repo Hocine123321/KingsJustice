@@ -47,6 +47,18 @@ Simulation at the three skill levels (seconds, wins out of 4, average player hea
 Fight length is unchanged (about 50 to 58 seconds for a typical player). The King is slightly harder, as a final boss should be (a typical player went from 4 wins to 3 in this small sample). Four fights per cell is a small sample, so treat single-cell changes as noise.
 The other champion settings (`parryChance`, `feintChance`, `comboLength`, `special`) are still unused, see the roadmap.
 
+## Third pass: authored data nobody could see
+
+A scan of every data-definition struct for fields that no code reads found:
+
+| Struct | Unused fields | What happened |
+|---|---|---|
+| AIDef | parryChance, feintChance, comboLength, special | Still unused. Each would be a new mechanic, see the roadmap |
+| PhaseDef | newPatternPool | Still unused (the patterns already contain each signature move) |
+| ArenaDef | sub | **Now shown**: the fight intro card names the battlefield and its one-line description, for example "Drowned Marsh: Fog, rot and whispering reeds" |
+| ArenaLight | fogOp | **Now used**: each arena's mist thickness follows its authored value (marsh thickest at 0.28, castle thinnest at 0.17). Normalised so the average fog level is unchanged |
+| ArenaLight | ambient, fog (colour) | Still unused. The renderer keeps its own brighter fog colours, and I did not swap them blind |
+
 ## Findings that need your call (nothing below was changed)
 
 - **The music does not follow the fight's tempo.** The music plays at the arena's own tempo (70 to 92 BPM) and never changes. The notes fall on the champion's tempo (80 to 112 BPM), which also creeps up by up to 10 BPM as the champion weakens and jumps at phase changes. `AudioEngine.setMusicBPM` exists but nothing calls it. The engine also re-anchors the beat grid at the start of every round, so there is no single global beat the music could lock to. A real fix is a continuous beat clock under all note scheduling. That is timing-critical, so I would only do it with you playtesting each step.
