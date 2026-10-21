@@ -77,7 +77,8 @@ final class AggressionPressureTests: XCTestCase {
 
     func testThePressCueShowsOnceOnTheNextRoundAndClears() {
         let e = GameEngine()
-        e.startRun(mode: "duel", enemyIndex: 6)
+        // The first champion never presses, so the flag cannot be set again by this round's own roll.
+        e.startRun(mode: "duel", enemyIndex: 0)
         e.pressing = true
         e.round = 6
         e.startRound2()
